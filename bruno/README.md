@@ -3,7 +3,8 @@
 A [Bruno](https://www.usebruno.com) collection that drives the core bike-leasing process end to end
 against a **running** service. Domain endpoints trigger the business actions; the CIB seven
 `/engine-rest` API completes user tasks, fires timer jobs and reads the history, so the whole flow runs
-without real 14-day waits. CI runs the collection on every pull request.
+without real 14-day waits. CI runs the collection on every pull request. Run the commands from this
+folder.
 
 ```bash
 npx --yes @usebruno/cli@4.0.0 run . --env local -r
@@ -11,10 +12,10 @@ npx --yes @usebruno/cli@4.0.0 run . --env local -r
 
 | Folder | Scenario |
 |---|---|
-| `00-demo-data` | leaves four cases in demo-friendly states (no timer is fired): one waiting for the signature, one rejected by the credit check (low income), one parked on *Clarify alternative with customer*, one waiting for the handover |
+| `00-demo-data` | leaves four cases in demo-friendly states (no timer is fired): one waiting for the signature, one rejected by the credit check (low income), one parked on *Clarify alternative with customer*, one waiting for the handover. It also creates the Tasklist filter "All tasks" if it is missing |
 | `01-happy-path` | submit → sign the contract → bike ordered → report the handover → withdrawal period → active lease |
 | `02-signature-deadline` | the contract is not signed within 14 days and the application is rejected |
-| `03-not-solvent` | the `checkCreditRating` DMN rejects the applicant (under 18) |
+| `03-not-solvent` | the `checkCreditRating` DMN rejects the customer (under 18) |
 | `04-bike-unavailable` | the bike is out of stock, the customer picks an alternative via the domain endpoint, the alternative is ordered and the lease becomes active |
 | `05-alternative-declined` | the bike is out of stock and no alternative is found: the contract is revoked by compensation, a cancellation confirmation is sent, the application ends `CANCELLED`, no incident |
 | `06-alternative-via-tasklist` | the bike is out of stock and the alternative is chosen the way the Tasklist form does it |
@@ -22,11 +23,15 @@ npx --yes @usebruno/cli@4.0.0 run . --env local -r
 | `08-incident-demo` | the dealer is down for `BIKE-FAIL`: the order job runs out of retries and raises an incident |
 
 Run `00-demo-data` on its own to prepare a live demo (Cockpit and Tasklist at
-`http://localhost:8081/camunda`, admin/admin):
+`http://localhost:8081/camunda`, admin/admin). Without a filter the Tasklist shows "No filter
+available" and hides every task, so the last request creates the filter "All tasks" (owner `admin`)
+unless it exists. Running it again is safe:
 
 ```bash
 npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local
 ```
+
+To start again from an empty engine, follow "Demo data and reset" in the [README](../README.md).
 
 ## 📮 Start a case by hand
 
@@ -36,7 +41,7 @@ npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local
 { "customerName": "…", "email": "…", "age": 35, "monthlyNetIncome": 3500, "bikeId": "BIKE-900" }
 ```
 
-`age` and `monthlyNetIncome` feed the `checkCreditRating` DMN: applicants under 18 or over 99, or with
+`age` and `monthlyNetIncome` feed the `checkCreditRating` DMN: customers under 18 or over 99, or with
 less than 1500 a month, are not solvent. `bikeId` is the only bike attribute the request and the engine
 carry. Availability is decided by the `BikeDealerPort` outbound adapter, a simulated dealer with two demo
 ids: `BIKE-OOS` is out of stock (the bike-unavailable branch) and `BIKE-FAIL` makes the dealer call fail
