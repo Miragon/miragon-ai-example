@@ -47,9 +47,10 @@ With the service running, drive the REST scenarios end to end:
 cd bruno && npx --yes @usebruno/cli@4.0.0 run . --env local -r
 ```
 
-The happy path submits an application, signs the contract, and reports the handover; the other numbered
-folders cover escalation, abort, not-solvent, bike-unavailable, the incident demo, the list/inbox
-endpoints, a declined alternative and an invalid request. Confirm <http://localhost:8081/camunda> and
+`00-demo-data` leaves four cases in demo-friendly states; the happy path submits an application, signs
+the contract, and reports the handover; the other numbered folders cover the signature deadline,
+not-solvent, bike-unavailable, a declined alternative, the alternative via the Tasklist, an invalid
+request and the incident demo. Confirm <http://localhost:8081/camunda> and
 <http://localhost:8081/webapp> (both admin/admin), <http://localhost:8081/swagger-ui.html> and
 <http://localhost:8081/actuator/health> (status `UP`) all load.
 

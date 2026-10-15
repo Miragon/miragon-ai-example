@@ -10,18 +10,27 @@ Spring Boot — one complete, runnable, production-shaped BPMN service.
 
 ## 🚲 The scenario
 
-**MiraVelo** is a (fictional) bike brand that sells on a **leasing model**. This service automates a
-leasing application from the first request to an active lease — and deliberately walks through the
-**broad palette of BPMN elements you meet in real processes**, not just a happy-path service task:
+**MiraVelo** is a (fictional) bike brand that sells on a **leasing model**. This service automates the
+**core** of a leasing application, from the first request to an active lease: credit check, contract
+with a signature deadline, bike order with a clarification when the bike is out of stock, handover and
+withdrawal period. Along the way it uses the BPMN elements you meet in real processes, not just a
+happy-path service task:
 
 ![The bike-leasing process](docs/assets/bike-leasing.png)
 
-- **message start event**, **service tasks** (JavaDelegates) and a **DMN business-rule task**
-- **embedded sub-process** with an **event-based gateway** and a non-interrupting **reminder timer**
-- **parallel fork/join**, and a **user task with a Camunda Form** — completable in the Tasklist or via REST
-- **execution** and **task listeners**, wired as Spring beans like the delegates
-- **compensation / SAGA** handlers guarded by **error** and **escalation** boundary events
-- **call activity**, **message event sub-process** (withdrawal) and a **terminate end event**
+- **message start event**, **service tasks** (JavaDelegates) and a **DMN business-rule task** for the
+  credit check
+- an **event-based gateway** that races the customer's signature against a **14-day timer**
+- an **error boundary event** on the bike order and a **user task with a Camunda Form**, completable in
+  the Tasklist or via REST, that loops back to a re-order
+- a **compensation** handler that revokes the contract when no alternative bike is found
+- a **task listener**, wired as a Spring bean like the delegates, and a **retry cycle** that turns a
+  dealer outage into an incident
+
+The executable model is [`docs/use-cases/bike-leasing/process/bike-leasing.bpmn`](docs/use-cases/bike-leasing/process/bike-leasing.bpmn).
+The original, larger model (signature reminder, insurance policy, withdrawal, order cancellation) is
+kept for reference in [`docs/use-cases/bike-leasing/original/`](docs/use-cases/bike-leasing/original/);
+those capabilities come back as features.
 
 ## 🚀 Run it
 
@@ -73,9 +82,9 @@ Run them from the repo root. Postgres comes from `docker compose -f stack/docker
 src/main/kotlin/io/miragon/blueprint/   the service (one Gradle project at the repo root)
   adapter/inbound/rest        REST controllers + OpenAPI / problem-details config
   adapter/inbound/cibseven    JavaDelegates + listeners for the BPMN service tasks
-  adapter/outbound/cibseven   drives the engine (RuntimeService / TaskService) + task inbox
-  adapter/outbound/db         JPA persistence (leasing applications + bike portfolio)
-  adapter/outbound/…          simulated dealer / contract / insurance / notification adapters
+  adapter/outbound/cibseven   drives the engine (RuntimeService / TaskService)
+  adapter/outbound/db         JPA persistence (leasing applications)
+  adapter/outbound/…          simulated dealer / contract / notification adapters
   adapter/process             generated *ProcessApi (bpmn-to-code) + engine config
   application/{port,service}  use-case ports and their services
   domain/{leasing,bike}       pure domain model

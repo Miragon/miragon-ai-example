@@ -24,9 +24,9 @@ The service — a single Gradle project at the repo root:
 src/main/kotlin/io/miragon/blueprint/   the CIB seven bike-leasing service (hexagonal)
   adapter/inbound/rest        domain REST controllers + OpenAPI / problem-details config
   adapter/inbound/cibseven    JavaDelegates + listeners for the BPMN service tasks
-  adapter/outbound/cibseven   drives the engine (RuntimeService / TaskService) + task inbox
-  adapter/outbound/db         JPA persistence (leasing applications + bike portfolio)
-  adapter/outbound/…          simulated dealer / contract / insurance / notification adapters
+  adapter/outbound/cibseven   drives the engine (RuntimeService / TaskService)
+  adapter/outbound/db         JPA persistence (leasing applications)
+  adapter/outbound/…          simulated dealer / contract / notification adapters
   adapter/process             generated *ProcessApi (bpmn-to-code) + engine config
   application/{port,service}  use-case ports and their services
   domain/{leasing,bike}       pure domain model
@@ -40,7 +40,7 @@ docs/use-cases/bike-leasing/process/   the executable BPMN + DMN models; Gradle 
 Around it:
 
 ```
-bruno/                         REST scenarios (happy-path / escalation / abort / not-solvent / …)
+bruno/                         REST scenarios (demo data / happy path / signature deadline / not solvent / …)
 openapi/                       the checked-in, drift-gated OpenAPI contract (openapi.json)
 docs/                          Architecture Decision Records + diagrams
 stack/                         Postgres dev stack (docker compose)
@@ -100,14 +100,14 @@ Read `HexagonalArchitectureTest.kt` and `NamingConventionArchitectureTest.kt` be
 hard rules:
 
 - **One inbound port per controller.** `onlyFulfilOneUseCase` counts constructor params in
-  `application.port.inbound` and fails at >1. An inbox listing + a completion are two controllers.
+  `application.port.inbound` and fails at >1. A read and a completion are two controllers.
 - **No new top-level `config` package.** The containment rule ignores only *direct* members of the
-  root package, so `io.miragon.blueprint.config` would fail. Cross-cutting `@Configuration` (CORS,
-  OpenAPI, error handling) goes in `adapter.inbound.rest` — the `Configuration` suffix is whitelisted
+  root package, so `io.miragon.blueprint.config` would fail. Cross-cutting `@Configuration` (OpenAPI,
+  error handling) goes in `adapter.inbound.rest` — the `Configuration` suffix is whitelisted
   there.
 - **`adapter/process` is generated.** Never hand-edit `*ProcessApi` or the shared
-  `ServiceTasks`/`Messages`/`ProcessVariables`/`Errors`/`Escalations` files; edit the `.bpmn` and
-  regenerate.
+  `ServiceTasks`/`Messages`/`ProcessVariables`/`Errors` files (and `Escalations` once a model defines
+  one); edit the `.bpmn` and regenerate.
 - **Suffixes:** inbound port `UseCase|Query`; outbound `Port|Repository|Process`; service
   `Service|Configuration`; `adapter.inbound.rest` `Controller|Dto|Input|Mapper|Configuration`;
   `adapter.inbound.cibseven` `Delegate|Worker|Listener`; `adapter.outbound`
