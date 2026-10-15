@@ -14,6 +14,7 @@ import org.cibseven.bpm.engine.TaskService
 import org.cibseven.bpm.engine.runtime.MessageCorrelationBuilder
 import org.cibseven.bpm.engine.task.Task
 import org.cibseven.bpm.engine.task.TaskQuery
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -76,6 +77,23 @@ class LeasingProcessAdapterTest {
             )
         }
         confirmVerified(taskService)
+    }
+
+    @Test
+    fun `completeAlternativeClarification fails loudly when no clarification task is open`() {
+
+        // given: no open alternative-clarification task for the instance keyed by the application id
+        val query = mockk<TaskQuery>()
+        every { taskService.createTaskQuery() } returns query
+        every { query.processInstanceBusinessKey(any()) } returns query
+        every { query.taskDefinitionKey(any()) } returns query
+        every { query.singleResult() } returns null
+
+        // when / then: the completion is refused and no task is completed
+        assertThatThrownBy { underTest.completeAlternativeClarification(id, alternativeFound = false) }
+            .isInstanceOf(IllegalStateException::class.java)
+            .hasMessage("No open 'userTask_clarifyAlternative' task for business key ${id.value}")
+        verify(exactly = 0) { taskService.complete(any(), any()) }
     }
 
     @Test
