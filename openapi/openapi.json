@@ -22,11 +22,21 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "The id of the new leasing application",
             "content" : {
               "*/*" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/LeasingApplicationCreatedDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request, for example no income",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
                 }
               }
             }
@@ -47,8 +57,28 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK"
+          "202" : {
+            "description" : "Accepted: the process continues asynchronously"
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "The case is not waiting for a signature",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -66,8 +96,28 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK"
+          "202" : {
+            "description" : "Accepted: the process continues asynchronously"
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "The case is not waiting for the handover",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -95,8 +145,28 @@
           "required" : true
         },
         "responses" : {
-          "200" : {
-            "description" : "OK"
+          "202" : {
+            "description" : "Accepted: the task is completed, the process continues asynchronously"
+          },
+          "400" : {
+            "description" : "Invalid application id, or an accepted alternative without a bike id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Unknown application, or no open clarification task",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -115,7 +185,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "The leasing application",
             "content" : {
               "*/*" : {
                 "schema" : {
@@ -123,6 +193,19 @@
                 }
               }
             }
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Unknown application (no body)"
           }
         }
       }
@@ -212,6 +295,33 @@
           }
         },
         "required" : [ "age", "bikeId", "customerName", "email", "monthlyNetIncome" ]
+      },
+      "ProblemDetail" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "format" : "uri"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "detail" : {
+            "type" : "string"
+          },
+          "instance" : {
+            "type" : "string",
+            "format" : "uri"
+          },
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : { }
+          }
+        }
       }
     }
   }

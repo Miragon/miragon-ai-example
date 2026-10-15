@@ -6,6 +6,10 @@ import io.miragon.blueprint.application.port.inbound.SelectAlternativeUseCase
 import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.bike.BikeId
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,7 +27,35 @@ class SelectAlternativeController(
     private val useCase: SelectAlternativeUseCase,
 ) {
 
-    @Operation(operationId = "selectAlternative")
+    @Operation(
+        operationId = "selectAlternative",
+        responses = [
+            ApiResponse(
+                responseCode = "202",
+                description = "Accepted: the task is completed, the process continues asynchronously",
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid application id, or an accepted alternative without a bike id",
+                content = [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Unknown application, or no open clarification task",
+                content = [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    ),
+                ],
+            ),
+        ],
+    )
     @PostMapping("/{applicationId}/clarify-alternative")
     fun clarifyAlternative(
         @PathVariable applicationId: String,

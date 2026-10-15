@@ -7,7 +7,11 @@ import io.miragon.blueprint.domain.bike.BikeId
 import io.miragon.blueprint.domain.leasing.CustomerName
 import io.miragon.blueprint.domain.leasing.Email
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import mu.KotlinLogging
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -22,7 +26,22 @@ class SubmitLeasingRequestController(
 
     private val log = KotlinLogging.logger {}
 
-    @Operation(operationId = "submitLeasingRequest")
+    @Operation(
+        operationId = "submitLeasingRequest",
+        responses = [
+            ApiResponse(responseCode = "200", description = "The id of the new leasing application"),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid request, for example no income",
+                content = [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    ),
+                ],
+            ),
+        ],
+    )
     @PostMapping
     fun submit(@RequestBody input: LeasingRequestInput): ResponseEntity<LeasingApplicationCreatedDto> {
         log.debug { "Received leasing request: $input" }
