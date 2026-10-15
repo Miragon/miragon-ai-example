@@ -88,11 +88,6 @@ class LeasingProcessAdapterTest {
         assertCorrelation(Messages.MIRAVELO_HANDOVER_REPORTED.value) { underTest.correlateHandoverReported(id) }
     }
 
-    @Test
-    fun `correlateApplicationWithdrawn correlates the message by business key`() {
-        assertCorrelation(Messages.MIRAVELO_APPLICATION_WITHDRAWN.value) { underTest.correlateApplicationWithdrawn(id) }
-    }
-
     private fun assertCorrelation(expectedMessage: String, action: () -> Unit) {
 
         // given: a message-correlation builder chain

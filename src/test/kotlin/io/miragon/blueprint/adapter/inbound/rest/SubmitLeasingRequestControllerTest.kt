@@ -43,7 +43,6 @@ class SubmitLeasingRequestControllerTest {
                 "age" to 35,
                 "monthlyNetIncome" to 3500.0,
                 "bikeId" to "BIKE-900",
-                "bikeModel" to "Gravel Explorer 900",
             )
         val applicationId = ApplicationId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
         val expectedCommand =
@@ -53,7 +52,6 @@ class SubmitLeasingRequestControllerTest {
                 age = 35,
                 monthlyNetIncome = 3500.0,
                 bikeId = BikeId("BIKE-900"),
-                bikeModel = "Gravel Explorer 900",
             )
         every { useCase.submit(any()) } returns applicationId
         val operation =
@@ -72,7 +70,7 @@ class SubmitLeasingRequestControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["customerName", "email", "bikeId", "bikeModel"])
+    @ValueSource(strings = ["customerName", "email", "bikeId"])
     fun `a request without a required text field is rejected`(missingField: String) {
 
         // given: an otherwise valid request that lacks one required field
@@ -83,7 +81,6 @@ class SubmitLeasingRequestControllerTest {
                 "age" to 35,
                 "monthlyNetIncome" to 3500.0,
                 "bikeId" to "BIKE-900",
-                "bikeModel" to "Gravel Explorer 900",
             ) - missingField
         val operation =
             post("/api/bike-leasing")

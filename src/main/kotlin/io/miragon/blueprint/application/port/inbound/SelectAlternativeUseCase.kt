@@ -1,7 +1,7 @@
 package io.miragon.blueprint.application.port.inbound
 
-import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.bike.BikeId
+import io.miragon.blueprint.domain.leasing.ApplicationId
 
 /**
  * Resolves the `Clarify alternative with customer` user task from the outside — the "external"
@@ -15,7 +15,6 @@ interface SelectAlternativeUseCase {
         val applicationId: ApplicationId,
         val alternativeFound: Boolean,
         val bikeId: BikeId? = null,
-        val bikeModel: String? = null,
     ) {
         init {
             require(!alternativeFound || bikeId != null) { "An accepted alternative must name the bike" }

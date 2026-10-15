@@ -34,7 +34,7 @@ class SelectAlternativeControllerTest {
 
         // given: a decision body and the application-id path variable
         val pathVar = "123e4567-e89b-12d3-a456-426614174000"
-        val body = mapOf("alternativeFound" to true, "bikeId" to "BIKE-ALT", "bikeModel" to "Aero Road 700")
+        val body = mapOf("alternativeFound" to true, "bikeId" to "BIKE-ALT")
         every { useCase.selectAlternative(any()) } just Runs
         val operation =
             post("/api/bike-leasing/{applicationId}/clarify-alternative", pathVar)
@@ -48,7 +48,7 @@ class SelectAlternativeControllerTest {
         assertThat(response.response.status).isEqualTo(202)
         verify {
             useCase.selectAlternative(
-                SelectAlternativeUseCase.Command(ApplicationId.of(pathVar), alternativeFound = true, bikeId = BikeId("BIKE-ALT"), bikeModel = "Aero Road 700"),
+                SelectAlternativeUseCase.Command(ApplicationId.of(pathVar), alternativeFound = true, bikeId = BikeId("BIKE-ALT")),
             )
         }
         confirmVerified(useCase)
@@ -57,7 +57,7 @@ class SelectAlternativeControllerTest {
     @Test
     fun `client reports that no alternative was found`() {
 
-        // given: a decision body with no alternative and no bike details
+        // given: a decision body with no alternative and no bike
         val pathVar = "123e4567-e89b-12d3-a456-426614174000"
         val body = mapOf("alternativeFound" to false)
         every { useCase.selectAlternative(any()) } just Runs
@@ -73,7 +73,7 @@ class SelectAlternativeControllerTest {
         assertThat(response.response.status).isEqualTo(202)
         verify {
             useCase.selectAlternative(
-                SelectAlternativeUseCase.Command(ApplicationId.of(pathVar), alternativeFound = false, bikeId = null, bikeModel = null),
+                SelectAlternativeUseCase.Command(ApplicationId.of(pathVar), alternativeFound = false, bikeId = null),
             )
         }
         confirmVerified(useCase)

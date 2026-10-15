@@ -103,8 +103,6 @@ pitest {
         listOf(
             "io.miragon.blueprint.adapter.process.*",
             "io.miragon.blueprint.CibsevenBikeLeasingApplication*",
-            "io.miragon.blueprint.BikeCatalogueSeeder*",
-            "io.miragon.blueprint.adapter.inbound.rest.DevCorsConfiguration*",
             "io.miragon.blueprint.adapter.inbound.cibseven.*",
         ),
     )

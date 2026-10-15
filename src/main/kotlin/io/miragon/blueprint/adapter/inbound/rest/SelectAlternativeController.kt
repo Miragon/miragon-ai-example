@@ -34,7 +34,6 @@ class SelectAlternativeController(
                 applicationId = ApplicationId.of(applicationId),
                 alternativeFound = input.alternativeFound,
                 bikeId = input.bikeId?.let { BikeId(it) },
-                bikeModel = input.bikeModel,
             ),
         )
         return ResponseEntity.accepted().build()
@@ -45,6 +44,5 @@ class SelectAlternativeController(
         constructor(
             @JsonProperty("alternativeFound") val alternativeFound: Boolean,
             @JsonProperty("bikeId") val bikeId: String? = null,
-            @JsonProperty("bikeModel") val bikeModel: String? = null,
         )
 }

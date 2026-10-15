@@ -1,6 +1,6 @@
 package io.miragon.blueprint.adapter.outbound.db
 
-import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
+import io.miragon.blueprint.domain.bike.OrderId
 import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.LeasingStatus
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
@@ -62,40 +62,23 @@ class LeasingApplicationPersistenceAdapterTest {
     }
 
     @Test
-    fun `findAll returns a page ordered by creation date, newest first`() {
+    fun `save overwrites a stored application with its new state and returns it`() {
 
-        // given: three applications created on different days
-        val older = testLeasingApplication(id = ApplicationId(UUID.randomUUID()), createdAt = java.time.LocalDateTime.of(2026, 1, 1, 8, 0))
-        val newer = testLeasingApplication(id = ApplicationId(UUID.randomUUID()), createdAt = java.time.LocalDateTime.of(2026, 3, 1, 8, 0))
-        val newest = testLeasingApplication(id = ApplicationId(UUID.randomUUID()), createdAt = java.time.LocalDateTime.of(2026, 6, 1, 8, 0))
-        listOf(older, newest, newer).forEach { underTest.save(it) }
+        // given: a stored application that is later ordered
+        val application = testLeasingApplication(id = id)
+        underTest.save(application)
+        entityManager.flush()
+        entityManager.clear()
+        val ordered = application.documentOrder(OrderId("ORDER-1"))
+
+        // when: the new state is saved
+        val saved = underTest.save(ordered)
         entityManager.flush()
         entityManager.clear()
 
-        // when: the first page is read without a filter
-        val page = underTest.findAll(LeasingApplicationRepository.Criteria(status = null, page = 0, size = 10))
-
-        // then: all three come back, newest first
-        assertThat(page.totalElements).isEqualTo(3)
-        assertThat(page.items.map { it.id }).containsExactly(newest.id, newer.id, older.id)
-    }
-
-    @Test
-    fun `findAll filters by status and paginates`() {
-
-        // given: two RECEIVED and one ACTIVE application
-        underTest.save(testLeasingApplication(id = ApplicationId(UUID.randomUUID()), status = LeasingStatus.RECEIVED))
-        underTest.save(testLeasingApplication(id = ApplicationId(UUID.randomUUID()), status = LeasingStatus.RECEIVED))
-        underTest.save(testLeasingApplication(id = ApplicationId(UUID.randomUUID()), status = LeasingStatus.ACTIVE))
-        entityManager.flush()
-        entityManager.clear()
-
-        // when: only ACTIVE applications are requested
-        val page = underTest.findAll(LeasingApplicationRepository.Criteria(status = LeasingStatus.ACTIVE, page = 0, size = 10))
-
-        // then: only the single ACTIVE application is returned
-        assertThat(page.totalElements).isEqualTo(1)
-        assertThat(page.items).hasSize(1)
-        assertThat(page.items.single().status).isEqualTo(LeasingStatus.ACTIVE)
+        // then: the returned and the reloaded application both carry the order
+        assertThat(saved).usingRecursiveComparison().isEqualTo(ordered)
+        assertThat(underTest.findById(id)?.status).isEqualTo(LeasingStatus.ORDERED)
+        assertThat(underTest.findById(id)?.orderId).isEqualTo(OrderId("ORDER-1"))
     }
 }

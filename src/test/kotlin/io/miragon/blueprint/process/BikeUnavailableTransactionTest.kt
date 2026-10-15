@@ -9,7 +9,6 @@ import io.miragon.blueprint.domain.leasing.CustomerName
 import io.miragon.blueprint.domain.leasing.Email
 import io.miragon.blueprint.domain.leasing.LeasingApplication
 import io.miragon.blueprint.domain.leasing.LeasingStatus
-import io.miragon.blueprint.process.util.continueToNextWaitState
 import io.miragon.blueprint.process.util.executeJobFor
 import io.miragon.blueprint.process.util.findProcessInstance
 import org.assertj.core.api.Assertions
@@ -55,26 +54,12 @@ class BikeUnavailableTransactionTest {
     @Test
     fun `bike unavailable - the BPMN error raised by the real order service is committed`() {
         // BIKE-OOS is on the simulated dealer's out-of-stock list
-        val application =
-            LeasingApplication.receive(
-                id = ApplicationId.new(),
-                customerName = CustomerName("Test Customer"),
-                email = Email("test@example.com"),
-                age = 35,
-                monthlyNetIncome = 3500.0,
-                bikeId = BikeId("BIKE-OOS"),
-                createdAt = LocalDateTime.now(),
-            )
+        val application = receive(bikeId = BikeId("BIKE-OOS"))
         repository.save(application)
         process.submitRequest(application)
         val instance = runtimeService.findProcessInstance(application.id)
 
-        processEngine.executeJobFor(FlowNodes.StartEventLeasingRequestReceived)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
-        process.correlateContractSigned(application.id)
-        processEngine.executeJobFor(FlowNodes.EventContractSigned)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskIssueInsurancePolicy)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike) // unavailable -> BPMN error -> clarify alternative
+        driveUntilTheOrderStepRuns(application.id) // unavailable -> BPMN error -> clarify alternative
 
         assertThat(instance)
             .isWaitingAt(FlowNodes.UserTaskClarifyAlternative.ELEMENT_ID)
@@ -84,34 +69,69 @@ class BikeUnavailableTransactionTest {
     @Test
     fun `bike unavailable - the bike the process carries is stored although the order service throws`() {
         // the stored application names another bike than the out-of-stock one the process carries
-        val application =
-            LeasingApplication.receive(
-                id = ApplicationId.new(),
-                customerName = CustomerName("Test Customer"),
-                email = Email("test@example.com"),
-                age = 35,
-                monthlyNetIncome = 3500.0,
-                bikeId = BikeId("BIKE-900"),
-                createdAt = LocalDateTime.now(),
-            )
+        val application = receive(bikeId = BikeId("BIKE-900"))
         repository.save(application)
         process.submitRequest(application.selectAlternative(BikeId("BIKE-OOS")))
 
-        processEngine.executeJobFor(FlowNodes.StartEventLeasingRequestReceived)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
-        process.correlateContractSigned(application.id)
-        processEngine.executeJobFor(FlowNodes.EventContractSigned)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskIssueInsurancePolicy)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike) // unavailable -> BPMN error -> clarify alternative
+        driveUntilTheOrderStepRuns(application.id) // unavailable -> BPMN error -> clarify alternative
 
         Assertions.assertThat(repository.findById(application.id)?.bikeId).isEqualTo(BikeId("BIKE-OOS"))
 
         // the alternative reaches the application through the process variable alone
         process.completeAlternativeClarification(application.id, alternativeFound = true, bikeId = BikeId("BIKE-ALT"))
-        processEngine.continueToNextWaitState()
+        processEngine.executeJobFor(FlowNodes.UserTaskClarifyAlternative)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike) // the re-order succeeds
 
         val reordered = repository.findById(application.id)
         Assertions.assertThat(reordered?.bikeId).isEqualTo(BikeId("BIKE-ALT"))
         Assertions.assertThat(reordered?.status).isEqualTo(LeasingStatus.ORDERED)
+        Assertions.assertThat(reordered?.orderId).isNotNull
     }
+
+    @Test
+    fun `bike unavailable - declining the alternative revokes the contract and cancels the application`() {
+        val application = receive(bikeId = BikeId("BIKE-OOS"))
+        repository.save(application)
+        process.submitRequest(application)
+        val instance = runtimeService.findProcessInstance(application.id)
+        driveUntilTheOrderStepRuns(application.id) // unavailable -> BPMN error -> clarify alternative
+
+        process.completeAlternativeClarification(application.id, alternativeFound = false)
+        // the compensation handler runs inside the throw event's continuation, so one job takes the
+        // case from the declined alternative through "Cancel contract" to the cancellation confirmation
+        processEngine.executeJobFor(FlowNodes.UserTaskClarifyAlternative)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskConfirmContractCancellation) // -> contract cancelled
+
+        assertThat(instance)
+            .isEnded
+            .hasPassed(
+                FlowNodes.ServiceTaskCancelContract.ELEMENT_ID,
+                FlowNodes.EndEventContractCancelled.ELEMENT_ID,
+            )
+        val cancelled = repository.findById(application.id)
+        Assertions.assertThat(cancelled?.status).isEqualTo(LeasingStatus.CANCELLED)
+        // the contract that "Cancel contract" revoked was issued and recorded by "Send contract"
+        Assertions.assertThat(cancelled?.contractId).isNotNull
+        Assertions.assertThat(cancelled?.orderId).isNull()
+    }
+
+    /** Async continuations up to and including the order step: credit check, contract sent and signed. */
+    private fun driveUntilTheOrderStepRuns(id: ApplicationId) {
+        processEngine.executeJobFor(FlowNodes.StartEventLeasingRequestReceived)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
+        process.correlateContractSigned(id)
+        processEngine.executeJobFor(FlowNodes.EventContractSigned)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
+    }
+
+    private fun receive(bikeId: BikeId) =
+        LeasingApplication.receive(
+            id = ApplicationId.new(),
+            customerName = CustomerName("Test Customer"),
+            email = Email("test@example.com"),
+            age = 35,
+            monthlyNetIncome = 3500.0,
+            bikeId = bikeId,
+            createdAt = LocalDateTime.now(),
+        )
 }

@@ -1,10 +1,8 @@
 package io.miragon.blueprint.application.service
 
 import io.miragon.blueprint.application.port.inbound.SelectAlternativeUseCase
-import io.miragon.blueprint.application.port.outbound.BikePortfolioRepository
 import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
 import io.miragon.blueprint.application.port.outbound.LeasingProcess
-import io.miragon.blueprint.domain.bike.Bike
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -12,16 +10,16 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class SelectAlternativeService(
     private val repository: LeasingApplicationRepository,
-    private val bikePortfolio: BikePortfolioRepository,
     private val process: LeasingProcess,
 ) : SelectAlternativeUseCase {
 
+    /**
+     * Completes the clarification with the customer's decision. The chosen bike is not stored here:
+     * it travels to the re-order as the `bikeId` process variable, and the order step persists it —
+     * the same way a completion through the Tasklist form reaches the domain.
+     */
     override fun selectAlternative(command: SelectAlternativeUseCase.Command) {
         repository.findById(command.applicationId) ?: error("Unknown application ${command.applicationId}")
-        val alternativeBike = command.bikeId
-        if (command.alternativeFound && alternativeBike != null) {
-            command.bikeModel?.let { bikePortfolio.save(Bike(alternativeBike, it)) }
-        }
         process.completeAlternativeClarification(
             id = command.applicationId,
             alternativeFound = command.alternativeFound,

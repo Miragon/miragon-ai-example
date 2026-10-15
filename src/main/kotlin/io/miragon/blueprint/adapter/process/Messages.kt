@@ -11,9 +11,6 @@ import kotlin.collections.List
  * BPMN message names used to correlate messages to running process instances.
  */
 object Messages {
-  val MIRAVELO_APPLICATION_WITHDRAWN: MessageName =
-      MessageName("miravelo.applicationWithdrawn")
-
   val MIRAVELO_CONTRACT_SIGNED: MessageName = MessageName("miravelo.contractSigned")
 
   val MIRAVELO_HANDOVER_REPORTED: MessageName = MessageName("miravelo.handoverReported")
@@ -24,7 +21,6 @@ object Messages {
       MessageName("miravelo.leasingRequestReceived")
 
   val all: List<MessageName> = listOf(
-    MIRAVELO_APPLICATION_WITHDRAWN,
     MIRAVELO_CONTRACT_SIGNED,
     MIRAVELO_HANDOVER_REPORTED,
     MIRAVELO_LEASING_ACTIVATED,

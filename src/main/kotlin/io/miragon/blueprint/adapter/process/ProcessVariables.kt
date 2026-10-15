@@ -20,8 +20,6 @@ object ProcessVariables {
 
   const val BIKE_ID: String = "bikeId"
 
-  const val CANCELLATION_POSSIBLE: String = "cancellationPossible"
-
   const val MONTHLY_NET_INCOME: String = "monthlyNetIncome"
 
   const val ORDER_ID: String = "orderId"
@@ -31,7 +29,6 @@ object ProcessVariables {
     ALTERNATIVE_FOUND,
     APPLICATION_ID,
     BIKE_ID,
-    CANCELLATION_POSSIBLE,
     MONTHLY_NET_INCOME,
     ORDER_ID,
   )

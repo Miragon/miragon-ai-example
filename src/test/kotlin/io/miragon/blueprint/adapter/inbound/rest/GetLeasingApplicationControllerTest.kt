@@ -5,6 +5,7 @@ import io.miragon.blueprint.application.port.inbound.GetLeasingApplicationQuery
 import io.miragon.blueprint.domain.bike.OrderId
 import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.ContractId
+import io.miragon.blueprint.domain.leasing.LeasingStatus
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -30,10 +31,13 @@ class GetLeasingApplicationControllerTest {
 
         // given: a fully-populated application (incl. order and contract) the query can find
         val application = testLeasingApplication(
+            age = 41,
+            monthlyNetIncome = 4100.5,
+            status = LeasingStatus.ORDERED,
             orderId = OrderId("ORDER-42"),
             contractId = ContractId("CONTRACT-7"),
         )
-        every { query.byId(application.id) } returns GetLeasingApplicationQuery.Result(application, "Gravel Explorer 900")
+        every { query.byId(application.id) } returns application
         val operation = get("/api/bike-leasing/{applicationId}", application.id.value.toString())
 
         // when: the request is performed
@@ -42,34 +46,37 @@ class GetLeasingApplicationControllerTest {
         // then: the response is 200 and every DTO field is mapped from the domain object
         assertThat(response.response.status).isEqualTo(200)
         assertThat(response.response.contentAsString).contains(
-            application.id.value.toString(),
-            application.customerName.value,
-            application.email.value,
-            application.bikeId.value,
-            "Gravel Explorer 900",
-            "RECEIVED",
-            "ORDER-42",
-            "CONTRACT-7",
+            "\"applicationId\":\"${application.id.value}\"",
+            "\"customerName\":\"${application.customerName.value}\"",
+            "\"email\":\"${application.email.value}\"",
+            "\"age\":41",
+            "\"monthlyNetIncome\":4100.5",
+            "\"bikeId\":\"${application.bikeId.value}\"",
+            "\"status\":\"ORDERED\"",
+            "\"orderId\":\"ORDER-42\"",
+            "\"contractId\":\"CONTRACT-7\"",
+            "\"createdAt\":\"2024-01-15T10:30:00\"",
         )
         verify { query.byId(application.id) }
         confirmVerified(query)
     }
 
     @Test
-    fun `maps a not-yet-ordered application with null order and contract`() {
+    fun `maps a not-yet-ordered application with null order and contract and no bike model`() {
 
         // given: an application still without an order or contract (both nullable fields absent)
         val application = testLeasingApplication(orderId = null, contractId = null)
-        every { query.byId(application.id) } returns GetLeasingApplicationQuery.Result(application, null)
+        every { query.byId(application.id) } returns application
         val operation = get("/api/bike-leasing/{applicationId}", application.id.value.toString())
 
         // when: the request is performed
         val response = mockMvc.perform(operation).andReturn()
 
-        // then: the response is 200 and the nullable fields are serialised as null
+        // then: the response is 200, the nullable fields are serialised as null, and only the bike id is exposed
         assertThat(response.response.status).isEqualTo(200)
         assertThat(response.response.contentAsString)
-            .contains("\"orderId\":null", "\"contractId\":null", "\"bikeModel\":null")
+            .contains("\"orderId\":null", "\"contractId\":null")
+            .doesNotContain("bikeModel")
     }
 
     @Test

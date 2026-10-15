@@ -3,8 +3,8 @@ package io.miragon.blueprint.adapter.outbound.cibseven
 import io.miragon.blueprint.adapter.process.BikeLeasingProcessProcessApi.FlowNodes
 import io.miragon.blueprint.adapter.process.Messages
 import io.miragon.blueprint.application.port.outbound.LeasingProcess
-import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.bike.BikeId
+import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.LeasingApplication
 import org.cibseven.bpm.engine.RuntimeService
 import org.cibseven.bpm.engine.TaskService
@@ -41,9 +41,6 @@ class LeasingProcessAdapter(
 
     override fun correlateHandoverReported(id: ApplicationId) =
         runtimeService.correlateByBusinessKey(Messages.MIRAVELO_HANDOVER_REPORTED.value, id.value.toString())
-
-    override fun correlateApplicationWithdrawn(id: ApplicationId) =
-        runtimeService.correlateByBusinessKey(Messages.MIRAVELO_APPLICATION_WITHDRAWN.value, id.value.toString())
 
     /**
      * Completes the `Clarify alternative with customer` user task via the engine client — the same

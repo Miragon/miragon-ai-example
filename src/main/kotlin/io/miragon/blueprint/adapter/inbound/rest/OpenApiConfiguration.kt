@@ -18,8 +18,7 @@ import org.springframework.context.annotation.Primary
 class OpenApiConfiguration {
 
     // The CIB seven webapp registers its own OpenAPI bean (org.cibseven.webapp.config.OpenApiConfig).
-    // @Primary makes springdoc's openAPIBuilder pick ours for the /api/** contract we generate the
-    // frontend client from.
+    // @Primary makes springdoc's openAPIBuilder pick ours for the /api/** contract we publish.
     @Bean
     @Primary
     fun bikeLeasingOpenApi(): OpenAPI =
@@ -29,8 +28,10 @@ class OpenApiConfiguration {
                     .title("MiraVelo Bike-Leasing API")
                     .version("1.0")
                     .description(
-                        "Customer-portal and back-office endpoints for the MiraVelo bike-leasing " +
-                            "process. The engine-internal /engine-rest API is intentionally excluded.",
+                        "Endpoints that drive the MiraVelo bike-leasing process: submit a request, " +
+                            "read an application, sign the contract, clarify an alternative bike and " +
+                            "report the handover. The engine-internal /engine-rest API is intentionally " +
+                            "excluded.",
                     ),
             )
 }

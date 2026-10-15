@@ -21,7 +21,7 @@ class GlobalExceptionConfiguration {
 
     private val log = KotlinLogging.logger {}
 
-    /** Invalid input — a bad UUID, a blank value object, an unknown status filter. */
+    /** Invalid input — a bad UUID, a blank value object, a broken domain invariant (e.g. no income). */
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgument(exception: IllegalArgumentException): ProblemDetail {
         log.debug { "Bad request: ${exception.message}" }

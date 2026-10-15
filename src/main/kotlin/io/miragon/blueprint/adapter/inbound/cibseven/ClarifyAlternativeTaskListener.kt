@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component
 /**
  * Example [TaskListener] on the `userTask_clarifyAlternative` user task, wired via
  * `camunda:taskListener event="create"` in the BPMN. It fires when the out-of-stock branch parks the
- * human task, and simply audit-logs that manual clarification is required — the human-task counterpart
- * to an [ExecutionListener].
+ * human task, and simply audit-logs that manual clarification is required.
  *
  * Like the delegates, it is a Spring `@Component` referenced by expression
  * (`#{clarifyAlternativeTaskListener}`). A production listener could notify the customer via a

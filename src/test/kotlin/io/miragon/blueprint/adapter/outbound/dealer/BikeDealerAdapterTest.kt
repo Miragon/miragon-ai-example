@@ -1,9 +1,7 @@
 package io.miragon.blueprint.adapter.outbound.dealer
 
 import io.miragon.blueprint.domain.bike.BikeId
-import io.miragon.blueprint.domain.bike.OrderId
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
@@ -46,17 +44,5 @@ class BikeDealerAdapterTest {
         // given: the poison bike / when-then: the dealer call throws so the async job fails → incident
         assertThatThrownBy { underTest.order(BikeId("BIKE-FAIL")) }
             .isInstanceOf(BikeDealerAdapter.DealerUnavailableException::class.java)
-    }
-
-    @Test
-    fun `requestCancellation reports the order as cancellable`() {
-        // given: a placed order / when-then: the demo dealer always allows cancellation
-        assertThat(underTest.requestCancellation(OrderId("ORDER-900"))).isTrue()
-    }
-
-    @Test
-    fun `bookCancellationCosts runs without error`() {
-        // given: a placed order / when-then: booking the dealer's costs runs without error
-        assertThatCode { underTest.bookCancellationCosts(OrderId("ORDER-900")) }.doesNotThrowAnyException()
     }
 }

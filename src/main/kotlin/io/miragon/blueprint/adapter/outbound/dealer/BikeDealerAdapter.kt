@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 /**
- * Simulated bike dealer. Availability is decided by a small deny-list of bike ids so the
- * bike-unavailable → alternative branch can be triggered deterministically. The ids mirror the Bruno
- * scenario data: `BIKE-OOS` is the out-of-stock bike the `05-bike-unavailable` collection submits,
- * and `BIKE-FAIL` is the poison id the `06-incident-demo` collection uses to make the dealer "outage"
- * throw — see [order].
+ * Simulated bike dealer. Two demo bike ids make its behaviour deterministic, and the Bruno scenarios
+ * use them: `BIKE-OOS` is out of stock, which drives the bike-unavailable → alternative branch
+ * (`04-bike-unavailable`, `05-alternative-declined`, `06-alternative-via-tasklist`), and `BIKE-FAIL`
+ * is the poison id that makes the dealer "outage" throw (`08-incident-demo`) — see [order]. Every
+ * other bike id is in stock.
  */
 @Component
 class BikeDealerAdapter : BikeDealerPort {
@@ -23,34 +23,21 @@ class BikeDealerAdapter : BikeDealerPort {
 
     /**
      * Demo mechanism (not a real integration fault): ordering one of these bikes makes the dealer
-     * call fail as if the dealer's API were unreachable. `serviceTask_orderBike` runs on the job
-     * executor (asyncAfter), so the failure exhausts its retries and raises an incident — the basis
-     * of the reproducible incident demo. It stays available in [checkAvailability] so the flow reaches
-     * the order step (rather than the out-of-stock branch) before failing.
+     * call fail as if the dealer's API were unreachable. `serviceTask_orderBike` runs as its own job
+     * on the job executor (asyncBefore, retry cycle R3/PT10S), so the failure exhausts its retries and
+     * raises an incident — the basis of the reproducible incident demo. It stays available in
+     * [checkAvailability] so the flow reaches the order step (rather than the out-of-stock branch)
+     * before failing.
      */
     private val unavailableDealerBikeIds = setOf("BIKE-FAIL")
 
-    override fun checkAvailability(bikeId: BikeId): Boolean {
-        val available = bikeId.value !in outOfStockBikeIds
-        return available
-    }
+    override fun checkAvailability(bikeId: BikeId): Boolean = bikeId.value !in outOfStockBikeIds
 
     override fun order(bikeId: BikeId): OrderId {
         if (bikeId.value in unavailableDealerBikeIds) throw DealerUnavailableException(bikeId)
         val orderId = OrderId("ORDER-${UUID.randomUUID()}")
         log.info { "Placed order ${orderId.value} for bike ${bikeId.value}" }
         return orderId
-    }
-
-    override fun requestCancellation(orderId: OrderId): Boolean {
-        // Demo dealer response: cancellation is always possible in this blueprint.
-        log.info { "Requesting cancellation of order ${orderId.value}" }
-        return true
-    }
-
-    override fun bookCancellationCosts(orderId: OrderId) {
-        // A real system would book the dealer's cancellation fee here.
-        log.info { "Booking cancellation costs for order ${orderId.value}" }
     }
 
     /**

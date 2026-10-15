@@ -14,17 +14,9 @@ import kotlin.collections.List
 object ServiceTasks {
   const val ACTIVATE_LEASING_DELEGATE: String = "#{activateLeasingDelegate}"
 
-  const val BOOK_COSTS_DELEGATE: String = "#{bookCostsDelegate}"
-
   const val CANCEL_CONTRACT_DELEGATE: String = "#{cancelContractDelegate}"
 
-  const val CANCEL_POLICY_DELEGATE: String = "#{cancelPolicyDelegate}"
-
-  const val ISSUE_INSURANCE_POLICY_DELEGATE: String = "#{issueInsurancePolicyDelegate}"
-
   const val ORDER_BIKE_DELEGATE: String = "#{orderBikeDelegate}"
-
-  const val REQUEST_CANCELLATION_DELEGATE: String = "#{requestCancellationDelegate}"
 
   const val SEND_CANCELLATION_CONFIRMATION_DELEGATE: String =
       "#{sendCancellationConfirmationDelegate}"
@@ -33,19 +25,12 @@ object ServiceTasks {
 
   const val SEND_REJECTION_DELEGATE: String = "#{sendRejectionDelegate}"
 
-  const val SEND_REMINDER_MAIL_DELEGATE: String = "#{sendReminderMailDelegate}"
-
   val all: List<String> = listOf(
     ACTIVATE_LEASING_DELEGATE,
-    BOOK_COSTS_DELEGATE,
     CANCEL_CONTRACT_DELEGATE,
-    CANCEL_POLICY_DELEGATE,
-    ISSUE_INSURANCE_POLICY_DELEGATE,
     ORDER_BIKE_DELEGATE,
-    REQUEST_CANCELLATION_DELEGATE,
     SEND_CANCELLATION_CONFIRMATION_DELEGATE,
     SEND_CONTRACT_DELEGATE,
     SEND_REJECTION_DELEGATE,
-    SEND_REMINDER_MAIL_DELEGATE,
   )
 }

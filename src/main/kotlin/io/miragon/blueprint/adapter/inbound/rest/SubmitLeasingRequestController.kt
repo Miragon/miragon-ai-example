@@ -38,7 +38,6 @@ class SubmitLeasingRequestController(
             @JsonProperty("age") val age: Int,
             @JsonProperty("monthlyNetIncome") val monthlyNetIncome: Double,
             @JsonProperty("bikeId") val bikeId: String,
-            @JsonProperty("bikeModel") val bikeModel: String,
         )
 
     data class LeasingApplicationCreatedDto(val applicationId: String)
@@ -50,6 +49,5 @@ class SubmitLeasingRequestController(
             age = age,
             monthlyNetIncome = monthlyNetIncome,
             bikeId = BikeId(bikeId),
-            bikeModel = bikeModel,
         )
 }

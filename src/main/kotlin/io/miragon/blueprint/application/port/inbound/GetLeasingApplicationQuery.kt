@@ -3,12 +3,7 @@ package io.miragon.blueprint.application.port.inbound
 import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.LeasingApplication
 
+/** Reads a single leasing application — the domain view of one case. */
 interface GetLeasingApplicationQuery {
-    fun byId(id: ApplicationId): Result?
-
-    /** The application together with the model of its bike, resolved from the portfolio. */
-    data class Result(
-        val application: LeasingApplication,
-        val bikeModel: String?,
-    )
+    fun byId(id: ApplicationId): LeasingApplication?
 }

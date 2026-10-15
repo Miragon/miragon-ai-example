@@ -34,8 +34,6 @@ data class LeasingApplication(
 
     fun activate(): LeasingApplication = copy(status = LeasingStatus.ACTIVE)
 
-    fun withdraw(): LeasingApplication = copy(status = LeasingStatus.WITHDRAWN)
-
     fun reject(): LeasingApplication = copy(status = LeasingStatus.REJECTED)
 
     fun cancel(): LeasingApplication = copy(status = LeasingStatus.CANCELLED)
