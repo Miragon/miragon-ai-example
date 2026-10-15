@@ -1,0 +1,22 @@
+meta {
+  name: Assert the contract was revoked by compensation
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{engineRest}}/history/activity-instance?processInstanceId={{processInstanceId}}&activityId=serviceTask_cancelContract
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body: length 1
+  res.body[0].endTime: isDefined
+}
+
+docs {
+  "Trigger reversal" compensates every completed step that has a compensation handler.
+  In the core that is "Send contract", so "Cancel contract" ran exactly once.
+}

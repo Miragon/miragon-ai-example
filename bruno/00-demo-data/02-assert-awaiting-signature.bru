@@ -1,0 +1,22 @@
+meta {
+  name: Assert the case waits for the signature
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{engineRest}}/process-instance?businessKey={{awaitingSignatureId}}&activityIdIn=gateway_awaitSignature
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollApp("/api/bike-leasing/" + bru.getVar("awaitingSignatureId"),
+    (b, s) => s === 200 && b && b.contractId != null);
+}
+
+assert {
+  res.status: eq 200
+  res.body: length 1
+  res.body[0].ended: eq false
+}

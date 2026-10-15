@@ -1,0 +1,35 @@
+meta {
+  name: Submit a case the credit check rejects (low income)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerName": "Lena Lowincome",
+    "email": "lena@example.com",
+    "age": 29,
+    "monthlyNetIncome": 1200.0,
+    "bikeId": "BIKE-800"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.applicationId: isDefined
+}
+
+vars:post-response {
+  notSolventId: res.body.applicationId
+}
+
+docs {
+  Demo case 2: the checkCreditRating DMN rejects a monthly net income below 1500
+  (rule_lowIncome), so the case ends as REJECTED without a contract.
+}

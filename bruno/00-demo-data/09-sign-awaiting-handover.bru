@@ -1,0 +1,20 @@
+meta {
+  name: Sign the contract of the handover case
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{awaitingHandoverId}}/sign-contract
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollApp("/api/bike-leasing/" + bru.getVar("awaitingHandoverId"),
+    (b, s) => s === 200 && b && b.contractId != null);
+}
+
+assert {
+  res.status: eq 202
+}
