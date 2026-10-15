@@ -41,3 +41,25 @@ fun ProcessEngine.continueToNextWaitState(maxIterations: Int = 50) {
         managementService.executeJob(job.id)
     }
 }
+
+/**
+ * Executes the job of [activity] again and again, the way the job executor would after each retry
+ * interval, until its retries are used up and the engine raises an incident. Every attempt is expected
+ * to fail — a successful attempt fails the test. Returns the failures, one per attempt, so a test can
+ * assert both how often the engine retried and why the job failed.
+ */
+fun ProcessEngine.failJobUntilRetriesAreExhausted(activity: FlowNode, maxAttempts: Int = 10): List<Throwable> {
+    val failures = mutableListOf<Throwable>()
+    repeat(maxAttempts) {
+        val job =
+            managementService
+                .createJobQuery()
+                .activityId(activity.id.value)
+                .withRetriesLeft()
+                .singleResult() ?: return failures
+        val failure = runCatching { managementService.executeJob(job.id) }.exceptionOrNull()
+        requireNotNull(failure) { "the job of activity '${activity.id.value}' was expected to fail but succeeded" }
+        failures += failure
+    }
+    error("the retries of activity '${activity.id.value}' were not exhausted after $maxAttempts attempts")
+}
