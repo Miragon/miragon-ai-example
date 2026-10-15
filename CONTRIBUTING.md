@@ -6,18 +6,13 @@ are welcome — bug reports, feature ideas, docs, and code.
 ## Getting started
 
 ```bash
-git clone git@github.com:miragon-blueprints/cibseven-embedded-example.git
-cd cibseven-embedded-example
+git clone git@github.com:miragon-blueprints/miragon-ai-example.git
+cd miragon-ai-example
 npm ci && npm run hooks:install   # BPMN lint + git hooks
 ```
 
 You need **JDK 21** and **Docker (or Podman)** for Postgres. BPMN linting uses Node (the root
 `package.json`) but the service itself has no Node runtime dependency.
-
-<!-- variant:blueprint -->
-The service exists in two equivalent variants: [`kotlin-gradle/`](kotlin-gradle/README.md) (recommended)
-and [`java-maven/`](java-maven/README.md). Run either one.
-<!-- /variant:blueprint -->
 
 The build wrapper is included, so nothing else needs installing. Start Postgres, then the backend and
 engine on :8081:
@@ -26,16 +21,9 @@ engine on :8081:
 docker compose -f stack/docker-compose.yml up -d
 ```
 
-<!-- variant:kotlin-gradle -->
 ```bash
-cd kotlin-gradle && ./gradlew :service:app:bootRun
+./gradlew bootRun
 ```
-<!-- /variant:kotlin-gradle -->
-<!-- variant:java-maven -->
-```bash
-cd java-maven && ./mvnw -DskipTests install && ./mvnw -pl service/app spring-boot:run
-```
-<!-- /variant:java-maven -->
 
 ### Ports
 
@@ -73,16 +61,9 @@ rationale is in [ADR-0011](docs/adr/0011-build-and-deployment-approach.md).
 
 Build the backend OCI image; it produces `miravelo/cibseven-embedded-example:1.0-SNAPSHOT`:
 
-<!-- variant:kotlin-gradle -->
 ```bash
-(cd kotlin-gradle && ./gradlew :service:app:bootBuildImage)
+./gradlew bootBuildImage
 ```
-<!-- /variant:kotlin-gradle -->
-<!-- variant:java-maven -->
-```bash
-(cd java-maven && ./mvnw -pl service/app -am -DskipTests spring-boot:build-image)
-```
-<!-- /variant:java-maven -->
 
 Then run it against the compose Postgres:
 
@@ -125,12 +106,7 @@ values are read from the environment (they win over the baked defaults):
 
 The build, mutation-testing and code-generation commands are listed in the README next to the code:
 
-<!-- variant:kotlin-gradle -->
-- [`kotlin-gradle/README.md`](kotlin-gradle/README.md#-commands)
-  <!-- /variant:kotlin-gradle -->
-  <!-- variant:java-maven -->
-- [`java-maven/README.md`](java-maven/README.md#-commands)
-  <!-- /variant:java-maven -->
+- [`README.md`](README.md#-commands)
 
 From the repo root:
 
@@ -148,13 +124,6 @@ npm run lint:bpmn        # bpmnlint the .bpmn models
 - **Conventional Commits.** Commit messages and PR titles follow
   [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`,
   `refactor:`, `test:`, `chore:`). Write everything in **English**.
-  <!-- variant:blueprint -->
-- **Change both variants together.** A change in behaviour goes into `kotlin-gradle/` *and*
-  `java-maven/` in the same PR, with equivalent tests. Changes that only concern one language's idioms
-  stay on that side. Models, forms, migrations and `application.yaml` exist in both variants and must
-  be byte-identical — copy your change over; the `Blueprint Checks` workflow fails otherwise. See
-  [ADR-0013](docs/adr/0013-two-stack-variants-side-by-side-on-main.md).
-  <!-- /variant:blueprint -->
 - **Keep the gates green.** The architecture, contract-drift and mutation (≥ 80) gates run in CI on
   every PR. They are fitness functions, not style guides — a violation fails the
   build. The mutation gate is **diff-scoped** on PRs (only the classes you changed); the full-module
@@ -163,10 +132,11 @@ npm run lint:bpmn        # bpmnlint the .bpmn models
   Mutation testing means a test that runs without asserting will fail CI.
 - **Changing the API?** Re-export the spec (the `OpenApiSpecExportTest`, which every full build runs)
   so the committed `openapi/openapi.json` contract stays in sync — it is **drift-gated in CI**.
-- **Changing the process?** Edit the `.bpmn` model under `service/app/src/main/resources/bpmn`,
-  regenerate the typed `*ProcessApi`, and lint it with `npm run lint:bpmn`.
+- **Changing the process?** Edit the `.bpmn` model under `docs/use-cases/bike-leasing/process/`
+  (Gradle packages it onto the classpath), regenerate the typed `*ProcessApi`, and lint it with
+  `npm run lint:bpmn`.
 - **Changing the database schema?** Flyway owns it. Add a new forward-only migration
-  `V{n}__description.sql` under `service/app/src/main/resources/db/migration/` in the same change as
+  `V{n}__description.sql` under `src/main/resources/db/migration/` in the same change as
   the entity edit — never edit an already-applied migration. Hibernate runs `validate`, so a mismatch
   fails startup. A dev database first created by the old `ddl-auto: create` has no Flyway history;
   reset it once with `docker compose -f stack/docker-compose.yml down -v` before running. See
@@ -174,17 +144,9 @@ npm run lint:bpmn        # bpmnlint the .bpmn models
 
 ## Before opening a PR
 
-<!-- variant:kotlin-gradle -->
 ```bash
-(cd kotlin-gradle && ./gradlew build && ./gradlew :service:app:pitest)   # mutation score >= 80
+./gradlew build pitest   # mutation score >= 80
 ```
-<!-- /variant:kotlin-gradle -->
-<!-- variant:java-maven -->
-```bash
-(cd java-maven && ./mvnw verify \
-  && ./mvnw -pl service/app -am test-compile org.pitest:pitest-maven:mutationCoverage)   # mutation score >= 80
-```
-<!-- /variant:java-maven -->
 
 ```bash
 git diff --exit-code openapi/openapi.json    # the API contract must not drift
