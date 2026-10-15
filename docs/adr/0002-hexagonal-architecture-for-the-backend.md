@@ -2,6 +2,11 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-18
+- **Amended by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md) and
+  [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** the service is the one
+  Gradle project at the repo root (read `service/app` below as the root), the rule suite lives in
+  the test sources under `src/test/kotlin/io/miragon/common/architecture` instead of the
+  `service/common-architecture-tests` module, and the core has no insurance adapter.
 
 ## Context
 

@@ -1,7 +1,12 @@
-# 0006 — Mutation testing as a blocking PR gate
+# 0004 — Mutation testing as a blocking PR gate
 
 - **Status:** Accepted
 - **Date:** 2026-08-20
+- **Amended by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md) and
+  [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** PIT is configured in
+  the root `build.gradle.kts` and runs via `./gradlew pitest`; the `process.*` engine tests are
+  `@SpringBootTest` tests with the CIB seven assertions (JGiven is no longer a dependency);
+  `BikeCatalogueSeeder` was removed with the bike catalogue.
 
 ## Context
 

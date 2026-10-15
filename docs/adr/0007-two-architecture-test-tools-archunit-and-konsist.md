@@ -1,7 +1,10 @@
-# 0010 — Two architecture-test tools: ArchUnit (bytecode) and Konsist (source)
+# 0007 — Two architecture-test tools: ArchUnit (bytecode) and Konsist (source)
 
 - **Status:** Accepted
 - **Date:** 2026-08-20
+- **Amended by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md) (2026-10-15):** the
+  suite lives in the test sources under `src/test/kotlin/io/miragon/common/architecture`; the
+  `service/common-architecture-tests` module no longer exists.
 
 ## Context
 
