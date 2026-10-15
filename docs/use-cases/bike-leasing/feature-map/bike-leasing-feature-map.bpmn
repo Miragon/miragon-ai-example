@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmiq="https://bpmiq.io/schema/1.0/bpmiq" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="fmap_definitions_bikeLeasing" targetNamespace="http://miragon.io/miravelo/bike-leasing/feature-map" bpmiq:mode="workshop">
+  <bpmn:collaboration id="fmap_collaboration_bikeLeasing">
+    <bpmn:participant id="fmap_participant_bikeLeasing" name="Bike leasing — feature map" processRef="fmap_process_bikeLeasing" />
+    <bpmn:group id="fmap_group_coreApply" categoryValueRef="fmap_cv_coreApply" />
+    <bpmn:group id="fmap_group_coreContract" categoryValueRef="fmap_cv_coreContract" />
+    <bpmn:group id="fmap_group_coreReject" categoryValueRef="fmap_cv_coreReject" />
+    <bpmn:group id="fmap_group_coreOrder" categoryValueRef="fmap_cv_coreOrder" />
+    <bpmn:group id="fmap_group_coreCancel" categoryValueRef="fmap_cv_coreCancel" />
+    <bpmn:group id="fmap_group_coreActivate" categoryValueRef="fmap_cv_coreActivate" />
+    <bpmn:group id="fmap_group_f1Reminder" categoryValueRef="fmap_cv_f1Reminder" />
+    <bpmn:group id="fmap_group_f2Insurance" categoryValueRef="fmap_cv_f2Insurance" />
+    <bpmn:group id="fmap_group_f3Withdrawal" categoryValueRef="fmap_cv_f3Withdrawal" />
+    <bpmn:group id="fmap_group_f4OrderCancellation" categoryValueRef="fmap_cv_f4OrderCancellation" />
+  </bpmn:collaboration>
+  <bpmn:process id="fmap_process_bikeLeasing" name="Bike leasing — feature map" isExecutable="false">
+    <bpmn:extensionElements>
+      <bpmiq:sticky id="fmap_sticky_f6ApplicationList" text="#6 Application list (Stage 4)" x="40" y="4" kind="note" width="150" height="56" />
+      <bpmiq:sticky id="fmap_sticky_f1SignatureReminder" text="#1 Signature reminder (Stage 1)" x="630" y="82" kind="note" width="140" height="56" />
+      <bpmiq:sticky id="fmap_sticky_f1Shorthand" text="Shorthand: 7 days after sending. #1 lists two ways to model it." x="590" y="310" kind="note" width="180" height="62" />
+      <bpmiq:sticky id="fmap_sticky_f2InsurancePolicy" text="#2 Insurance policy (Stage 2)" x="1265" y="82" kind="note" width="140" height="56" />
+      <bpmiq:sticky id="fmap_sticky_f7BikeCatalogue" text="#7 Bike catalogue (Stage 4)" x="1030" y="322" kind="note" width="125" height="56" />
+      <bpmiq:sticky id="fmap_sticky_d10DealerIntegration" text="#10 Dealer integration?" x="1165" y="322" kind="decision" width="125" height="56" />
+      <bpmiq:sticky id="fmap_sticky_d8ContractSignature" text="#8 Contract &amp; e-signature: make, buy or adapt?" x="485" y="545" kind="decision" width="165" height="56" />
+      <bpmiq:sticky id="fmap_sticky_d9NotificationChannel" text="#9 Customer notification channel?" x="745" y="768" kind="decision" width="150" height="56" />
+      <bpmiq:sticky id="fmap_sticky_f5BackOfficeInbox" text="#5 Back-office inbox (Stage 4)" x="1165" y="768" kind="note" width="135" height="56" />
+      <bpmiq:sticky id="fmap_sticky_d11TaskUi" text="#11 Back-office task UI?" x="1310" y="768" kind="decision" width="135" height="56" />
+      <bpmiq:sticky id="fmap_sticky_f3Withdrawal" text="#3 Withdrawal (Stage 3)" x="1500" y="890" kind="note" width="140" height="56" />
+      <bpmiq:sticky id="fmap_sticky_f4OrderCancellation" text="#4 Bike order cancellation (Stage 3)" x="1115" y="848" kind="note" width="150" height="56" />
+      <bpmiq:sticky id="fmap_sticky_q4WhichBranch" text="Open in #4: which answer leads to the return and the costs?" x="625" y="1093" kind="question" width="180" height="60" />
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="startEvent_leasingRequestReceived" name="Leasing request received">
+      <bpmn:categoryValueRef>fmap_cv_coreApply</bpmn:categoryValueRef>
+      <bpmn:outgoing>flow_requestToCreditCheck</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="businessRuleTask_checkCreditRating" name="Check credit rating">
+      <bpmn:categoryValueRef>fmap_cv_coreApply</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_requestToCreditCheck</bpmn:incoming>
+      <bpmn:outgoing>flow_creditCheckToSolvency</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="gateway_isSolvent" name="Solvent?">
+      <bpmn:categoryValueRef>fmap_cv_coreApply</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_creditCheckToSolvency</bpmn:incoming>
+      <bpmn:outgoing>flow_solvent</bpmn:outgoing>
+      <bpmn:outgoing>flow_notSolvent</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="serviceTask_sendContract" name="Send contract">
+      <bpmn:categoryValueRef>fmap_cv_coreContract</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_solvent</bpmn:incoming>
+      <bpmn:outgoing>flow_contractSentToAwait</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="gateway_awaitSignature" name="Signed within 14 days?">
+      <bpmn:categoryValueRef>fmap_cv_coreContract</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_contractSentToAwait</bpmn:incoming>
+      <bpmn:outgoing>flow_contractConcludedToFork</bpmn:outgoing>
+      <bpmn:outgoing>tbpm_flow_awaitToRejection</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="gateway_rejectionJoin" name="Rejection reason">
+      <bpmn:categoryValueRef>fmap_cv_coreReject</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_notSolvent</bpmn:incoming>
+      <bpmn:incoming>tbpm_flow_awaitToRejection</bpmn:incoming>
+      <bpmn:outgoing>flow_rejectionJoined</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="serviceTask_sendRejection" name="Send rejection">
+      <bpmn:categoryValueRef>fmap_cv_coreReject</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_rejectionJoined</bpmn:incoming>
+      <bpmn:outgoing>flow_rejectionSent</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="endEvent_applicationRejected" name="Application rejected">
+      <bpmn:categoryValueRef>fmap_cv_coreReject</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_rejectionSent</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="gateway_bikeSourceJoin">
+      <bpmn:categoryValueRef>fmap_cv_coreOrder</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_forkToBikeSource</bpmn:incoming>
+      <bpmn:incoming>flow_alternativeFound</bpmn:incoming>
+      <bpmn:outgoing>flow_bikeSourceToOrder</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="serviceTask_orderBike" name="Order bike from dealer">
+      <bpmn:categoryValueRef>fmap_cv_coreOrder</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_bikeSourceToOrder</bpmn:incoming>
+      <bpmn:outgoing>tbpm_flow_orderToAvailability</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="tbpm_gateway_bikeAvailable" name="Bike available?">
+      <bpmn:categoryValueRef>fmap_cv_coreOrder</bpmn:categoryValueRef>
+      <bpmn:incoming>tbpm_flow_orderToAvailability</bpmn:incoming>
+      <bpmn:outgoing>flow_orderedToJoin</bpmn:outgoing>
+      <bpmn:outgoing>tbpm_flow_availabilityToClarify</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="userTask_clarifyAlternative" name="Clarify alternative with customer">
+      <bpmn:categoryValueRef>fmap_cv_coreOrder</bpmn:categoryValueRef>
+      <bpmn:incoming>tbpm_flow_availabilityToClarify</bpmn:incoming>
+      <bpmn:outgoing>flow_clarifyToAlternativeGateway</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="gateway_alternativeFound" name="Alternative found?">
+      <bpmn:categoryValueRef>fmap_cv_coreOrder</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_clarifyToAlternativeGateway</bpmn:incoming>
+      <bpmn:outgoing>flow_alternativeFound</bpmn:outgoing>
+      <bpmn:outgoing>tbpm_flow_alternativeGatewayToCancel</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="serviceTask_cancelContract" name="Cancel contract">
+      <bpmn:categoryValueRef>fmap_cv_coreCancel</bpmn:categoryValueRef>
+      <bpmn:incoming>tbpm_flow_alternativeGatewayToCancel</bpmn:incoming>
+      <bpmn:outgoing>tbpm_flow_cancelToConfirmation</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="serviceTask_confirmContractCancellation" name="Send cancellation confirmation">
+      <bpmn:categoryValueRef>fmap_cv_coreCancel</bpmn:categoryValueRef>
+      <bpmn:incoming>tbpm_flow_cancelToConfirmation</bpmn:incoming>
+      <bpmn:outgoing>flow_confirmationToContractCancelled</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="endEvent_contractCancelled" name="Contract cancelled">
+      <bpmn:categoryValueRef>fmap_cv_coreCancel</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_confirmationToContractCancelled</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateThrowEvent id="event_handoverReported" name="Handover reported">
+      <bpmn:categoryValueRef>fmap_cv_coreActivate</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_joinToHandover</bpmn:incoming>
+      <bpmn:outgoing>flow_handoverToWithdrawalPeriod</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:intermediateCatchEvent id="event_withdrawalPeriodElapsed" name="Await end of withdrawal period">
+      <bpmn:categoryValueRef>fmap_cv_coreActivate</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_handoverToWithdrawalPeriod</bpmn:incoming>
+      <bpmn:outgoing>flow_withdrawalElapsedToActive</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="tbpm_timer_withdrawalPeriod">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P14D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="endEvent_leasingActive" name="Leasing active">
+      <bpmn:categoryValueRef>fmap_cv_coreActivate</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_withdrawalElapsedToActive</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:boundaryEvent id="event_signatureReminder" name="7 days" cancelActivity="false" attachedToRef="serviceTask_sendContract">
+      <bpmn:categoryValueRef>fmap_cv_f1Reminder</bpmn:categoryValueRef>
+      <bpmn:outgoing>flow_reminderToMail</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="fmap_timer_signatureReminder">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P7D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:task id="serviceTask_sendReminderMail" name="Send reminder">
+      <bpmn:categoryValueRef>fmap_cv_f1Reminder</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_reminderToMail</bpmn:incoming>
+      <bpmn:outgoing>flow_mailToProspectReminded</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="endEvent_prospectReminded" name="Customer reminded">
+      <bpmn:categoryValueRef>fmap_cv_f1Reminder</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_mailToProspectReminded</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:parallelGateway id="gateway_fork">
+      <bpmn:categoryValueRef>fmap_cv_f2Insurance</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_contractConcludedToFork</bpmn:incoming>
+      <bpmn:outgoing>flow_forkToBikeSource</bpmn:outgoing>
+      <bpmn:outgoing>flow_forkToInsurance</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="serviceTask_issueInsurancePolicy" name="Issue insurance policy">
+      <bpmn:categoryValueRef>fmap_cv_f2Insurance</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_forkToInsurance</bpmn:incoming>
+      <bpmn:outgoing>flow_insuranceToJoin</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:parallelGateway id="gateway_join">
+      <bpmn:categoryValueRef>fmap_cv_f2Insurance</bpmn:categoryValueRef>
+      <bpmn:incoming>flow_insuranceToJoin</bpmn:incoming>
+      <bpmn:incoming>flow_orderedToJoin</bpmn:incoming>
+      <bpmn:outgoing>flow_joinToHandover</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:subProcess id="subProcess_applicationWithdrawn" name="Customer withdraws" triggeredByEvent="true">
+      <bpmn:categoryValueRef>fmap_cv_f3Withdrawal</bpmn:categoryValueRef>
+      <bpmn:startEvent id="startEvent_applicationWithdrawn" name="Application&#10;withdrawn">
+        <bpmn:categoryValueRef>fmap_cv_f3Withdrawal</bpmn:categoryValueRef>
+        <bpmn:outgoing>flow_withdrawalToReversal</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="fmap_message_applicationWithdrawn" />
+      </bpmn:startEvent>
+      <bpmn:intermediateThrowEvent id="event_reverseApplication" name="Reverse completed steps">
+        <bpmn:categoryValueRef>fmap_cv_f3Withdrawal</bpmn:categoryValueRef>
+        <bpmn:incoming>flow_withdrawalToReversal</bpmn:incoming>
+        <bpmn:outgoing>fmap_flow_reversalToBikeOrdered</bpmn:outgoing>
+        <bpmn:compensateEventDefinition id="fmap_compensate_reverseApplication" />
+      </bpmn:intermediateThrowEvent>
+      <bpmn:exclusiveGateway id="fmap_gateway_bikeOrdered" name="Bike already&#10;ordered?">
+        <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+        <bpmn:incoming>fmap_flow_reversalToBikeOrdered</bpmn:incoming>
+        <bpmn:outgoing>fmap_flow_bikeOrderedToCancelOrder</bpmn:outgoing>
+        <bpmn:outgoing>fmap_flow_bikeNotOrdered</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:subProcess id="callActivity_cancelBikeOrder" name="Cancel bike order">
+        <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+        <bpmn:incoming>fmap_flow_bikeOrderedToCancelOrder</bpmn:incoming>
+        <bpmn:outgoing>fmap_flow_cancelOrderToJoin</bpmn:outgoing>
+        <bpmn:startEvent id="startEvent_cancellationRequired" name="Cancellation required">
+          <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+          <bpmn:outgoing>flow_requiredToRequest</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:task id="serviceTask_requestCancellation" name="Request order cancellation">
+          <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+          <bpmn:incoming>flow_requiredToRequest</bpmn:incoming>
+          <bpmn:outgoing>flow_requestToPossibleGateway</bpmn:outgoing>
+        </bpmn:task>
+        <bpmn:exclusiveGateway id="gateway_cancellationPossible" name="Cancellation possible?">
+          <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+          <bpmn:incoming>flow_requestToPossibleGateway</bpmn:incoming>
+          <bpmn:outgoing>flow_cancellationPossible</bpmn:outgoing>
+          <bpmn:outgoing>flow_cancellationNotPossible</bpmn:outgoing>
+        </bpmn:exclusiveGateway>
+        <bpmn:task id="userTask_clarifyReturn" name="Clarify return with dealer">
+          <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+          <bpmn:incoming>flow_cancellationNotPossible</bpmn:incoming>
+          <bpmn:outgoing>flow_clarifyToBookCosts</bpmn:outgoing>
+        </bpmn:task>
+        <bpmn:task id="serviceTask_bookCosts" name="Book cancellation costs">
+          <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+          <bpmn:incoming>flow_clarifyToBookCosts</bpmn:incoming>
+          <bpmn:outgoing>flow_bookCostsToJoin</bpmn:outgoing>
+        </bpmn:task>
+        <bpmn:exclusiveGateway id="cbo_gateway_join">
+          <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+          <bpmn:incoming>flow_cancellationPossible</bpmn:incoming>
+          <bpmn:incoming>flow_bookCostsToJoin</bpmn:incoming>
+          <bpmn:outgoing>flow_joinToReversed</bpmn:outgoing>
+        </bpmn:exclusiveGateway>
+        <bpmn:endEvent id="endEvent_orderReversed" name="Order reversed">
+          <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+          <bpmn:incoming>flow_joinToReversed</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="flow_requiredToRequest" sourceRef="startEvent_cancellationRequired" targetRef="serviceTask_requestCancellation" />
+        <bpmn:sequenceFlow id="flow_requestToPossibleGateway" sourceRef="serviceTask_requestCancellation" targetRef="gateway_cancellationPossible" />
+        <bpmn:sequenceFlow id="flow_cancellationPossible" sourceRef="gateway_cancellationPossible" targetRef="cbo_gateway_join" />
+        <bpmn:sequenceFlow id="flow_cancellationNotPossible" sourceRef="gateway_cancellationPossible" targetRef="userTask_clarifyReturn" />
+        <bpmn:sequenceFlow id="flow_clarifyToBookCosts" sourceRef="userTask_clarifyReturn" targetRef="serviceTask_bookCosts" />
+        <bpmn:sequenceFlow id="flow_bookCostsToJoin" sourceRef="serviceTask_bookCosts" targetRef="cbo_gateway_join" />
+        <bpmn:sequenceFlow id="flow_joinToReversed" sourceRef="cbo_gateway_join" targetRef="endEvent_orderReversed" />
+      </bpmn:subProcess>
+      <bpmn:exclusiveGateway id="fmap_gateway_orderCancellationJoin">
+        <bpmn:categoryValueRef>fmap_cv_f4OrderCancellation</bpmn:categoryValueRef>
+        <bpmn:incoming>fmap_flow_bikeNotOrdered</bpmn:incoming>
+        <bpmn:incoming>fmap_flow_cancelOrderToJoin</bpmn:incoming>
+        <bpmn:outgoing>fmap_flow_joinToConfirmation</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:task id="serviceTask_sendCancellationConfirmation" name="Send cancellation confirmation">
+        <bpmn:categoryValueRef>fmap_cv_f3Withdrawal</bpmn:categoryValueRef>
+        <bpmn:incoming>fmap_flow_joinToConfirmation</bpmn:incoming>
+        <bpmn:outgoing>flow_confirmationToCancelled</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:endEvent id="endEvent_applicationCancelled" name="Leasing cancelled">
+        <bpmn:categoryValueRef>fmap_cv_f3Withdrawal</bpmn:categoryValueRef>
+        <bpmn:incoming>flow_confirmationToCancelled</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="flow_withdrawalToReversal" sourceRef="startEvent_applicationWithdrawn" targetRef="event_reverseApplication" />
+      <bpmn:sequenceFlow id="fmap_flow_reversalToBikeOrdered" sourceRef="event_reverseApplication" targetRef="fmap_gateway_bikeOrdered" />
+      <bpmn:sequenceFlow id="fmap_flow_bikeOrderedToCancelOrder" name="yes" sourceRef="fmap_gateway_bikeOrdered" targetRef="callActivity_cancelBikeOrder" />
+      <bpmn:sequenceFlow id="fmap_flow_bikeNotOrdered" name="no" sourceRef="fmap_gateway_bikeOrdered" targetRef="fmap_gateway_orderCancellationJoin" />
+      <bpmn:sequenceFlow id="fmap_flow_cancelOrderToJoin" sourceRef="callActivity_cancelBikeOrder" targetRef="fmap_gateway_orderCancellationJoin" />
+      <bpmn:sequenceFlow id="fmap_flow_joinToConfirmation" sourceRef="fmap_gateway_orderCancellationJoin" targetRef="serviceTask_sendCancellationConfirmation" />
+      <bpmn:sequenceFlow id="flow_confirmationToCancelled" sourceRef="serviceTask_sendCancellationConfirmation" targetRef="endEvent_applicationCancelled" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="flow_requestToCreditCheck" sourceRef="startEvent_leasingRequestReceived" targetRef="businessRuleTask_checkCreditRating" />
+    <bpmn:sequenceFlow id="flow_creditCheckToSolvency" sourceRef="businessRuleTask_checkCreditRating" targetRef="gateway_isSolvent" />
+    <bpmn:sequenceFlow id="flow_solvent" name="yes" sourceRef="gateway_isSolvent" targetRef="serviceTask_sendContract" />
+    <bpmn:sequenceFlow id="flow_notSolvent" name="no" sourceRef="gateway_isSolvent" targetRef="gateway_rejectionJoin" />
+    <bpmn:sequenceFlow id="flow_contractSentToAwait" sourceRef="serviceTask_sendContract" targetRef="gateway_awaitSignature" />
+    <bpmn:sequenceFlow id="flow_contractConcludedToFork" name="yes" sourceRef="gateway_awaitSignature" targetRef="gateway_fork" />
+    <bpmn:sequenceFlow id="tbpm_flow_awaitToRejection" name="no" sourceRef="gateway_awaitSignature" targetRef="gateway_rejectionJoin" />
+    <bpmn:sequenceFlow id="flow_rejectionJoined" sourceRef="gateway_rejectionJoin" targetRef="serviceTask_sendRejection" />
+    <bpmn:sequenceFlow id="flow_rejectionSent" sourceRef="serviceTask_sendRejection" targetRef="endEvent_applicationRejected" />
+    <bpmn:sequenceFlow id="flow_forkToBikeSource" sourceRef="gateway_fork" targetRef="gateway_bikeSourceJoin" />
+    <bpmn:sequenceFlow id="flow_forkToInsurance" sourceRef="gateway_fork" targetRef="serviceTask_issueInsurancePolicy" />
+    <bpmn:sequenceFlow id="flow_insuranceToJoin" sourceRef="serviceTask_issueInsurancePolicy" targetRef="gateway_join" />
+    <bpmn:sequenceFlow id="flow_bikeSourceToOrder" sourceRef="gateway_bikeSourceJoin" targetRef="serviceTask_orderBike" />
+    <bpmn:sequenceFlow id="tbpm_flow_orderToAvailability" sourceRef="serviceTask_orderBike" targetRef="tbpm_gateway_bikeAvailable" />
+    <bpmn:sequenceFlow id="flow_orderedToJoin" name="yes" sourceRef="tbpm_gateway_bikeAvailable" targetRef="gateway_join" />
+    <bpmn:sequenceFlow id="tbpm_flow_availabilityToClarify" name="no" sourceRef="tbpm_gateway_bikeAvailable" targetRef="userTask_clarifyAlternative" />
+    <bpmn:sequenceFlow id="flow_joinToHandover" sourceRef="gateway_join" targetRef="event_handoverReported" />
+    <bpmn:sequenceFlow id="flow_handoverToWithdrawalPeriod" sourceRef="event_handoverReported" targetRef="event_withdrawalPeriodElapsed" />
+    <bpmn:sequenceFlow id="flow_withdrawalElapsedToActive" sourceRef="event_withdrawalPeriodElapsed" targetRef="endEvent_leasingActive" />
+    <bpmn:sequenceFlow id="flow_clarifyToAlternativeGateway" sourceRef="userTask_clarifyAlternative" targetRef="gateway_alternativeFound" />
+    <bpmn:sequenceFlow id="flow_alternativeFound" name="yes" sourceRef="gateway_alternativeFound" targetRef="gateway_bikeSourceJoin" />
+    <bpmn:sequenceFlow id="tbpm_flow_alternativeGatewayToCancel" name="no" sourceRef="gateway_alternativeFound" targetRef="serviceTask_cancelContract" />
+    <bpmn:sequenceFlow id="tbpm_flow_cancelToConfirmation" sourceRef="serviceTask_cancelContract" targetRef="serviceTask_confirmContractCancellation" />
+    <bpmn:sequenceFlow id="flow_confirmationToContractCancelled" sourceRef="serviceTask_confirmContractCancellation" targetRef="endEvent_contractCancelled" />
+    <bpmn:sequenceFlow id="flow_reminderToMail" sourceRef="event_signatureReminder" targetRef="serviceTask_sendReminderMail" />
+    <bpmn:sequenceFlow id="flow_mailToProspectReminded" sourceRef="serviceTask_sendReminderMail" targetRef="endEvent_prospectReminded" />
+  </bpmn:process>
+  <bpmn:category id="fmap_category_features">
+    <bpmn:categoryValue id="fmap_cv_coreApply" value="Core · runs today: apply and check credit" />
+    <bpmn:categoryValue id="fmap_cv_coreContract" value="Core · runs today: conclude the contract" />
+    <bpmn:categoryValue id="fmap_cv_coreReject" value="Core · runs today: reject the application" />
+    <bpmn:categoryValue id="fmap_cv_coreOrder" value="Core · runs today: order the bike, clarify alternatives" />
+    <bpmn:categoryValue id="fmap_cv_coreCancel" value="Core · runs today: cancel when no alternative is found" />
+    <bpmn:categoryValue id="fmap_cv_coreActivate" value="Core · runs today: hand over and activate" />
+    <bpmn:categoryValue id="fmap_cv_f1Reminder" value="#1 Signature reminder · Stage 1" />
+    <bpmn:categoryValue id="fmap_cv_f2Insurance" value="#2 Insurance policy · Stage 2" />
+    <bpmn:categoryValue id="fmap_cv_f3Withdrawal" value="#3 Withdrawal · Stage 3" />
+    <bpmn:categoryValue id="fmap_cv_f4OrderCancellation" value="#4 Bike order cancellation · Stage 3" />
+  </bpmn:category>
+  <bpmndi:BPMNDiagram id="fmap_diagram_bikeLeasing">
+    <bpmndi:BPMNPlane id="fmap_plane_bikeLeasing" bpmnElement="fmap_collaboration_bikeLeasing">
+      <bpmndi:BPMNShape id="fmap_participant_bikeLeasing_di" bpmnElement="fmap_participant_bikeLeasing" isHorizontal="true">
+        <dc:Bounds x="100" y="40" width="1850" height="1225" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="startEvent_leasingRequestReceived_di" bpmnElement="startEvent_leasingRequestReceived">
+        <dc:Bounds x="182" y="457" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="160" y="500" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="businessRuleTask_checkCreditRating_di" bpmnElement="businessRuleTask_checkCreditRating">
+        <dc:Bounds x="270" y="435" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_isSolvent_di" bpmnElement="gateway_isSolvent" isMarkerVisible="true">
+        <dc:Bounds x="425" y="450" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="428" y="428" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_sendContract_di" bpmnElement="serviceTask_sendContract">
+        <dc:Bounds x="540" y="435" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_awaitSignature_di" bpmnElement="gateway_awaitSignature" isMarkerVisible="true">
+        <dc:Bounds x="695" y="450" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="682" y="418" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_rejectionJoin_di" bpmnElement="gateway_rejectionJoin" isMarkerVisible="true">
+        <dc:Bounds x="695" y="640" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="677" y="697" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_sendRejection_di" bpmnElement="serviceTask_sendRejection">
+        <dc:Bounds x="780" y="625" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_applicationRejected_di" bpmnElement="endEvent_applicationRejected">
+        <dc:Bounds x="917" y="647" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="905" y="690" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_bikeSourceJoin_di" bpmnElement="gateway_bikeSourceJoin" isMarkerVisible="true">
+        <dc:Bounds x="1025" y="450" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_orderBike_di" bpmnElement="serviceTask_orderBike">
+        <dc:Bounds x="1120" y="435" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="tbpm_gateway_bikeAvailable_di" bpmnElement="tbpm_gateway_bikeAvailable" isMarkerVisible="true">
+        <dc:Bounds x="1275" y="450" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1262" y="428" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="userTask_clarifyAlternative_di" bpmnElement="userTask_clarifyAlternative">
+        <dc:Bounds x="1250" y="625" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_alternativeFound_di" bpmnElement="gateway_alternativeFound" isMarkerVisible="true">
+        <dc:Bounds x="1405" y="640" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1385" y="618" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_cancelContract_di" bpmnElement="serviceTask_cancelContract">
+        <dc:Bounds x="1520" y="625" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_confirmContractCancellation_di" bpmnElement="serviceTask_confirmContractCancellation">
+        <dc:Bounds x="1670" y="625" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_contractCancelled_di" bpmnElement="endEvent_contractCancelled">
+        <dc:Bounds x="1832" y="647" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1820" y="690" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="event_handoverReported_di" bpmnElement="event_handoverReported">
+        <dc:Bounds x="1612" y="457" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1600" y="500" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="event_withdrawalPeriodElapsed_di" bpmnElement="event_withdrawalPeriodElapsed">
+        <dc:Bounds x="1732" y="457" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1705" y="500" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_leasingActive_di" bpmnElement="endEvent_leasingActive">
+        <dc:Bounds x="1852" y="457" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1835" y="500" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="event_signatureReminder_di" bpmnElement="event_signatureReminder" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="547" y="417" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="573" y="383" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_sendReminderMail_di" bpmnElement="serviceTask_sendReminderMail" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="515" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_prospectReminded_di" bpmnElement="endEvent_prospectReminded" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="657" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="645" y="255" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_fork_di" bpmnElement="gateway_fork" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="845" y="450" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_issueInsurancePolicy_di" bpmnElement="serviceTask_issueInsurancePolicy" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1150" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_join_di" bpmnElement="gateway_join" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1505" y="450" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="subProcess_applicationWithdrawn_di" bpmnElement="subProcess_applicationWithdrawn" isExpanded="true" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <dc:Bounds x="195" y="880" width="1465" height="345" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="startEvent_applicationWithdrawn_di" bpmnElement="startEvent_applicationWithdrawn" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="232" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="205" y="1035" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="event_reverseApplication_di" bpmnElement="event_reverseApplication" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="332" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="315" y="1035" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_gateway_bikeOrdered_di" bpmnElement="fmap_gateway_bikeOrdered" isMarkerVisible="true" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="445" y="985" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="425" y="953" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="callActivity_cancelBikeOrder_di" bpmnElement="callActivity_cancelBikeOrder" isExpanded="true" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <dc:Bounds x="540" y="935" width="750" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="startEvent_cancellationRequired_di" bpmnElement="startEvent_cancellationRequired" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="572" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="560" y="1035" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_requestCancellation_di" bpmnElement="serviceTask_requestCancellation" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="650" y="970" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="gateway_cancellationPossible_di" bpmnElement="gateway_cancellationPossible" isMarkerVisible="true" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="795" y="985" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="782" y="953" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="userTask_clarifyReturn_di" bpmnElement="userTask_clarifyReturn" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="880" y="1080" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_bookCosts_di" bpmnElement="serviceTask_bookCosts" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1020" y="1080" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cbo_gateway_join_di" bpmnElement="cbo_gateway_join" isMarkerVisible="true" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1135" y="985" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_orderReversed_di" bpmnElement="endEvent_orderReversed" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1222" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1205" y="1035" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_gateway_orderCancellationJoin_di" bpmnElement="fmap_gateway_orderCancellationJoin" isMarkerVisible="true" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1325" y="985" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="serviceTask_sendCancellationConfirmation_di" bpmnElement="serviceTask_sendCancellationConfirmation" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1420" y="970" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_applicationCancelled_di" bpmnElement="endEvent_applicationCancelled" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="1582" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1570" y="1035" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow_requestToCreditCheck_di" bpmnElement="flow_requestToCreditCheck">
+        <di:waypoint x="218" y="475" />
+        <di:waypoint x="270" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_creditCheckToSolvency_di" bpmnElement="flow_creditCheckToSolvency">
+        <di:waypoint x="370" y="475" />
+        <di:waypoint x="425" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_solvent_di" bpmnElement="flow_solvent">
+        <di:waypoint x="475" y="475" />
+        <di:waypoint x="540" y="475" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="516" y="456" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_notSolvent_di" bpmnElement="flow_notSolvent">
+        <di:waypoint x="450" y="500" />
+        <di:waypoint x="450" y="665" />
+        <di:waypoint x="695" y="665" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="456" y="535" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_contractSentToAwait_di" bpmnElement="flow_contractSentToAwait">
+        <di:waypoint x="640" y="475" />
+        <di:waypoint x="695" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_contractConcludedToFork_di" bpmnElement="flow_contractConcludedToFork" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="745" y="475" />
+        <di:waypoint x="845" y="475" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="764" y="455" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tbpm_flow_awaitToRejection_di" bpmnElement="tbpm_flow_awaitToRejection">
+        <di:waypoint x="720" y="500" />
+        <di:waypoint x="720" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="726" y="535" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_rejectionJoined_di" bpmnElement="flow_rejectionJoined">
+        <di:waypoint x="745" y="665" />
+        <di:waypoint x="780" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_rejectionSent_di" bpmnElement="flow_rejectionSent">
+        <di:waypoint x="880" y="665" />
+        <di:waypoint x="917" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_forkToBikeSource_di" bpmnElement="flow_forkToBikeSource" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="895" y="475" />
+        <di:waypoint x="1025" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_forkToInsurance_di" bpmnElement="flow_forkToInsurance" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="870" y="450" />
+        <di:waypoint x="870" y="230" />
+        <di:waypoint x="1150" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_insuranceToJoin_di" bpmnElement="flow_insuranceToJoin" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1250" y="230" />
+        <di:waypoint x="1530" y="230" />
+        <di:waypoint x="1530" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_bikeSourceToOrder_di" bpmnElement="flow_bikeSourceToOrder">
+        <di:waypoint x="1075" y="475" />
+        <di:waypoint x="1120" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tbpm_flow_orderToAvailability_di" bpmnElement="tbpm_flow_orderToAvailability">
+        <di:waypoint x="1220" y="475" />
+        <di:waypoint x="1275" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_orderedToJoin_di" bpmnElement="flow_orderedToJoin" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1325" y="475" />
+        <di:waypoint x="1505" y="475" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1344" y="455" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tbpm_flow_availabilityToClarify_di" bpmnElement="tbpm_flow_availabilityToClarify">
+        <di:waypoint x="1300" y="500" />
+        <di:waypoint x="1300" y="625" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1306" y="535" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_joinToHandover_di" bpmnElement="flow_joinToHandover" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1555" y="475" />
+        <di:waypoint x="1612" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_handoverToWithdrawalPeriod_di" bpmnElement="flow_handoverToWithdrawalPeriod">
+        <di:waypoint x="1648" y="475" />
+        <di:waypoint x="1732" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_withdrawalElapsedToActive_di" bpmnElement="flow_withdrawalElapsedToActive">
+        <di:waypoint x="1768" y="475" />
+        <di:waypoint x="1852" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_clarifyToAlternativeGateway_di" bpmnElement="flow_clarifyToAlternativeGateway">
+        <di:waypoint x="1350" y="665" />
+        <di:waypoint x="1405" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_alternativeFound_di" bpmnElement="flow_alternativeFound">
+        <di:waypoint x="1430" y="690" />
+        <di:waypoint x="1430" y="735" />
+        <di:waypoint x="1050" y="735" />
+        <di:waypoint x="1050" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1436" y="703" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tbpm_flow_alternativeGatewayToCancel_di" bpmnElement="tbpm_flow_alternativeGatewayToCancel">
+        <di:waypoint x="1455" y="665" />
+        <di:waypoint x="1520" y="665" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1463" y="645" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="tbpm_flow_cancelToConfirmation_di" bpmnElement="tbpm_flow_cancelToConfirmation">
+        <di:waypoint x="1620" y="665" />
+        <di:waypoint x="1670" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_confirmationToContractCancelled_di" bpmnElement="flow_confirmationToContractCancelled">
+        <di:waypoint x="1770" y="665" />
+        <di:waypoint x="1832" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_reminderToMail_di" bpmnElement="flow_reminderToMail" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="565" y="417" />
+        <di:waypoint x="565" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_mailToProspectReminded_di" bpmnElement="flow_mailToProspectReminded" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="615" y="230" />
+        <di:waypoint x="657" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_withdrawalToReversal_di" bpmnElement="flow_withdrawalToReversal" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="268" y="1010" />
+        <di:waypoint x="332" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fmap_flow_reversalToBikeOrdered_di" bpmnElement="fmap_flow_reversalToBikeOrdered" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="368" y="1010" />
+        <di:waypoint x="445" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fmap_flow_bikeOrderedToCancelOrder_di" bpmnElement="fmap_flow_bikeOrderedToCancelOrder" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="495" y="1010" />
+        <di:waypoint x="540" y="1010" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="507" y="990" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fmap_flow_bikeNotOrdered_di" bpmnElement="fmap_flow_bikeNotOrdered" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="470" y="1035" />
+        <di:waypoint x="470" y="1195" />
+        <di:waypoint x="1350" y="1195" />
+        <di:waypoint x="1350" y="1035" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="476" y="1070" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fmap_flow_cancelOrderToJoin_di" bpmnElement="fmap_flow_cancelOrderToJoin" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1290" y="1010" />
+        <di:waypoint x="1325" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fmap_flow_joinToConfirmation_di" bpmnElement="fmap_flow_joinToConfirmation" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1375" y="1010" />
+        <di:waypoint x="1420" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_confirmationToCancelled_di" bpmnElement="flow_confirmationToCancelled" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1520" y="1010" />
+        <di:waypoint x="1582" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_requiredToRequest_di" bpmnElement="flow_requiredToRequest" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="608" y="1010" />
+        <di:waypoint x="650" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_requestToPossibleGateway_di" bpmnElement="flow_requestToPossibleGateway" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="750" y="1010" />
+        <di:waypoint x="795" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_cancellationPossible_di" bpmnElement="flow_cancellationPossible" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="845" y="1010" />
+        <di:waypoint x="1135" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_cancellationNotPossible_di" bpmnElement="flow_cancellationNotPossible" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="820" y="1035" />
+        <di:waypoint x="820" y="1120" />
+        <di:waypoint x="880" y="1120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_clarifyToBookCosts_di" bpmnElement="flow_clarifyToBookCosts" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="980" y="1120" />
+        <di:waypoint x="1020" y="1120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_bookCostsToJoin_di" bpmnElement="flow_bookCostsToJoin" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1120" y="1120" />
+        <di:waypoint x="1160" y="1120" />
+        <di:waypoint x="1160" y="1035" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_joinToReversed_di" bpmnElement="flow_joinToReversed" bioc:stroke="#6b3c00" color:border-color="#6b3c00">
+        <di:waypoint x="1185" y="1010" />
+        <di:waypoint x="1222" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="fmap_group_coreApply_di" bpmnElement="fmap_group_coreApply" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="145" y="395" width="350" height="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="153" y="401" width="230" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_coreContract_di" bpmnElement="fmap_group_coreContract" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="510" y="395" width="320" height="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="598" y="401" width="225" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_coreReject_di" bpmnElement="fmap_group_coreReject" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="670" y="565" width="315" height="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="571" width="228" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_coreOrder_di" bpmnElement="fmap_group_coreOrder" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1005" y="395" width="475" height="360" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1013" y="401" width="300" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_coreCancel_di" bpmnElement="fmap_group_coreCancel" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1495" y="565" width="425" height="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1503" y="571" width="300" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_coreActivate_di" bpmnElement="fmap_group_coreActivate" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1585" y="395" width="335" height="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1593" y="401" width="230" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_f1Reminder_di" bpmnElement="fmap_group_f1Reminder" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="495" y="140" width="265" height="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="503" y="146" width="180" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_f2Insurance_di" bpmnElement="fmap_group_f2Insurance" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="845" y="140" width="710" height="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="853" y="146" width="170" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_f3Withdrawal_di" bpmnElement="fmap_group_f3Withdrawal" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="175" y="845" width="1505" height="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="183" y="851" width="140" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fmap_group_f4OrderCancellation_di" bpmnElement="fmap_group_f4OrderCancellation" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
+        <dc:Bounds x="430" y="905" width="965" height="305" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="438" y="911" width="210" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
