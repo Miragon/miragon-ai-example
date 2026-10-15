@@ -1,4 +1,4 @@
-# 0012 — Actuator probes and Prometheus metrics
+# 0009 — Actuator probes and Prometheus metrics
 
 - **Status:** Accepted
 - **Date:** 2026-08-20

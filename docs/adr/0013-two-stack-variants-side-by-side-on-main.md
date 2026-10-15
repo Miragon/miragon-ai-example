@@ -1,7 +1,10 @@
 # 0013 — Two stack variants side by side on `main`
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md)
 - **Date:** 2026-10-08
+- **Amended by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md) (2026-10-15):** there is
+  no `java-maven` tag in this repository; the last tree with both variants is commit `40da36e` (tag
+  `original-process-v1`).
 
 ## Context
 

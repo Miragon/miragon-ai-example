@@ -1,4 +1,4 @@
-# 0008 — Fixed ports for v1, portless as the upgrade path
+# 0006 — Fixed ports for v1, portless as the upgrade path
 
 - **Status:** Accepted
 - **Date:** 2026-08-18

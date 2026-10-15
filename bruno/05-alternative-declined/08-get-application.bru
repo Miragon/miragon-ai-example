@@ -1,0 +1,24 @@
+meta {
+  name: Get the leasing application after the contract was cancelled
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{applicationId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollApp("/api/bike-leasing/" + bru.getVar("applicationId"),
+    (b, s) => s === 200 && b && b.status === "CANCELLED");
+}
+
+assert {
+  res.status: eq 200
+  res.body.applicationId: eq {{applicationId}}
+  res.body.status: eq CANCELLED
+  res.body.contractId: isDefined
+  res.body.orderId: isNull
+}

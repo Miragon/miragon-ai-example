@@ -1,7 +1,11 @@
-# 0004 — OpenAPI as the checked-in contract
+# 0003 — OpenAPI as the checked-in contract
 
 - **Status:** Accepted
 - **Date:** 2026-08-18
+- **Amended by [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** the core
+  API has five operations (`submitLeasingRequest`, `getLeasingApplication`, `signContract`,
+  `selectAlternative`, `reportHandover`); `listLeasingApplications`, the example below, was removed
+  with the application list.
 
 ## Context
 

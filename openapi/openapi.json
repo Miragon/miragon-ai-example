@@ -2,53 +2,11 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "MiraVelo Bike-Leasing API",
-    "description" : "Customer-portal and back-office endpoints for the MiraVelo bike-leasing process. The engine-internal /engine-rest API is intentionally excluded.",
+    "description" : "Endpoints that drive the MiraVelo bike-leasing process: submit a request, read an application, sign the contract, clarify an alternative bike and report the handover. The engine-internal /engine-rest API is intentionally excluded.",
     "version" : "1.0"
   },
   "paths" : {
     "/api/bike-leasing" : {
-      "get" : {
-        "tags" : [ "list-leasing-applications-controller" ],
-        "operationId" : "listLeasingApplications",
-        "parameters" : [ {
-          "name" : "status",
-          "in" : "query",
-          "required" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "page",
-          "in" : "query",
-          "required" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32",
-            "default" : 0
-          }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "required" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32",
-            "default" : 20
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "*/*" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/LeasingApplicationPageDto"
-                }
-              }
-            }
-          }
-        }
-      },
       "post" : {
         "tags" : [ "submit-leasing-request-controller" ],
         "operationId" : "submitLeasingRequest",
@@ -64,7 +22,7 @@
         },
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "The id of the new leasing application",
             "content" : {
               "*/*" : {
                 "schema" : {
@@ -72,25 +30,16 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/api/bike-leasing/{applicationId}/withdraw" : {
-      "post" : {
-        "tags" : [ "withdraw-application-controller" ],
-        "operationId" : "withdrawApplication",
-        "parameters" : [ {
-          "name" : "applicationId",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK"
+          },
+          "400" : {
+            "description" : "Invalid request, for example no income",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -108,8 +57,28 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK"
+          "202" : {
+            "description" : "Accepted: the process continues asynchronously"
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "The case is not waiting for a signature",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -127,8 +96,28 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK"
+          "202" : {
+            "description" : "Accepted: the process continues asynchronously"
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "The case is not waiting for the handover",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -156,47 +145,25 @@
           "required" : true
         },
         "responses" : {
-          "200" : {
-            "description" : "OK"
-          }
-        }
-      }
-    },
-    "/api/tasks/clarify-alternative" : {
-      "get" : {
-        "tags" : [ "get-pending-clarifications-controller" ],
-        "operationId" : "listPendingClarifications",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
+          "202" : {
+            "description" : "Accepted: the task is completed, the process continues asynchronously"
+          },
+          "400" : {
+            "description" : "Invalid application id, or an accepted alternative without a bike id",
             "content" : {
-              "*/*" : {
+              "application/problem+json" : {
                 "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/PendingClarificationDto"
-                  }
+                  "$ref" : "#/components/schemas/ProblemDetail"
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/api/bikes" : {
-      "get" : {
-        "tags" : [ "list-bikes-controller" ],
-        "operationId" : "listBikes",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
+          },
+          "404" : {
+            "description" : "Unknown application, or no open clarification task",
             "content" : {
-              "*/*" : {
+              "application/problem+json" : {
                 "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/BikeDto"
-                  }
+                  "$ref" : "#/components/schemas/ProblemDetail"
                 }
               }
             }
@@ -218,7 +185,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "The leasing application",
             "content" : {
               "*/*" : {
                 "schema" : {
@@ -226,6 +193,19 @@
                 }
               }
             }
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Unknown application (no body)"
           }
         }
       }
@@ -241,27 +221,9 @@
           },
           "bikeId" : {
             "type" : [ "string", "null" ]
-          },
-          "bikeModel" : {
-            "type" : [ "string", "null" ]
           }
         },
         "required" : [ "alternativeFound" ]
-      },
-      "BikeDto" : {
-        "type" : "object",
-        "properties" : {
-          "bikeId" : {
-            "type" : "string"
-          },
-          "model" : {
-            "type" : "string"
-          },
-          "available" : {
-            "type" : "boolean"
-          }
-        },
-        "required" : [ "available", "bikeId", "model" ]
       },
       "LeasingApplicationCreatedDto" : {
         "type" : "object",
@@ -295,9 +257,6 @@
           "bikeId" : {
             "type" : "string"
           },
-          "bikeModel" : {
-            "type" : [ "string", "null" ]
-          },
           "status" : {
             "type" : "string"
           },
@@ -313,59 +272,6 @@
           }
         },
         "required" : [ "age", "applicationId", "bikeId", "createdAt", "customerName", "email", "monthlyNetIncome", "status" ]
-      },
-      "LeasingApplicationPageDto" : {
-        "type" : "object",
-        "properties" : {
-          "items" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/LeasingApplicationSummaryDto"
-            }
-          },
-          "page" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "size" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "totalElements" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "totalPages" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        },
-        "required" : [ "items", "page", "size", "totalElements", "totalPages" ]
-      },
-      "LeasingApplicationSummaryDto" : {
-        "type" : "object",
-        "properties" : {
-          "applicationId" : {
-            "type" : "string"
-          },
-          "customerName" : {
-            "type" : "string"
-          },
-          "bikeId" : {
-            "type" : "string"
-          },
-          "bikeModel" : {
-            "type" : [ "string", "null" ]
-          },
-          "status" : {
-            "type" : "string"
-          },
-          "createdAt" : {
-            "type" : "string",
-            "format" : "date-time"
-          }
-        },
-        "required" : [ "applicationId", "bikeId", "createdAt", "customerName", "status" ]
       },
       "LeasingRequestInput" : {
         "type" : "object",
@@ -386,34 +292,36 @@
           },
           "bikeId" : {
             "type" : "string"
-          },
-          "bikeModel" : {
-            "type" : "string"
           }
         },
-        "required" : [ "age", "bikeId", "bikeModel", "customerName", "email", "monthlyNetIncome" ]
+        "required" : [ "age", "bikeId", "customerName", "email", "monthlyNetIncome" ]
       },
-      "PendingClarificationDto" : {
+      "ProblemDetail" : {
         "type" : "object",
         "properties" : {
-          "applicationId" : {
-            "type" : "string"
-          },
-          "customerName" : {
-            "type" : "string"
-          },
-          "requestedBikeId" : {
-            "type" : "string"
-          },
-          "requestedBikeModel" : {
-            "type" : [ "string", "null" ]
-          },
-          "waitingSince" : {
+          "type" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "uri"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "detail" : {
+            "type" : "string"
+          },
+          "instance" : {
+            "type" : "string",
+            "format" : "uri"
+          },
+          "properties" : {
+            "type" : "object",
+            "additionalProperties" : { }
           }
-        },
-        "required" : [ "applicationId", "customerName", "requestedBikeId", "waitingSince" ]
+        }
       }
     }
   }

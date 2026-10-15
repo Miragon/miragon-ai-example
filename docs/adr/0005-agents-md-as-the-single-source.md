@@ -1,4 +1,4 @@
-# 0007 — AGENTS.md as the single source of agent instructions
+# 0005 — AGENTS.md as the single source of agent instructions
 
 - **Status:** Accepted
 - **Date:** 2026-08-18

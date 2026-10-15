@@ -1,0 +1,2 @@
+# designIQ reads its models from this one folder (see docs/README.md).
+models: docs

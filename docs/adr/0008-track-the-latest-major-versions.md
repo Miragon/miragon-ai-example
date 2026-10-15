@@ -1,4 +1,4 @@
-# 0011 — Deliberately track the latest major versions
+# 0008 — Deliberately track the latest major versions
 
 - **Status:** Accepted
 - **Date:** 2026-08-20
