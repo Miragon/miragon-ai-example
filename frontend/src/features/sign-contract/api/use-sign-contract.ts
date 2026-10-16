@@ -1,0 +1,22 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/shared/ui";
+import { useCopy } from "@/shared/i18n";
+import { useSignContract } from "@/shared/api/generated/endpoints";
+import { leasingApplicationKeys } from "@/entities/leasing-application";
+
+export function useSignContractAction(applicationId: string) {
+  const copy = useCopy();
+  const queryClient = useQueryClient();
+  return useSignContract({
+    mutation: {
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: leasingApplicationKeys.all }),
+          queryClient.invalidateQueries({ queryKey: leasingApplicationKeys.detail(applicationId) }),
+        ]);
+        toast.success(copy.actions.signSuccess);
+      },
+      onError: () => toast.error(copy.actions.error),
+    },
+  });
+}
