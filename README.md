@@ -3,28 +3,33 @@
 [![Pre-Merge Checks](https://github.com/miragon-blueprints/miragon-ai-example/actions/workflows/pre-merge.yml/badge.svg)](https://github.com/miragon-blueprints/miragon-ai-example/actions/workflows/pre-merge.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-An example of how we at Miragon automate a business process when AI agents do much of the work:
-one BPMN model that runs on an embedded [CIB seven](https://cibseven.org) engine, a Kotlin service
-and a React frontend around it, and the design artifacts that explain it, all in one repository.
-Guardrails decide what a change may do, and the open features are issues anchored to the model.
+A solution template for process automation with AI agents. On one small but complete process, it
+shows how we at Miragon get from the business picture to a running application: a BPMN model on an
+embedded [CIB seven](https://cibseven.org) engine, a Kotlin service and a React frontend around it,
+and the design artifacts that explain them, in one repository that people and agents work on
+together.
 
 ![The frontend: an ordered application with its data, the next actions and the process timeline](docs/assets/frontend-application.png)
 
 ## Why
 
-An agent can write a delegate, a controller or a React page in seconds. Whether the result is right
-depends on what the repository tells it, and on what the repository refuses. This example shows the
-setup we use for that:
+Agents write code fast. What they don't know on their own is which process the code serves, which
+rules it has to keep and what comes next. In most projects that knowledge is spread across workshop
+boards, wikis, tickets and code. This template keeps it in one place and makes it checkable:
 
-- **The model is the source.** The executable BPMN lives next to the use case and the glossary. Gradle
-  generates a typed process API from it, so code that references a removed element no longer compiles.
-- **The rules are machine-checked.** ArchUnit and Konsist enforce the hexagonal architecture,
-  mutation testing (gate 80) catches tests that assert nothing, bpmnlint checks the executable model, and the
-  OpenAPI contract and the generated frontend client are drift-gated in CI.
-- **One file of instructions.** [AGENTS.md](AGENTS.md) is what humans and agents read first;
-  `.claude/` adds skills for recurring work and review agents.
-- **Work is anchored to the process.** Every feature issue starts with an anchor block that pins it
-  to BPMN elements, so [designIQ](docs/README.md) shows it as a todo on the model.
+- **From the business picture to running code.** Use case, glossary, t.BPM model, feature map, C4
+  and Wardley Map sit in [`docs/`](docs/README.md) next to the executable BPMN. designIQ shows them,
+  and Gradle deploys the model from the same folder, so every layer traces back to a process step.
+- **The process model is the contract.** A typed process API is generated from the BPMN, so code
+  that references a removed element no longer compiles, and the process tests walk its paths.
+- **Guardrails, not only reviews.** Architecture tests, a mutation gate, bpmnlint and drift gates on
+  the OpenAPI contract and the frontend client fail the build when a change breaks a rule, whether a
+  person or an agent wrote it.
+- **The next work sits on the model.** The gap to the target process is a set of GitHub issues
+  anchored to BPMN elements, shown as todos on the model. [AGENTS.md](AGENTS.md), the skills and the
+  review agents in `.claude/` take an agent from such an issue to a pull request.
+- **A starting point to fork.** A real UI for customers and the back office, operations in the
+  Cockpit with retries and incidents, CI and containers: replace the process and keep the rest.
 
 ## The process
 
