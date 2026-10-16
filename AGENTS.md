@@ -120,7 +120,8 @@ npm --prefix frontend ci && npm --prefix frontend run dev
 
 | What | Port |
 |---|---|
-| Frontend (Vite dev server, proxies `/api`, `/engine-rest`, `/camunda` to 8081) | 5173 |
+| Frontend (Vite dev server, proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda` to 8081) | 5173 |
+| Frontend in a container (nginx, `stack/docker-compose.full.yml`) | 8090 |
 | Postgres | 5432 |
 | Backend (REST + `/engine-rest`) | 8081 |
 | CIB seven Cockpit / Tasklist / Admin | 8081/camunda (admin/admin) |
@@ -195,8 +196,8 @@ CONTRIBUTING "Run it in containers".
   rendering, and refresh the PNG in `docs/assets/` when a model's picture changes.
 - **Validate** every changed model with the validator (see Build Commands), or with the dry-run
   `validate_model` MCP tool. The executable model validates without errors or warnings; keep it
-  that way. The frozen original shows known errors (compensation false positives, too many
-  activities); a change must add no other error.
+  that way. The frozen original shows 9 known errors (unreachable / dead-end compensation handlers
+  and the call activity) and 2 warnings; a change must add no other finding.
 - **Todos are GitHub issues** labelled `todo` and `process:bike-leasing`, with this anchor block at the
   very top of the body (one `element:` line per element; none for a process-level todo):
 
@@ -220,7 +221,7 @@ CONTRIBUTING "Run it in containers".
 |---|---|---|
 | [#18](https://github.com/miragon-blueprints/miragon-ai-example/issues/18) | Signature deadline (14 days) | Stage 1 – Customer follow-up |
 | [#1](https://github.com/miragon-blueprints/miragon-ai-example/issues/1) | Signature reminder (depends on #18) | Stage 1 – Customer follow-up |
-| [#19](https://github.com/miragon-blueprints/miragon-ai-example/issues/19) | Credit check via DMN | Stage 2 – Automation and supply |
+| [#19](https://github.com/miragon-blueprints/miragon-ai-example/issues/19) | Credit check by DMN | Stage 2 – Automation and supply |
 | [#20](https://github.com/miragon-blueprints/miragon-ai-example/issues/20) | Alternative bike when unavailable | Stage 2 – Automation and supply |
 | [#21](https://github.com/miragon-blueprints/miragon-ai-example/issues/21) | Withdrawal period before activation | Stage 3 – Withdrawal |
 | [#3](https://github.com/miragon-blueprints/miragon-ai-example/issues/3) | Automatic reversal (compensation) | Stage 3 – Withdrawal |
@@ -230,8 +231,8 @@ CONTRIBUTING "Run it in containers".
 | [#9](https://github.com/miragon-blueprints/miragon-ai-example/issues/9) | Decision: customer notification | – |
 | [#10](https://github.com/miragon-blueprints/miragon-ai-example/issues/10) | Decision: dealer integration | – |
 
-Delivered by the rebase and closed: #2 (insurance policy), #5 (back-office inbox), #6 (application
-list) and the decision #11 (task UI, [ADR-0019](docs/adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
+Delivered by the rebase, to be closed with its merge: #2 (insurance policy), #5 (back-office inbox),
+#6 (application list) and the decision #11 (task UI, [ADR-0019](docs/adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
 
 - **Implementing a feature** means following its acceptance criteria through every layer: model,
   regenerated process API, code, tests, `openapi.json`, the regenerated frontend client and the UI

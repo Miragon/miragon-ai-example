@@ -2,8 +2,9 @@
 
 A [Bruno](https://www.usebruno.com) collection that drives the bike-leasing process end to end
 against a **running** service. Domain endpoints trigger the business actions (including the two
-back-office tasks); the CIB seven `/engine-rest` API is only read: process instances, history, jobs
-and incidents. Every flow node is `asyncAfter`, so each step polls for the wait state it needs
+back-office tasks); the CIB seven `/engine-rest` API reads process instances, history, jobs and
+incidents, and resets the retries of the failed job in the incident demo. The tasks, events and
+the order step are asynchronous continuations, so each step polls for the wait state it needs
 (`pollApp`, `pollEngine`, `pollActivity` in `collection.bru`, see ADR-0012) instead of sleeping. CI
 runs the collection on every pull request. Run the commands from this folder.
 
@@ -30,7 +31,8 @@ Run `00-demo-data` on its own to prepare a live demo: the frontend list and the 
 npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local
 ```
 
-To start again from an empty engine, follow "Demo data and reset" in the [README](../README.md).
+To start again from an empty engine, follow "Bruno scenarios and demo data" in
+[CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## 📮 Start a case by hand
 

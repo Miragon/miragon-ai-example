@@ -92,7 +92,7 @@ by. The architecture tests ([ArchitectureTest][arch]) enforce these directions.
 flowchart TB
   subgraph service["Bike-leasing service: components"]
     webapps["CIB seven webapps, engine REST<br/>library<br/>/camunda, /webapp, /engine-rest"]
-    rest["adapter.inbound.rest<br/>11 REST controllers<br/>/api/bike-leasing, /api/tasks, /api/bikes"]
+    rest["adapter.inbound.rest<br/>10 REST controllers<br/>/api/bike-leasing, /api/tasks, /api/bikes"]
     engine["CIB seven process engine<br/>library, runs bike-leasing.bpmn"]
     delegates["adapter.inbound.cibseven<br/>5 delegates"]
     inPorts["application.port.inbound<br/>11 use cases, 4 queries"]
@@ -142,7 +142,7 @@ from.
 
 | Component | What it is | Origin in the process | Source in the repo |
 |---|---|---|---|
-| `adapter.inbound.rest` | 11 controllers: submit, list, get, sign, report handover, withdraw (`/api/bike-leasing`), the credit-check and reversal completions (`/api/bike-leasing/{id}/credit-check`, `.../reversal`), the open tasks (`/api/tasks`) and the catalogue (`/api/bikes`). Errors become problem details: 400 invalid input, 404 unknown application, 409 when the state forbids the action, the task is not open or a job updated the case at the same time. Also the metadata of the [OpenAPI contract][openapi]. | Leasing request received, Contract signed, Handover reported, Application withdrawn, Check credit rating, Reverse application; reading applications, tasks and bikes | [adapter/inbound/rest][pkg-rest] |
+| `adapter.inbound.rest` | 10 controllers: submit, list, get, sign, report handover, withdraw (`/api/bike-leasing`), the credit-check and reversal completions (`/api/bike-leasing/{id}/credit-check`, `.../reversal`), the open tasks (`/api/tasks`) and the catalogue (`/api/bikes`). Errors become problem details: 400 invalid input, 404 unknown application, 409 when the state forbids the action, the task is not open or a job updated the case at the same time. Also the metadata of the [OpenAPI contract][openapi]. | Leasing request received, Contract signed, Handover reported, Application withdrawn, Check credit rating, Reverse application; reading applications, tasks and bikes | [adapter/inbound/rest][pkg-rest] |
 | `adapter.inbound.cibseven` | 5 JavaDelegates the engine calls by delegate expression, such as `#{sendContractDelegate}`. `ValidateApplicationDelegate` turns an invalid application into the BPMN error `applicationInvalid`. | Validate application, Send contract, Issue insurance policy, Order bike from dealer, Send rejection | [adapter/inbound/cibseven][pkg-delegates] |
 | `application.port.inbound` | One interface per use case: 11 use cases and the queries `GetLeasingApplicationQuery`, `ListLeasingApplicationsQuery`, `ListOpenTasksQuery`, `ListBikesQuery`. | Called over REST: submit, sign contract, report handover, withdraw, complete credit check, complete reversal. Called by the engine: validate, send contract, issue insurance policy, order bike, reject. | [application/port/inbound][pkg-in] |
 | `application.service` | One service per use case or query; transactional, so domain writes and engine state commit together. | The same steps | [application/service][pkg-service] |
@@ -164,7 +164,7 @@ Not drawn above; each issue describes its change.
 
 - [#18 Signature deadline][i18] and [#1 Signature reminder][i1]: timers in the engine, no new box.
   #1 sends one more message through `NotificationPort`.
-- [#19 Credit check via DMN][i19]: the decision `checkCreditRating` is deployed again and runs in
+- [#19 Credit check by DMN][i19]: the decision `checkCreditRating` is deployed again and runs in
   the engine; the credit check leaves the inbox unless a manual fallback is kept.
 - [#20 Alternative bike][i20]: `BikeDealerPort` gains an availability check, and the inbox gets a
   third task type with its own domain endpoint.

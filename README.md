@@ -19,7 +19,7 @@ setup we use for that:
 - **The model is the source.** The executable BPMN lives next to the use case and the glossary. Gradle
   generates a typed process API from it, so code that references a removed element no longer compiles.
 - **The rules are machine-checked.** ArchUnit and Konsist enforce the hexagonal architecture,
-  mutation testing (gate 80) catches tests that assert nothing, bpmnlint checks every model, and the
+  mutation testing (gate 80) catches tests that assert nothing, bpmnlint checks the executable model, and the
   OpenAPI contract and the generated frontend client are drift-gated in CI.
 - **One file of instructions.** [AGENTS.md](AGENTS.md) is what humans and agents read first;
   `.claude/` adds skills for recurring work and review agents.
@@ -33,7 +33,7 @@ setup we use for that:
 A customer applies to lease a bike. The application is validated, the back office checks the credit
 rating, and a solvent customer receives the contract. Once it is signed, the insurance policy is
 issued and the bike is ordered from the dealer in parallel. When the dealer reports the handover,
-the leasing is active. The customer can withdraw at any time; the back office then reverses the
+the leasing is active. Until then the customer can withdraw; the back office then reverses the
 application.
 
 The model is stage 3 of the [MiraVelo reference models](https://github.com/Miragon/miravelo-reference)
@@ -54,7 +54,7 @@ npm --prefix frontend ci && npm --prefix frontend run dev   # frontend on :5173
 | What | URL | Login |
 |---|---|---|
 | Frontend (applications, new application, back-office inbox) | <http://localhost:5173> | |
-| CIB seven Cockpit and Tasklist | <http://localhost:8081/camunda> | admin / admin |
+| CIB seven Cockpit (operations) | <http://localhost:8081/camunda> | admin / admin |
 | Swagger UI | <http://localhost:8081/swagger-ui.html> | |
 
 Demo cases in every state: `cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local`.

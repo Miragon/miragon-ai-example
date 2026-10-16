@@ -100,7 +100,7 @@ Notes on the ids:
 
 [#11] (back-office task UI) is decided: the back office works in an own inbox in the frontend
 ([ADR-0019](../../../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)). A note sticky
-next to "Check credit rating" records it.
+above "Leasing request received" and "Validate application" records it.
 
 The options, criteria and the Wardley map are in
 [sourcing-decisions.md](../../../architecture/sourcing-decisions.md) and

@@ -87,15 +87,15 @@ decisions, so they live in CONTRIBUTING.md and AGENTS.md.
 | [0001][a01] | Record architecture decisions                         | Accepted                             |
 | [0002][a02] | Hexagonal architecture for the backend                | Accepted, amended (0014, 0015, 0017) |
 | [0003][a03] | OpenAPI as the checked-in, drift-gated contract       | Accepted, amended (0015, 0017, 0018) |
-| [0004][a04] | Mutation testing as a blocking PR gate                | Accepted, amended (0014, 0015)       |
+| [0004][a04] | Mutation testing as a blocking PR gate                | Accepted, amended (0014, 0015, 0017) |
 | [0005][a05] | AGENTS.md as the single source of agent instructions  | Accepted                             |
 | [0006][a06] | Fixed ports for v1, portless as the upgrade path      | Accepted, amended (0018)             |
 | [0007][a07] | Two architecture-test tools: ArchUnit and Konsist     | Accepted, amended (0014)             |
 | [0008][a08] | Deliberately track the latest major versions          | Accepted                             |
 | [0009][a09] | Actuator probes and Prometheus metrics                | Accepted                             |
-| [0010][a10] | Flyway for database schema migrations                 | Accepted, amended (0014, 0015)       |
+| [0010][a10] | Flyway for database schema migrations                 | Accepted, amended (0014, 0015, 0017) |
 | [0011][a11] | Build and deployment: OCI image with `bootBuildImage` | Accepted, amended (0014)             |
-| [0012][a12] | Poll for eventual consistency in end-to-end tests     | Accepted, amended (0014, 0015)       |
+| [0012][a12] | Poll for eventual consistency in end-to-end tests     | Accepted, amended (0014, 0015, 0017) |
 | [0013][a13] | Two stack variants side by side on `main`             | Superseded by 0014                   |
 | [0014][a14] | One Kotlin/Gradle stack at the repo root              | Accepted, amended (0018)             |
 | [0015][a15] | Reduce the executable process to a core               | Superseded by 0017                   |

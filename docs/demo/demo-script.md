@@ -255,7 +255,7 @@ optionally a rejection and an incident.
 
 **Do:**
 
-1. Feature map: #19 "Credit check via DMN" in Stage 2, on "Check credit rating". In the executable
+1. Feature map: #19 "Credit check by DMN" in Stage 2, on "Check credit rating". In the executable
    model (hosted designIQ only) the badge on that step shows #19.
 2. Issue #19: "Today (core)", "Desired behaviour", and the open question about a manual fallback.
 3. The anchor block is an HTML comment that GitHub hides. Show it read-only:

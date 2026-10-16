@@ -31,6 +31,6 @@ designIQ model, so the file stem must be unique under `docs/`.
    mutation gate → `0004-…`). Show the full draft and ask: "Write this to `{path}`? (yes / edit /
    cancel)".
 7. **Write and report.** Remind the user to commit the ADR with the change it documents. If it takes a
-   decision issue (#8–#11), also update `docs/architecture/sourcing-map.owm` and
+   decision issue (#8–#10), also update `docs/architecture/sourcing-map.owm` and
    `sourcing-decisions.md` and close the issue from the PR; add the ADR to the list in
    `docs/README.md`.

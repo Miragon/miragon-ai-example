@@ -5,7 +5,9 @@
 - **Deciders:** Thomas (@Hafflgav)
 - **Amended by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md) (2026-10-16):**
   `process/` holds only `bike-leasing.bpmn`; `checkCreditRating.dmn` is a frozen reference in
-  `original/`, and there are no forms any more.
+  `original/`, and there are no forms any more. The executable model has no compensation any more and
+  validates without findings; the validator's compensation false positives now appear only on the
+  frozen `original-bike-leasing.bpmn`.
 
 ## Context
 

@@ -13,8 +13,8 @@ The executable model is the MiraVelo reference model
 https://github.com/Miragon/miravelo-reference/blob/541f8e0dda1672aad18b5d84b45cdfae807efe8b/bpmn/bike-leasing/03-bike-leasing-event-subprocess-simplified.bpmn
 
 Why this model: [ADR-0017](../../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md).
-The flow-node ids of the reference are kept. The copy here differs only where the engine or this
-repo's gates require it (see "Deviations from the reference").
+The flow-node ids of the reference are kept, except the error boundary. The copy here differs only
+where the engine or this repo's gates require it (see "Deviations from the reference").
 
 ## What is deployed
 

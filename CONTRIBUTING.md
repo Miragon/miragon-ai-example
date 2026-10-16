@@ -118,7 +118,7 @@ docker run --rm -p 8081:8081 \
 ```
 
 To run the frontend in a container too (nginx on :8090, proxying to the service), use the full
-stack instead. It brings its own Postgres, so stop the dev stack first:
+stack instead. Its service binds 8081 too, so stop `./gradlew bootRun` first:
 
 ```bash
 ./gradlew bootBuildImage

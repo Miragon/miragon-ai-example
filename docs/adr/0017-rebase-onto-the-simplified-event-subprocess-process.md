@@ -33,8 +33,9 @@ The executable `bikeLeasingProcess` is the reference model
 - An interrupting event subprocess `Application withdrawn` lets the customer withdraw at any time;
   the back office does `Reverse application` (**user task**) → `Application cancelled`.
 
-The flow-node ids of the reference are kept. The executable copy differs only where the engine or
-this repo's gates require it, and `executable-process.md` lists each difference:
+The flow-node ids of the reference are kept, except the error boundary (see below). The executable
+copy differs only where the engine or this repo's gates require it, and `executable-process.md`
+lists each difference:
 
 - `Order bike from dealer` is a delegate (`#{orderBikeDelegate}`) instead of an external task, so
   the engine stays embedded and every service task follows the same pattern. It gets `asyncBefore`
