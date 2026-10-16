@@ -150,10 +150,10 @@
         <dc:Bounds x="819" y="645" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_16r8g9s" bpmnElement="serviceTask_issueInsurancePolicy">
-        <dc:Bounds x="914" y="550" width="100" height="80" />
+        <dc:Bounds x="914" y="630" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1qlh2qb" bpmnElement="serviceTask_orderBike">
-        <dc:Bounds x="914" y="710" width="100" height="80" />
+        <dc:Bounds x="914" y="770" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_05h5jhe" bpmnElement="gateway_join">
         <dc:Bounds x="1059" y="645" width="50" height="50" />
@@ -246,23 +246,21 @@
         <di:waypoint x="819" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_1ihbgdo" bpmnElement="flow_forkToInsurance">
-        <di:waypoint x="844" y="645" />
-        <di:waypoint x="844" y="590" />
-        <di:waypoint x="914" y="590" />
+        <di:waypoint x="869" y="670" />
+        <di:waypoint x="914" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0b0j140" bpmnElement="flow_forkToOrder">
         <di:waypoint x="844" y="695" />
-        <di:waypoint x="844" y="750" />
-        <di:waypoint x="914" y="750" />
+        <di:waypoint x="844" y="810" />
+        <di:waypoint x="914" y="810" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_16rf9gu" bpmnElement="flow_insuranceToJoin">
-        <di:waypoint x="1014" y="590" />
-        <di:waypoint x="1084" y="590" />
-        <di:waypoint x="1084" y="645" />
+        <di:waypoint x="1014" y="670" />
+        <di:waypoint x="1059" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0h1lzng" bpmnElement="flow_orderToJoin">
-        <di:waypoint x="1014" y="750" />
-        <di:waypoint x="1084" y="750" />
+        <di:waypoint x="1014" y="810" />
+        <di:waypoint x="1084" y="810" />
         <di:waypoint x="1084" y="695" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_19kjk2n" bpmnElement="flow_joinToHandover">
