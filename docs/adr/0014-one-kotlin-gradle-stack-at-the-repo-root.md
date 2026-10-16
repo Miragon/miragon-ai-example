@@ -4,6 +4,9 @@
 - **Date:** 2026-10-15
 - **Deciders:** Thomas (@Hafflgav)
 - **Supersedes:** [ADR-0013](0013-two-stack-variants-side-by-side-on-main.md)
+- **Amended by [ADR-0018](0018-react-frontend-next-to-the-service.md) (2026-10-16):** `frontend/` is a
+  second, npm-only project next to the Gradle build; the Kotlin service is still the one Gradle
+  project at the root.
 
 ## Context
 

@@ -2,6 +2,9 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-18
+- **Amended by [ADR-0018](0018-react-frontend-next-to-the-service.md) (2026-10-16):** the stack is no
+  longer headless. The Vite dev server binds **5173** and proxies to 8081. Portless could wrap it, but
+  the backend and Postgres ports still collide, so the decision stands.
 
 ## Context
 

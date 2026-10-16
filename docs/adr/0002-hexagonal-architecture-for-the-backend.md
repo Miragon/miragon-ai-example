@@ -7,6 +7,9 @@
   Gradle project at the repo root (read `service/app` below as the root), the rule suite lives in
   the test sources under `src/test/kotlin/io/miragon/common/architecture` instead of the
   `service/common-architecture-tests` module, and the core has no insurance adapter.
+- **Amended by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md) (2026-10-16):**
+  the insurance adapter is back (`adapter/outbound/insurance`), because the new process issues the
+  policy in parallel with the bike order.
 
 ## Context
 

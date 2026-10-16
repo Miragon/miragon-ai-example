@@ -3,6 +3,9 @@
 - **Status:** Accepted
 - **Date:** 2026-10-15
 - **Deciders:** Thomas (@Hafflgav)
+- **Amended by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md) (2026-10-16):**
+  `process/` holds only `bike-leasing.bpmn`; `checkCreditRating.dmn` is a frozen reference in
+  `original/`, and there are no forms any more.
 
 ## Context
 
