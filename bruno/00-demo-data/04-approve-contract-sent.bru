@@ -1,0 +1,25 @@
+meta {
+  name: Approve the credit check of the signature case
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{contractSentId}}/credit-check
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "solvent": true
+  }
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("contractSentId"), "userTask_checkCreditRating");
+}
+
+assert {
+  res.status: eq 202
+}

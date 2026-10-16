@@ -1,0 +1,15 @@
+meta {
+  name: Complete the reversal
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{applicationId}}/reversal
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 202
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Withdraw the application while the contract waits for the signature
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{applicationId}}/withdraw
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("applicationId"), "event_contractSigned");
+}
+
+assert {
+  res.status: eq 202
+}
+
+docs {
+  The message starts the interrupting event subprocess "Application withdrawn": the main flow
+  (here the wait for the signature) is cancelled and the back office has to reverse the case.
+}

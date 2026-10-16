@@ -1,0 +1,17 @@
+meta {
+  name: Sign a contract with an invalid application id
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/not-a-uuid/sign-contract
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+  res.body.title: eq Invalid request
+  res.body.detail: contains not-a-uuid
+}

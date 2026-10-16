@@ -1,0 +1,24 @@
+meta {
+  name: Assert the unknown-bike request was rejected
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{unknownBikeId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollApp("/api/bike-leasing/" + bru.getVar("unknownBikeId"),
+    (b, s) => s === 200 && b && b.status === "REJECTED");
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq REJECTED
+  res.body.bikeId: eq BIKE-X
+  res.body.bikeModel: isNull
+  res.body.contractId: isNull
+}

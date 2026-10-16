@@ -1,0 +1,36 @@
+meta {
+  name: Find the open credit check in the back-office tasks
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/tasks
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const id = bru.getVar("applicationId");
+  await pollApp("/api/tasks",
+    (b) => Array.isArray(b) && b.some((t) => t.application.applicationId === id && t.type === "CREDIT_CHECK"));
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("the application waits for its credit check", function () {
+    const id = bru.getVar("applicationId");
+    const task = res.getBody().find((t) => t.application.applicationId === id);
+    expect(task).to.exist;
+    expect(task.type).to.equal("CREDIT_CHECK");
+    expect(task.waitingSince).to.be.a("string");
+  });
+}
+
+docs {
+  The validation passed (adult applicant, bike in the catalogue), so the case rests on the user task
+  "Check credit rating" (userTask_checkCreditRating) until the back office decides.
+}

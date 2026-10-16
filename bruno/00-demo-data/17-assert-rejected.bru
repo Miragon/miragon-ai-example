@@ -1,0 +1,22 @@
+meta {
+  name: Assert the case was rejected without a contract
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{rejectedId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollApp("/api/bike-leasing/" + bru.getVar("rejectedId"),
+    (b, s) => s === 200 && b && b.status === "REJECTED");
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq REJECTED
+  res.body.contractId: isNull
+}

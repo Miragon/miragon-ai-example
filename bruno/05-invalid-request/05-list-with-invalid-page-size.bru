@@ -1,0 +1,17 @@
+meta {
+  name: List applications with an invalid page size
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing?size=0
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+  res.body.title: eq Invalid request
+  res.body.detail: eq size must be between 1 and 100
+}

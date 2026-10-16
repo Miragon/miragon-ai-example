@@ -1,0 +1,23 @@
+meta {
+  name: Get the application stuck before the order
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{applicationId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq CONTRACT_SENT
+  res.body.policyId: isString
+  res.body.orderId: isNull
+}
+
+docs {
+  The insurance policy was issued in the parallel branch, but every failed order attempt rolled back
+  its own transaction: the application never reaches ORDERED.
+}

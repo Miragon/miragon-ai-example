@@ -1,0 +1,25 @@
+meta {
+  name: Approve the credit check of the active case
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{activeId}}/credit-check
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "solvent": true
+  }
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("activeId"), "userTask_checkCreditRating");
+}
+
+assert {
+  res.status: eq 202
+}

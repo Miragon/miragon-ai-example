@@ -1,0 +1,34 @@
+meta {
+  name: Submit a case the customer withdraws
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerName": "Walter Withdrawn",
+    "email": "walter@example.com",
+    "age": 46,
+    "monthlyNetIncome": 4600.0,
+    "bikeId": "BIKE-600"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.applicationId: isDefined
+}
+
+vars:post-response {
+  withdrawnId: res.body.applicationId
+}
+
+docs {
+  Demo case 6: withdrawn while it waits for the credit check; the back office has to reverse it.
+}

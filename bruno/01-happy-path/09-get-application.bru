@@ -1,5 +1,5 @@
 meta {
-  name: Get the leasing application after leasing is active
+  name: Get the leasing application after the lease is active
   type: http
   seq: 9
 }
@@ -14,4 +14,7 @@ assert {
   res.status: eq 200
   res.body.applicationId: eq {{applicationId}}
   res.body.status: eq ACTIVE
+  res.body.contractId: isString
+  res.body.policyId: isString
+  res.body.orderId: isString
 }

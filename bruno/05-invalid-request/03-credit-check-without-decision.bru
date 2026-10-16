@@ -1,0 +1,24 @@
+meta {
+  name: Complete a credit check without a decision
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/123e4567-e89b-12d3-a456-426614174000/credit-check
+  body: json
+  auth: none
+}
+
+body:json {
+  {}
+}
+
+assert {
+  res.status: eq 400
+  res.body.title: eq Bad Request
+}
+
+docs {
+  "solvent" is required: the body is refused before any application is looked up.
+}

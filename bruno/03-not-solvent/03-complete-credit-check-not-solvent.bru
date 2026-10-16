@@ -1,0 +1,30 @@
+meta {
+  name: Complete the credit check (not solvent)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{applicationId}}/credit-check
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "solvent": false
+  }
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("applicationId"), "userTask_checkCreditRating");
+}
+
+assert {
+  res.status: eq 202
+}
+
+docs {
+  The back office decides the credit rating by hand; "solvent": false takes the "No" flow of the
+  gateway "Solvent?" to "Send rejection".
+}

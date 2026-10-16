@@ -1,0 +1,22 @@
+meta {
+  name: Assert the bike is ordered and the case waits for the handover
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{orderedId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("orderedId"), "event_handoverReported");
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq ORDERED
+  res.body.orderId: isString
+  res.body.policyId: isString
+}

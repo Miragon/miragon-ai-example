@@ -1,0 +1,25 @@
+meta {
+  name: Approve the credit check of the handover case
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{orderedId}}/credit-check
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "solvent": true
+  }
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("orderedId"), "userTask_checkCreditRating");
+}
+
+assert {
+  res.status: eq 202
+}

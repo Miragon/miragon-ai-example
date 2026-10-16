@@ -1,0 +1,21 @@
+meta {
+  name: Assert the lease is active
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{activeId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollApp("/api/bike-leasing/" + bru.getVar("activeId"),
+    (b, s) => s === 200 && b && b.status === "ACTIVE");
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq ACTIVE
+}
