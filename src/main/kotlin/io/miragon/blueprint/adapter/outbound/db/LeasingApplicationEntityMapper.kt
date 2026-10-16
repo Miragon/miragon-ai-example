@@ -1,12 +1,13 @@
 package io.miragon.blueprint.adapter.outbound.db
 
-import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.bike.BikeId
+import io.miragon.blueprint.domain.bike.OrderId
+import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.ContractId
 import io.miragon.blueprint.domain.leasing.CustomerName
 import io.miragon.blueprint.domain.leasing.Email
 import io.miragon.blueprint.domain.leasing.LeasingApplication
-import io.miragon.blueprint.domain.bike.OrderId
+import io.miragon.blueprint.domain.leasing.PolicyId
 
 object LeasingApplicationEntityMapper {
 
@@ -18,10 +19,12 @@ object LeasingApplicationEntityMapper {
             age = entity.age,
             monthlyNetIncome = entity.monthlyNetIncome,
             bikeId = BikeId(entity.bikeId),
+            bikeModel = entity.bikeModel,
             status = entity.status,
             createdAt = entity.createdAt,
             orderId = entity.orderId?.let { OrderId(it) },
             contractId = entity.contractId?.let { ContractId(it) },
+            policyId = entity.policyId?.let { PolicyId(it) },
         )
 
     fun toEntity(domain: LeasingApplication): LeasingApplicationEntity =
@@ -32,9 +35,11 @@ object LeasingApplicationEntityMapper {
             age = domain.age,
             monthlyNetIncome = domain.monthlyNetIncome,
             bikeId = domain.bikeId.value,
+            bikeModel = domain.bikeModel,
             status = domain.status,
             createdAt = domain.createdAt,
             orderId = domain.orderId?.value,
             contractId = domain.contractId?.value,
+            policyId = domain.policyId?.value,
         )
 }

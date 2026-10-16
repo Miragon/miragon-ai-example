@@ -22,7 +22,7 @@ class ReportHandoverServiceTest {
     private val underTest = ReportHandoverService(process = process, repository = repository)
 
     @Test
-    fun `reportHandover correlates the message and persists the HANDED_OVER status`() {
+    fun `reportHandover correlates the message and persists the ACTIVE status`() {
 
         // given: an ordered application
         val id = ApplicationId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
@@ -34,10 +34,10 @@ class ReportHandoverServiceTest {
         // when: the handover is reported
         underTest.reportHandover(id)
 
-        // then: the message is correlated and the application is persisted with HANDED_OVER
+        // then: the message is correlated and the application is persisted with ACTIVE
         verify { process.correlateHandoverReported(id) }
         verify { repository.findById(id) }
-        verify { repository.save(match { it.status == LeasingStatus.HANDED_OVER }) }
+        verify { repository.save(match { it.status == LeasingStatus.ACTIVE }) }
         confirmVerified(process, repository)
     }
 

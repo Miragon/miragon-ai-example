@@ -6,6 +6,7 @@ import io.miragon.blueprint.domain.bike.OrderId
 import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.ContractId
 import io.miragon.blueprint.domain.leasing.LeasingStatus
+import io.miragon.blueprint.domain.leasing.PolicyId
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -36,6 +37,7 @@ class GetLeasingApplicationControllerTest {
             status = LeasingStatus.ORDERED,
             orderId = OrderId("ORDER-42"),
             contractId = ContractId("CONTRACT-7"),
+            policyId = PolicyId("POLICY-3"),
         )
         every { query.byId(application.id) } returns application
         val operation = get("/api/bike-leasing/{applicationId}", application.id.value.toString())
@@ -52,6 +54,8 @@ class GetLeasingApplicationControllerTest {
             "\"age\":41",
             "\"monthlyNetIncome\":4100.5",
             "\"bikeId\":\"${application.bikeId.value}\"",
+            "\"bikeModel\":\"Gravel Explorer 900\"",
+            "\"policyId\":\"POLICY-3\"",
             "\"status\":\"ORDERED\"",
             "\"orderId\":\"ORDER-42\"",
             "\"contractId\":\"CONTRACT-7\"",
@@ -62,21 +66,20 @@ class GetLeasingApplicationControllerTest {
     }
 
     @Test
-    fun `maps a not-yet-ordered application with null order and contract and no bike model`() {
+    fun `maps a not-yet-ordered application with null order, contract, policy and bike model`() {
 
         // given: an application still without an order or contract (both nullable fields absent)
-        val application = testLeasingApplication(orderId = null, contractId = null)
+        val application = testLeasingApplication(bikeModel = null)
         every { query.byId(application.id) } returns application
         val operation = get("/api/bike-leasing/{applicationId}", application.id.value.toString())
 
         // when: the request is performed
         val response = mockMvc.perform(operation).andReturn()
 
-        // then: the response is 200, the nullable fields are serialised as null, and only the bike id is exposed
+        // then: the response is 200 and the nullable fields are serialised as null
         assertThat(response.response.status).isEqualTo(200)
         assertThat(response.response.contentAsString)
-            .contains("\"orderId\":null", "\"contractId\":null")
-            .doesNotContain("bikeModel")
+            .contains("\"orderId\":null", "\"contractId\":null", "\"policyId\":null", "\"bikeModel\":null")
     }
 
     @Test

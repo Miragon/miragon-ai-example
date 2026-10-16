@@ -12,24 +12,18 @@ import kotlin.collections.List
  * Kept as `const val String` because annotation arguments must be compile-time constants.
  */
 object ProcessVariables {
-  const val AGE: String = "age"
-
-  const val ALTERNATIVE_FOUND: String = "alternativeFound"
-
   const val APPLICATION_ID: String = "applicationId"
 
   const val BIKE_ID: String = "bikeId"
 
-  const val MONTHLY_NET_INCOME: String = "monthlyNetIncome"
+  const val BIKE_MODEL: String = "bikeModel"
 
-  const val ORDER_ID: String = "orderId"
+  const val SOLVENT: String = "solvent"
 
   val all: List<String> = listOf(
-    AGE,
-    ALTERNATIVE_FOUND,
     APPLICATION_ID,
     BIKE_ID,
-    MONTHLY_NET_INCOME,
-    ORDER_ID,
+    BIKE_MODEL,
+    SOLVENT,
   )
 }

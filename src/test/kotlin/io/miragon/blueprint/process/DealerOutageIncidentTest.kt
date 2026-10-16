@@ -29,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
 /**
- * The incident demo with the **real** use cases and the simulated dealer: ordering the poison bike
+ * The incident demo with the **real** use cases and the simulated dealer: ordering the demo bike
  * `BIKE-FAIL` fails the dealer call as an outage. `serviceTask_orderBike` runs as its own job
  * (asyncBefore) with the retry cycle `R3/PT10S`, so the engine tries the order three times and then
  * raises a `failedJob` incident on that task. The test fires the retries by hand instead of waiting
@@ -66,6 +66,7 @@ class DealerOutageIncidentTest {
                 age = 35,
                 monthlyNetIncome = 3500.0,
                 bikeId = BikeId("BIKE-FAIL"),
+                bikeModel = "Prototype X (dealer outage demo)",
                 createdAt = LocalDateTime.now(),
             )
         repository.save(application)
@@ -73,13 +74,15 @@ class DealerOutageIncidentTest {
         val instance = runtimeService.findProcessInstance(application.id)
 
         processEngine.executeJobFor(FlowNodes.StartEventLeasingRequestReceived)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskValidateApplication)
+        process.completeCreditCheck(application.id, solvent = true)
+        processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
         processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
         process.correlateContractSigned(application.id)
-        processEngine.executeJobFor(FlowNodes.EventContractSigned) // -> the order step's own job
+        processEngine.executeJobFor(FlowNodes.EventContractSigned)
 
         val failures = processEngine.failJobUntilRetriesAreExhausted(FlowNodes.ServiceTaskOrderBike)
 
-        // R3: three attempts, each one failing on the simulated dealer outage
         Assertions.assertThat(failures).hasSize(3)
         failures.forEach { failure ->
             Assertions.assertThat(failure).hasStackTraceContaining("Bike dealer API unavailable for BIKE-FAIL")
@@ -94,24 +97,20 @@ class DealerOutageIncidentTest {
         Assertions.assertThat(incident?.incidentType).isEqualTo(Incident.FAILED_JOB_HANDLER_TYPE)
         Assertions.assertThat(incident?.activityId).isEqualTo(FlowNodes.ServiceTaskOrderBike.ELEMENT_ID)
 
-        // the instance is stuck before the order step; nothing of the failed order reached the application
         assertThat(instance)
             .isNotEnded
             .hasPassedInOrder(
                 ProcessPath.from(FlowNodes.StartEventLeasingRequestReceived)
-                    .then { it.businessRuleTaskCheckCreditRating }
+                    .then { it.serviceTaskValidateApplication }
+                    .then { it.userTaskCheckCreditRating }
                     .then { it.gatewayIsSolvent }
                     .then { it.serviceTaskSendContract }
-                    .then { it.gatewayAwaitSignature }
                     .then { it.eventContractSigned }
-                    .then { it.gatewayBikeSourceJoin },
+                    .then { it.gatewayFork },
             )
-            .hasNotPassed(
-                FlowNodes.ServiceTaskOrderBike.ELEMENT_ID,
-                FlowNodes.EventBikeUnavailable.ELEMENT_ID,
-            )
+            .hasNotPassed(FlowNodes.ServiceTaskOrderBike.ELEMENT_ID)
         val stored = repository.findById(application.id)
-        Assertions.assertThat(stored?.status).isEqualTo(LeasingStatus.RECEIVED)
+        Assertions.assertThat(stored?.status).isEqualTo(LeasingStatus.CONTRACT_SENT)
         Assertions.assertThat(stored?.orderId).isNull()
     }
 }

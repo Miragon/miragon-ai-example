@@ -4,6 +4,7 @@ import io.miragon.blueprint.application.port.outbound.ContractPort
 import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
 import io.miragon.blueprint.application.port.outbound.NotificationPort
 import io.miragon.blueprint.domain.leasing.ContractId
+import io.miragon.blueprint.domain.leasing.LeasingStatus
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
 import io.mockk.Runs
 import io.mockk.confirmVerified
@@ -37,8 +38,12 @@ class SendContractServiceTest {
         // then: the contract is issued, its id is stored on the application and the customer is asked to sign
         verify { repository.findById(application.id) }
         verify { contract.issueContract(application.id) }
-        verify { repository.save(match { it.contractId == ContractId("CONTRACT-1") }) }
-        verify { notification.send(any(), application) }
+        verify {
+            repository.save(
+                match { it.contractId == ContractId("CONTRACT-1") && it.status == LeasingStatus.CONTRACT_SENT },
+            )
+        }
+        verify { notification.send("Please review and sign your leasing contract", application) }
         confirmVerified(repository, contract, notification)
     }
 }

@@ -3,6 +3,7 @@ package io.miragon.blueprint.domain.leasing
 import io.miragon.blueprint.domain.bike.BikeId
 import io.miragon.blueprint.domain.bike.OrderId
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -10,109 +11,106 @@ import java.time.LocalDateTime
 class LeasingApplicationTest {
 
     @Test
-    fun `exposes the applicant's age and monthly net income`() {
-        // given: an application built with a specific age and income
-        val application = testLeasingApplication(age = 40, monthlyNetIncome = 4200.0)
-        // then: both fields are exposed unchanged
+    fun `receive creates a RECEIVED application with the submitted data`() {
+        // given / when: a request with income is received
+        val application =
+            LeasingApplication.receive(
+                id = ApplicationId.new(),
+                customerName = CustomerName("Jane Doe"),
+                email = Email("jane@test.com"),
+                age = 40,
+                monthlyNetIncome = 4200.0,
+                bikeId = BikeId("BIKE-800"),
+                bikeModel = "Carbon Road 800",
+                createdAt = LocalDateTime.of(2024, 1, 15, 10, 30),
+            )
+        // then: the application is RECEIVED and carries the data unchanged
+        assertThat(application.status).isEqualTo(LeasingStatus.RECEIVED)
         assertThat(application.age).isEqualTo(40)
         assertThat(application.monthlyNetIncome).isEqualTo(4200.0)
+        assertThat(application.bikeModel).isEqualTo("Carbon Road 800")
+        assertThat(application.contractId).isNull()
+        assertThat(application.orderId).isNull()
+        assertThat(application.policyId).isNull()
     }
 
     @Test
-    fun `documentOrder attaches the order id and moves to ORDERED`() {
-        // given: a received application
-        val application = testLeasingApplication(status = LeasingStatus.RECEIVED)
-        // when: a bike order is attached
-        val ordered = application.documentOrder(OrderId("ORDER-1"))
-        // then: the order id is set and the status is ORDERED
-        assertThat(ordered).isEqualTo(application.copy(orderId = OrderId("ORDER-1"), status = LeasingStatus.ORDERED))
-    }
-
-    @Test
-    fun `selectAlternative swaps in the newly chosen bike`() {
-        // given: an application whose requested bike was unavailable
-        val application = testLeasingApplication(bikeId = BikeId("BIKE-900"))
-        // when: the customer accepts an alternative bike
-        val updated = application.selectAlternative(BikeId("BIKE-ALT"))
-        // then: the chosen bike is recorded
-        assertThat(updated.bikeId).isEqualTo(BikeId("BIKE-ALT"))
-    }
-
-    @Test
-    fun `withContract records the issued contract`() {
-        // given: an application without a contract yet
-        val application = testLeasingApplication()
-        // when: the contract system issues a contract
-        val updated = application.withContract(ContractId("CONTRACT-1"))
-        // then: the contract id is recorded
-        assertThat(updated.contractId).isEqualTo(ContractId("CONTRACT-1"))
-    }
-
-    @Test
-    fun `reject changes the status to REJECTED`() {
-        // given: a received application
-        val application = testLeasingApplication()
-        // when: it is rejected
-        val rejected = application.reject()
-        // then: the status is REJECTED
-        assertThat(rejected.status).isEqualTo(LeasingStatus.REJECTED)
-    }
-
-    @Test
-    fun `cancel moves the application to CANCELLED`() {
-        // given: an application whose bike could not be replaced by an acceptable alternative
-        val application = testLeasingApplication(status = LeasingStatus.RECEIVED)
-        // when: the contract is cancelled
-        val cancelled = application.cancel()
-        // then: the status is CANCELLED
-        assertThat(cancelled.status).isEqualTo(LeasingStatus.CANCELLED)
-    }
-
-    @Test
-    fun `reportHandover moves the application to HANDED_OVER`() {
-        // given: an ordered application
-        val application = testLeasingApplication(status = LeasingStatus.ORDERED)
-        // when: the handover is reported
-        val handedOver = application.reportHandover()
-        // then: the status is HANDED_OVER
-        assertThat(handedOver.status).isEqualTo(LeasingStatus.HANDED_OVER)
-    }
-
-    @Test
-    fun `activate moves the application to ACTIVE`() {
-        // given: a handed-over application
-        val application = testLeasingApplication(status = LeasingStatus.HANDED_OVER)
-        // when: the leasing is activated
-        val active = application.activate()
-        // then: the status is ACTIVE
-        assertThat(active.status).isEqualTo(LeasingStatus.ACTIVE)
-    }
-
-    @Test
-    fun `receive rejects an application whose monthly net income is zero`() {
-        // when / then: an application without income cannot be received
-        assertThatThrownBy { receiveApplication(monthlyNetIncome = 0.0) }
-            .isInstanceOf(IllegalArgumentException::class.java)
+    fun `receive refuses a request without income`() {
+        assertThatThrownBy {
+            LeasingApplication.receive(
+                id = ApplicationId.new(),
+                customerName = CustomerName("Jane Doe"),
+                email = Email("jane@test.com"),
+                age = 40,
+                monthlyNetIncome = 0.0,
+                bikeId = BikeId("BIKE-800"),
+                bikeModel = "Carbon Road 800",
+                createdAt = LocalDateTime.of(2024, 1, 15, 10, 30),
+            )
+        }.isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("Monthly net income must be greater than zero")
     }
 
     @Test
-    fun `receive accepts the smallest positive monthly net income as RECEIVED`() {
-        // when: an application with a minimal income is received
-        val application = receiveApplication(monthlyNetIncome = 0.01)
-        // then: it starts its lifecycle as RECEIVED
-        assertThat(application.status).isEqualTo(LeasingStatus.RECEIVED)
-        assertThat(application.monthlyNetIncome).isEqualTo(0.01)
+    fun `validate accepts an adult applicant asking for a catalogue bike`() {
+        assertThatCode { testLeasingApplication(age = 18).validate() }.doesNotThrowAnyException()
     }
 
-    private fun receiveApplication(monthlyNetIncome: Double) =
-        LeasingApplication.receive(
-            id = ApplicationId.new(),
-            customerName = CustomerName("John Doe"),
-            email = Email("john.doe@test.com"),
-            age = 35,
-            monthlyNetIncome = monthlyNetIncome,
-            bikeId = BikeId("BIKE-900"),
-            createdAt = LocalDateTime.parse("2024-01-15T10:30:00"),
+    @Test
+    fun `validate rejects an applicant under 18`() {
+        assertThatThrownBy { testLeasingApplication(age = 17).validate() }
+            .isInstanceOf(ApplicationInvalidException::class.java)
+            .hasMessageContaining("the applicant must be at least 18 years old")
+            .hasMessageNotContaining("catalogue")
+    }
+
+    @Test
+    fun `validate rejects a bike that is not in the catalogue`() {
+        assertThatThrownBy { testLeasingApplication(bikeId = BikeId("BIKE-X"), bikeModel = null).validate() }
+            .isInstanceOf(ApplicationInvalidException::class.java)
+            .hasMessageContaining("bike BIKE-X is not in the catalogue")
+            .hasMessageNotContaining("years old")
+    }
+
+    @Test
+    fun `validate names every violated rule`() {
+        val application = testLeasingApplication(age = 16, bikeModel = null)
+        assertThatThrownBy { application.validate() }
+            .hasMessage(
+                "Application ${application.id.value} is invalid: the applicant must be at least 18 years old; " +
+                    "bike BIKE-900 is not in the catalogue",
+            )
+    }
+
+    @Test
+    fun `sendContract records the contract and moves to CONTRACT_SENT`() {
+        val application = testLeasingApplication()
+        val sent = application.sendContract(ContractId("CONTRACT-1"))
+        assertThat(sent).isEqualTo(
+            application.copy(contractId = ContractId("CONTRACT-1"), status = LeasingStatus.CONTRACT_SENT),
         )
+    }
+
+    @Test
+    fun `documentOrder records the order and moves to ORDERED`() {
+        val application = testLeasingApplication(status = LeasingStatus.CONTRACT_SENT)
+        val ordered = application.documentOrder(OrderId("ORDER-1"))
+        assertThat(ordered).isEqualTo(application.copy(orderId = OrderId("ORDER-1"), status = LeasingStatus.ORDERED))
+    }
+
+    @Test
+    fun `documentPolicy records the policy and keeps the status`() {
+        val application = testLeasingApplication(status = LeasingStatus.ORDERED)
+        val insured = application.documentPolicy(PolicyId("POLICY-1"))
+        assertThat(insured).isEqualTo(application.copy(policyId = PolicyId("POLICY-1")))
+    }
+
+    @Test
+    fun `the terminal and withdrawal transitions set their status`() {
+        val application = testLeasingApplication()
+        assertThat(application.activate().status).isEqualTo(LeasingStatus.ACTIVE)
+        assertThat(application.reject().status).isEqualTo(LeasingStatus.REJECTED)
+        assertThat(application.withdraw().status).isEqualTo(LeasingStatus.WITHDRAWN)
+        assertThat(application.cancel().status).isEqualTo(LeasingStatus.CANCELLED)
+    }
 }

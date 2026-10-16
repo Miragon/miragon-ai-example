@@ -18,9 +18,8 @@ class SendContractService(
 
     override fun sendContract(id: ApplicationId) {
         val application = repository.findById(id) ?: error("Unknown application $id")
-        // Issue the contract in the contract system and record its id on the application.
         val contractId = contract.issueContract(id)
-        repository.save(application.withContract(contractId))
+        repository.save(application.sendContract(contractId))
         notification.send("Please review and sign your leasing contract", application)
     }
 }

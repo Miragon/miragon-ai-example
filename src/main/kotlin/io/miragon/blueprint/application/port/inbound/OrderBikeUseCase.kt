@@ -1,9 +1,9 @@
 package io.miragon.blueprint.application.port.inbound
 
-import io.miragon.blueprint.domain.bike.BikeId
-import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.bike.OrderId
+import io.miragon.blueprint.domain.leasing.ApplicationId
 
-interface OrderBikeUseCase {
-    fun orderBike(id: ApplicationId, bikeId: BikeId): OrderId
+/** Orders the application's bike from the dealer. */
+fun interface OrderBikeUseCase {
+    fun orderBike(id: ApplicationId): OrderId
 }
