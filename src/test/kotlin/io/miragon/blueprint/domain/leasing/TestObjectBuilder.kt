@@ -5,7 +5,7 @@ import io.miragon.blueprint.domain.bike.OrderId
 import java.time.LocalDateTime
 import java.util.UUID
 
-/** Shared test builder — start from a valid, solvent application and override only what a test cares about. */
+/** Shared test builder — start from a valid application and override only what a test cares about. */
 fun testLeasingApplication(
     id: ApplicationId = ApplicationId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000")),
     customerName: CustomerName = CustomerName("John Doe"),
@@ -13,10 +13,12 @@ fun testLeasingApplication(
     age: Int = 35,
     monthlyNetIncome: Double = 3500.0,
     bikeId: BikeId = BikeId("BIKE-900"),
+    bikeModel: String? = "Gravel Explorer 900",
     status: LeasingStatus = LeasingStatus.RECEIVED,
     createdAt: LocalDateTime = LocalDateTime.of(2024, 1, 15, 10, 30, 0),
     orderId: OrderId? = null,
     contractId: ContractId? = null,
+    policyId: PolicyId? = null,
 ) = LeasingApplication(
     id = id,
     customerName = customerName,
@@ -24,8 +26,10 @@ fun testLeasingApplication(
     age = age,
     monthlyNetIncome = monthlyNetIncome,
     bikeId = bikeId,
+    bikeModel = bikeModel,
     status = status,
     createdAt = createdAt,
     orderId = orderId,
     contractId = contractId,
+    policyId = policyId,
 )

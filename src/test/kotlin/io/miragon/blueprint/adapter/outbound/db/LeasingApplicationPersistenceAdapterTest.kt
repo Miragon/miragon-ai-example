@@ -1,5 +1,6 @@
 package io.miragon.blueprint.adapter.outbound.db
 
+import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
 import io.miragon.blueprint.domain.bike.OrderId
 import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.LeasingStatus
@@ -12,6 +13,7 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
+import java.time.LocalDateTime
 import java.util.UUID
 
 @DataJpaTest
@@ -80,5 +82,44 @@ class LeasingApplicationPersistenceAdapterTest {
         assertThat(saved).usingRecursiveComparison().isEqualTo(ordered)
         assertThat(underTest.findById(id)?.status).isEqualTo(LeasingStatus.ORDERED)
         assertThat(underTest.findById(id)?.orderId).isEqualTo(OrderId("ORDER-1"))
+    }
+
+    @Test
+    fun `findAllByIds returns only the requested applications`() {
+        val first = testLeasingApplication(id = ApplicationId.new())
+        val second = testLeasingApplication(id = ApplicationId.new())
+        val other = testLeasingApplication(id = ApplicationId.new())
+        listOf(first, second, other).forEach { underTest.save(it) }
+        entityManager.flush()
+        entityManager.clear()
+
+        assertThat(underTest.findAllByIds(listOf(first.id, second.id)).map { it.id })
+            .containsExactlyInAnyOrder(first.id, second.id)
+    }
+
+    @Test
+    fun `findAll pages the applications newest first and filters by status`() {
+        val oldest = testLeasingApplication(id = ApplicationId.new(), createdAt = LocalDateTime.of(2024, 1, 1, 8, 0))
+        val middle = testLeasingApplication(
+            id = ApplicationId.new(),
+            createdAt = LocalDateTime.of(2024, 1, 2, 8, 0),
+            status = LeasingStatus.ACTIVE,
+        )
+        val newest = testLeasingApplication(id = ApplicationId.new(), createdAt = LocalDateTime.of(2024, 1, 3, 8, 0))
+        listOf(oldest, middle, newest).forEach { underTest.save(it) }
+        entityManager.flush()
+        entityManager.clear()
+
+        val firstPage = underTest.findAll(LeasingApplicationRepository.Criteria(status = null, page = 0, size = 2))
+        val received = underTest.findAll(
+            LeasingApplicationRepository.Criteria(status = LeasingStatus.RECEIVED, page = 0, size = 10),
+        )
+
+        assertThat(firstPage.items.map { it.id }).containsExactly(newest.id, middle.id)
+        assertThat(firstPage.page).isEqualTo(0)
+        assertThat(firstPage.size).isEqualTo(2)
+        assertThat(firstPage.totalElements).isEqualTo(3)
+        assertThat(firstPage.totalPages).isEqualTo(2)
+        assertThat(received.items.map { it.id }).containsExactly(newest.id, oldest.id)
     }
 }

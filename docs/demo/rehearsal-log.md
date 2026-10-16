@@ -4,6 +4,10 @@ This is a record of one full rehearsal of the [demo script](demo-script.md), run
 the branch (including the not yet committed `docs/` files). It lists what was checked and what was
 still open. It does not repeat the script.
 
+> **Current state:** the entries below up to "Limitations found" describe the process and the
+> setup of 2026-10-15, before the frontend. Since 2026-10-16 the process, the demo and the stack
+> are different; read the newest entry at the end of this file first.
+
 Who and how: an AI agent (Claude) ran the rehearsal on Thomas's machine. Browser steps ran in
 headless Chrome, driven over the DevTools protocol: page loads, button clicks and form input were
 scripted, and each step was screenshotted. The screenshots are not in the repository. No human used
@@ -257,3 +261,43 @@ Checklist for Thomas:
   the table icon. "Open link" is an icon in the Wardley context pad, not a text label.
 - **No human-like testing.** Clicks were scripted in headless Chrome. Opening the issue in a new tab
   from "Open link", and co-editing, were not tried.
+
+
+## 2026-10-16: new process and frontend, script not rehearsed yet
+
+What changed: the executable process was rebased onto Miragon's reference model
+`03-bike-leasing-event-subprocess-simplified` ([ADR-0017](../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)),
+a React frontend was added ([ADR-0018](../adr/0018-react-frontend-next-to-the-service.md)), and the
+back office works both user tasks in the frontend inbox ([ADR-0019](../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
+The [demo script](demo-script.md) was rewritten for it. A review then added the status
+`CONTRACT_SIGNED`, stricter state checks (404 for unknown ids, 409 for a forbidden state, a task
+that is not open or a concurrent update) and removed the Tasklist filter from `00-demo-data` and the
+Tasklist link from the frontend (commit `9d99c76`).
+
+Much of the 2026-10-15 entry above no longer applies: there is no DMN deployed, no 14-day timer, no
+"Clarify alternative with customer" task, no Tasklist form, no `BIKE-OOS` and no `HANDED_OVER`; the
+Bruno folders were renumbered (the incident demo is `06-incident-demo`). Those entries stay as they
+were, as a record of that day.
+
+Checked on 2026-10-16 by the AI agents (Claude) that made the change, on the development machine:
+
+- ✅ `./gradlew build pitest` green: mutation score 90 % (gate 80). After the later review fixes
+  (`86d38c6`, `52b5e6b`) `./gradlew test` is green again.
+- ✅ Bruno, full collection against the running stack (`run . --env local -r`, which includes
+  `00-demo-data`): 66/66 requests, 137/137 assertions.
+- ✅ Playwright, chromium, against the live stack and the dev server: 5/5 scenarios (happy path,
+  invalid application, not solvent, withdrawal, application list), also with `--repeat-each=3`
+  (15/15).
+- ✅ designIQ validator: `sourcing-map` reports no findings. The architecture files, the C4 PNGs and
+  the sourcing-map PNG were refreshed; the map PNG was exported from the Wardley Maps Modeler web
+  app ("Export · PNG (2×)").
+
+Not rehearsed yet:
+
+- ❌ The new demo script, step by step, by a person in a browser.
+- ❌ Every hosted designIQ step: the App installation and the merge to `main` are still open, so the
+  checklist "Only after the App is installed and the branch is merged" above still applies, with
+  these updates: the todos are now #1, #3, #4, #7, #18, #19, #20, #21 and #8, #9, #10 (11 issues);
+  "Send contract" carries #1, #3, #8, #9 and #18; "Check credit rating" carries #19; there is no
+  DMN in `process/`, so no business-rule link to check.
+

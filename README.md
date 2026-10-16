@@ -1,206 +1,115 @@
-# MiraVelo Bike Leasing: a designIQ demo
+# MiraVelo bike leasing
 
-> [!TIP]
-> **Presenting this demo?** Follow the [demo script](docs/demo/demo-script.md). It lists every step,
-> the artifact to open, the key message and what the audience should see.
+[![Pre-Merge Checks](https://github.com/miragon-blueprints/miragon-ai-example/actions/workflows/pre-merge.yml/badge.svg)](https://github.com/miragon-blueprints/miragon-ai-example/actions/workflows/pre-merge.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-This repository shows how **designIQ** links business context, design decisions, architecture,
-process models and feature issues for one application, using a single example that also runs.
+A solution template for process automation with AI agents. On one small but complete process, it
+shows how we at Miragon get from the business picture to a running application: a BPMN model on an
+embedded [CIB seven](https://cibseven.org) engine, a Kotlin service and a React frontend around it,
+and the design artifacts that explain them, in one repository that people and agents work on
+together.
 
-The example is the **bike-leasing process of MiraVelo**, a fictional bike brand that leases its
-bikes. The process is an executable BPMN model on an embedded [CIB seven](https://cibseven.org) engine
-(the community fork of Camunda 7), in a Spring Boot service written in Kotlin. It is **deliberately
-reduced to a core** so the whole story fits into one demo. The capabilities that were removed come
-back as feature issues. **Other Miragon AI components are deliberately left out for now.**
+![The frontend: an ordered application with its data, the next actions and the process timeline](docs/assets/frontend-application.png)
 
-Every design artifact is a versioned file under [`docs/`](docs/README.md), the folder designIQ reads.
+## Why
 
-![The core bike-leasing process](docs/assets/bike-leasing-core.png)
+Agents write code fast. What they don't know on their own is which process the code serves, which
+rules it has to keep and what comes next. In most projects that knowledge is spread across workshop
+boards, wikis, tickets and code. This template keeps it in one place and makes it checkable:
 
-The process started out larger (see [the original process](docs/assets/bike-leasing-original.png)).
-That state is frozen under the tag
-[`original-process-v1`](https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1).
-Copies of the original models and a
-[scope comparison](docs/use-cases/bike-leasing/original/scope-comparison.md) are in
-`docs/use-cases/bike-leasing/original/`.
+- **From the business picture to running code.** Use case, glossary, t.BPM model, feature map, C4
+  and Wardley Map sit in [`docs/`](docs/README.md) next to the executable BPMN. designIQ shows them,
+  and Gradle deploys the model from the same folder, so every layer traces back to a process step.
+- **The process model is the contract.** A typed process API is generated from the BPMN, so code
+  that references a removed element no longer compiles, and the process tests walk its paths.
+- **Guardrails, not only reviews.** Architecture tests, a mutation gate, bpmnlint and drift gates on
+  the OpenAPI contract and the frontend client fail the build when a change breaks a rule, whether a
+  person or an agent wrote it.
+- **The next work sits on the model.** The gap to the target process is a set of GitHub issues
+  anchored to BPMN elements, shown as todos on the model. [AGENTS.md](AGENTS.md), the skills and the
+  review agents in `.claude/` take an agent from such an issue to a pull request.
+- **A starting point to fork.** A real UI for customers and the back office, operations in the
+  Cockpit with retries and incidents, CI and containers: replace the process and keep the rest.
 
-## ✂️ Simplified scope
+## The process
 
-**The core (runs today):**
+![The executable bike-leasing process](docs/assets/bike-leasing-core.png)
 
-- A customer submits a leasing request for one bike over REST.
-- **Check credit rating** (a DMN decision on age and monthly net income) either rejects the
-  application or lets it continue.
-- A solvent customer receives a contract and has **14 days** to sign it. Otherwise the application is
-  rejected and the customer is notified.
-- Once the contract is signed, the bike is **ordered from the dealer**.
-- If the bike is unavailable, the **back office clarifies an alternative** with the customer (in the
-  Tasklist or over REST). If they find one, the alternative is ordered. If not, the contract is
-  reversed and the customer gets a cancellation confirmation.
-- The dealer reports the **handover**. After the 14-day withdrawal period the **leasing is active**.
-- If the dealer system is down, the order is retried and then raises an **incident** in Cockpit.
+A customer applies to lease a bike. The application is validated, the back office checks the credit
+rating, and a solvent customer receives the contract. Once it is signed, the insurance policy is
+issued and the bike is ordered from the dealer in parallel. When the dealer reports the handover,
+the leasing is active. Until then the customer can withdraw; the back office then reverses the
+application.
 
-**Planned features**, taken from the original process and ordered by stage
-([feature map](docs/use-cases/bike-leasing/feature-map/feature-map.md)):
+The model is stage 3 of the [MiraVelo reference models](https://github.com/Miragon/miravelo-reference)
+(`03-bike-leasing-event-subprocess-simplified.bpmn`). It deliberately leaves out what the
+[original process](docs/use-cases/bike-leasing/original/scope-comparison.md) could do. That gap is
+the roadmap below.
 
-| Stage | Feature issue |
-|---|---|
-| Stage 1 – Customer follow-up | [#1 Remind the customer to sign the contract after 7 days](https://github.com/miragon-blueprints/miragon-ai-example/issues/1) |
-| Stage 2 – Insurance | [#2 Issue the insurance policy alongside the bike order](https://github.com/miragon-blueprints/miragon-ai-example/issues/2) |
-| Stage 3 – Withdrawal | [#3 Let the customer withdraw the application and reverse completed steps](https://github.com/miragon-blueprints/miragon-ai-example/issues/3) |
-| Stage 3 – Withdrawal | [#4 Cancel a placed bike order at the dealer](https://github.com/miragon-blueprints/miragon-ai-example/issues/4) (depends on #3) |
-| Stage 4 – Portal and back-office views | [#5 Give the back office an inbox of pending alternative clarifications](https://github.com/miragon-blueprints/miragon-ai-example/issues/5) |
-| Stage 4 – Portal and back-office views | [#6 List leasing applications for the customer portal](https://github.com/miragon-blueprints/miragon-ai-example/issues/6) |
-| Stage 4 – Portal and back-office views | [#7 Offer a bike catalogue with models and live dealer availability](https://github.com/miragon-blueprints/miragon-ai-example/issues/7) |
+## Quick start
 
-**Open decisions** (make, buy or adapt; see the
-[sourcing decisions](docs/architecture/sourcing-decisions.md)):
-
-- [#8 Contract issuing and e-signature](https://github.com/miragon-blueprints/miragon-ai-example/issues/8)
-- [#9 Channel for customer notifications](https://github.com/miragon-blueprints/miragon-ai-example/issues/9)
-- [#10 How to integrate the bike dealer](https://github.com/miragon-blueprints/miragon-ai-example/issues/10)
-- [#11 Back-office task UI: adapt the CIB seven Tasklist or build an own inbox](https://github.com/miragon-blueprints/miragon-ai-example/issues/11)
-
-For each original capability, [scope-comparison.md](docs/use-cases/bike-leasing/original/scope-comparison.md)
-says whether it is in the core or in an issue.
-
-## 📖 Key terms
-
-- **Customer**: the person who applies for a lease.
-- **Back office**: MiraVelo staff who agree an alternative bike with the customer.
-- **Dealer**: the bike dealer. Checks availability, takes the order and reports the handover
-  (simulated here).
-- **Leasing application**: the case for one request, identified by its application id. Its status is
-  RECEIVED, ORDERED, HANDED_OVER, ACTIVE, REJECTED or CANCELLED.
-- **Credit rating**: the automated `checkCreditRating` decision. A customer is solvent at an age of
-  18 to 99 and a monthly net income of at least 1500.
-- **Signature deadline**: the 14 days the customer has to sign the contract.
-- **Alternative bike**: another bike the back office agrees with the customer when the requested one
-  is unavailable.
-- **Reversal**: undoing steps that are already done. In the core, that means revoking the contract
-  when no alternative is found.
-- **Handover**: the dealer hands the bike to the customer and reports it.
-- **Withdrawal period**: the 14 days after the handover before the leasing becomes active.
-
-All terms, with where each one appears in code and models: [docs/glossary.md](docs/glossary.md).
-
-## 🧰 Prerequisites
-
-- **JDK 21**
-- **Docker** (or Podman) with Compose, for the PostgreSQL database
-- **Node.js 22+**, for the Bruno scenarios and demo data, bpmnlint and the designIQ validator
-
-## 🚀 Build, test, start
-
-Run everything from the repo root.
+Requires JDK 21, Node 24 and Docker or Podman.
 
 ```bash
-./gradlew build                                    # all tests + model validation + OpenAPI export (uses H2, no Docker needed)
 docker compose -f stack/docker-compose.yml up -d   # PostgreSQL on :5432
-./gradlew bootRun                                  # the service and the embedded engine on :8081
+./gradlew bootRun                                  # service + embedded engine on :8081
+npm --prefix frontend ci && npm --prefix frontend run dev   # frontend on :5173
 ```
 
 | What | URL | Login |
 |---|---|---|
-| CIB seven Cockpit and Tasklist | <http://localhost:8081/camunda> | admin / admin |
-| CIB seven webclient (new UI) | <http://localhost:8081/webapp> | admin / admin |
-| Swagger UI (REST API) | <http://localhost:8081/swagger-ui.html> | |
-| Health | <http://localhost:8081/actuator/health> | |
+| Frontend (applications, new application, back-office inbox) | <http://localhost:5173> | |
+| CIB seven Cockpit (operations) | <http://localhost:8081/webapp/#/seven/auth/start> | admin / admin |
+| Swagger UI | <http://localhost:8081/swagger-ui.html> | |
 
-## 🎬 Demo data and reset
+Demo cases in every state: `cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local`.
+Everything else (tests, containers, reset) is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-With the service running:
+## What's inside
 
-```bash
-cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local && cd ..   # four demo cases + Tasklist filter
-cd bruno && npx --yes @usebruno/cli@4.0.0 run . --env local -r && cd ..           # optional: every scenario end to end
-```
+| Path | Content |
+|---|---|
+| [`src/`](src/main/kotlin/io/miragon/blueprint/) | Spring Boot 4 service in Kotlin, hexagonal, with JavaDelegates on the embedded engine |
+| [`frontend/`](frontend/AGENTS.md) | React app (Vite, TanStack, Tailwind) with a client generated from the OpenAPI contract |
+| [`docs/`](docs/README.md) | the designIQ workspace: use case, glossary, t.BPM, feature map, the executable model, C4, Wardley Map, ADRs |
+| [`openapi/`](openapi/openapi.json) | the checked-in REST contract |
+| [`bruno/`](bruno/README.md) | REST scenarios and demo data |
+| [`.claude/`](.claude/README.md) | skills and review agents for Claude Code |
 
-`00-demo-data` leaves four cases in Cockpit: one waiting for the signature, one rejected by the credit
-check, one waiting on *Clarify alternative with customer* in the Tasklist, and one waiting for the
-handover. It also creates the Tasklist filter "All tasks"; without a filter the Tasklist shows "No
-filter available" and no task. Running it again is safe. [bruno/README.md](bruno/README.md)
-describes every scenario.
+## Roadmap
 
-**Reset** to an empty engine:
+What the original process could do and this one cannot yet, ordered by stage
+([feature map](docs/use-cases/bike-leasing/feature-map/feature-map.md)):
 
-1. Stop the service (Ctrl+C).
-2. Run `docker compose -f stack/docker-compose.yml down -v` to delete the database.
-3. Start again with `docker compose -f stack/docker-compose.yml up -d` and `./gradlew bootRun`, then
-   load the demo data again. The reset also deletes the Tasklist filter, and `00-demo-data` creates
-   it again.
+| Stage | Feature |
+|---|---|
+| 1 – Customer follow-up | [#18 Reject the application when the contract stays unsigned for 14 days](https://github.com/miragon-blueprints/miragon-ai-example/issues/18) |
+| 1 – Customer follow-up | [#1 Remind the customer to sign the contract after 7 days](https://github.com/miragon-blueprints/miragon-ai-example/issues/1) |
+| 2 – Automation and supply | [#19 Automate the credit check with the DMN checkCreditRating](https://github.com/miragon-blueprints/miragon-ai-example/issues/19) |
+| 2 – Automation and supply | [#20 Clarify an alternative bike when the dealer cannot deliver](https://github.com/miragon-blueprints/miragon-ai-example/issues/20) |
+| 3 – Withdrawal | [#21 Activate the leasing only after the 14-day withdrawal period](https://github.com/miragon-blueprints/miragon-ai-example/issues/21) |
+| 3 – Withdrawal | [#3 Reverse a withdrawn application automatically instead of by hand](https://github.com/miragon-blueprints/miragon-ai-example/issues/3) |
+| 3 – Withdrawal | [#4 Cancel a placed bike order at the dealer](https://github.com/miragon-blueprints/miragon-ai-example/issues/4) |
+| 4 – Portal | [#7 Show live dealer availability in the bike catalogue](https://github.com/miragon-blueprints/miragon-ai-example/issues/7) |
 
-## 🧭 designIQ
+Open sourcing decisions (make, buy or adapt; [sourcing decisions](docs/architecture/sourcing-decisions.md)):
+[#8 contract and e-signature](https://github.com/miragon-blueprints/miragon-ai-example/issues/8),
+[#9 customer notifications](https://github.com/miragon-blueprints/miragon-ai-example/issues/9),
+[#10 dealer integration](https://github.com/miragon-blueprints/miragon-ai-example/issues/10).
 
-- **One folder.** The root [`designiq.yml`](designiq.yml) contains `models: docs`, so designIQ reads
-  everything under [`docs/`](docs/README.md) and nothing else.
-- **What it shows.** The BPMN models (the executable process, the t.BPM model, the feature map, the
-  frozen original) open in the process modeler. `checkCreditRating.dmn` opens in the decision modeler
-  and is linked from *Check credit rating*. `sourcing-map.owm` opens in the Wardley modeler. Markdown
-  files are shown as text.
-- **Todos.** Open issues labelled `todo` and `process:bike-leasing` show up as todos on the
-  executable process. An anchor block at the top of each issue body pins it to the BPMN elements it
-  affects. All eleven issues above are todos.
-- **Main branch only.** designIQ reads the default branch. A change on a branch shows up after it is
-  merged. Edits made in designIQ come back as a release pull request.
-- **Connection.** The designIQ GitHub App must be installed for `miragon-blueprints/miragon-ai-example`.
-  Without it, designIQ cannot see the repo. **Open on 2026-10-15:** the App was not installed and no
-  designIQ workspace listed the repo, so the hosted designIQ steps of the demo are not rehearsed yet
-  (see the [rehearsal log](docs/demo/rehearsal-log.md)). Until then, the demo script's local designIQ
-  fallback and the PNG renders in [`docs/assets/`](docs/assets/) stand in.
-- **Known limits.** Markdown, and with it the Mermaid C4 diagrams, appears as plain text (GitHub
-  renders it). The designIQ validator wrongly flags the compensation handler *Cancel contract* as
-  unreachable. The engine, bpmnlint and the model tests accept it. Details are in the
-  [docs index](docs/README.md) and in [ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md).
-- **Validate** the models locally with `npx --yes @miragon/design-iq-validator@5.3.0 --root .`.
+## Documentation
 
-## 🗺️ Demo order
+- [AGENTS.md](AGENTS.md): structure, rules, commands and how to implement a feature issue
+- [docs/README.md](docs/README.md): every design artifact, the demo order and the ADR list
+- [Executable process](docs/use-cases/bike-leasing/process/executable-process.md): element ids,
+  what differs from the reference model, how a model change reaches the code
+- [Demo script](docs/demo/demo-script.md): the live demo, step by step
+- [frontend/AGENTS.md](frontend/AGENTS.md): the frontend's structure and rules
 
-The [demo script](docs/demo/demo-script.md) tells the story in this order:
+## Contributing
 
-1. **Context and glossary**: the problem and the words for it.
-   [Use case](docs/use-cases/bike-leasing/bike-leasing-use-case.md) · [glossary](docs/glossary.md)
-2. **Wardley Map**: what MiraVelo builds, buys or adapts.
-   [sourcing-map.owm](docs/architecture/sourcing-map.owm) · [sourcing decisions](docs/architecture/sourcing-decisions.md)
-3. **t.BPM and feature map**: the process as a team lays it out on the table, and where each
-   feature fits into it. [t.BPM model](docs/use-cases/bike-leasing/tbpm/bike-leasing-tbpm.bpmn) ·
-   [feature map](docs/use-cases/bike-leasing/feature-map/bike-leasing-feature-map.bpmn) ·
-   [feature table](docs/use-cases/bike-leasing/feature-map/feature-map.md)
-4. **C4**: which systems carry the process.
-   [System context](docs/architecture/c4-system-context.md) · [containers](docs/architecture/c4-container.md)
-5. **Executable process**: what runs today, live in Cockpit.
-   [bike-leasing.bpmn](docs/use-cases/bike-leasing/process/bike-leasing.bpmn) ·
-   [checkCreditRating.dmn](docs/use-cases/bike-leasing/process/checkCreditRating.dmn) ·
-   [how it is built](docs/use-cases/bike-leasing/process/executable-process.md)
-6. **Feature issues**: from a todo on a process element to its GitHub issue.
-   [Open todos](https://github.com/miragon-blueprints/miragon-ai-example/issues?q=is%3Aissue+is%3Aopen+label%3Atodo)
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The steps that were actually tried in a rehearsal, and their limits, are in the
-[rehearsal log](docs/demo/rehearsal-log.md).
+## License
 
-## 📂 What's where
-
-- [`designiq.yml`](designiq.yml): points designIQ at `docs/`
-- [`docs/`](docs/README.md): every design artifact and the index to them
-  - [`use-cases/bike-leasing/`](docs/use-cases/bike-leasing/bike-leasing-use-case.md): use case, t.BPM model,
-    feature map, executable process (`process/`), frozen original (`original/`)
-  - [`architecture/`](docs/architecture/sourcing-decisions.md): C4 diagrams, Wardley Map, sourcing decisions
-  - [`adr/`](docs/adr/): Architecture Decision Records
-  - [`demo/`](docs/demo/demo-script.md): demo script and rehearsal log
-  - [`assets/`](docs/assets/): PNG renders of the models
-- [`src/`](src/main/kotlin/io/miragon/blueprint/): the Spring Boot service in Kotlin, hexagonal
-  ([AGENTS.md](AGENTS.md) explains the structure and its rules)
-- [`bruno/`](bruno/README.md): REST scenarios and demo data
-- [`openapi/`](openapi/openapi.json): the checked-in, drift-gated REST contract
-- [`stack/`](stack/docker-compose.yml): PostgreSQL for local runs
-
-## 🤝 Contributing
-
-Contributions are welcome. Start from an issue, keep the CI gates green and use
-[Conventional Commits](https://www.conventionalcommits.org). Setup, ports, ground rules and the PR
-checklist are in [CONTRIBUTING.md](CONTRIBUTING.md). The working rules for humans and AI agents are
-in [AGENTS.md](AGENTS.md).
-
-## 📄 License
-
-Licensed under the [MIT License](LICENSE).
+[MIT](LICENSE) © Miragon GmbH.

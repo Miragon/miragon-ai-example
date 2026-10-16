@@ -1,0 +1,31 @@
+meta {
+  name: Assert the withdrawn case waits for the reversal
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/api/tasks
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const id = bru.getVar("withdrawnId");
+  await pollApp("/api/tasks",
+    (b) => Array.isArray(b) && b.some((t) => t.application.applicationId === id && t.type === "REVERSAL"));
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("the withdrawn case is in the back-office tasks as a reversal", function () {
+    const id = bru.getVar("withdrawnId");
+    const tasks = res.getBody().filter((t) => t.application.applicationId === id);
+    expect(tasks).to.have.length(1);
+    expect(tasks[0].type).to.equal("REVERSAL");
+    expect(tasks[0].application.status).to.equal("WITHDRAWN");
+  });
+}

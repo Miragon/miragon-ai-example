@@ -1,6 +1,6 @@
 # 0015 — Reduce the executable process to a core
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md)
 - **Date:** 2026-10-15
 - **Deciders:** Thomas (@Hafflgav)
 

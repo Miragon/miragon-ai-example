@@ -44,4 +44,13 @@ script:pre-request {
       { method: 'get', url: bru.getEnvVar('engineRest') + path },
       predicate, opts);
   };
+
+  // Wait until the instance with this business key (the applicationId) rests on activityId: events
+  // and user tasks continue asynchronously, so a read-model status alone does not prove every wait
+  // state exists.
+  globalThis.pollActivity = function (businessKey, activityId, opts) {
+    return globalThis.pollEngine(
+      '/process-instance?businessKey=' + businessKey + '&activityIdIn=' + activityId,
+      (b) => Array.isArray(b) && b.length === 1, opts);
+  };
 }

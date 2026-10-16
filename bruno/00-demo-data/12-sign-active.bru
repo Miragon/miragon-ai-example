@@ -1,0 +1,19 @@
+meta {
+  name: Sign the contract of the active case
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{activeId}}/sign-contract
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("activeId"), "event_contractSigned");
+}
+
+assert {
+  res.status: eq 202
+}

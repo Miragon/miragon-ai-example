@@ -1,0 +1,23 @@
+meta {
+  name: Assert neither request reached the back office
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/tasks
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("no back-office task exists for an invalid application", function () {
+    const invalidIds = [bru.getVar("underAgeId"), bru.getVar("unknownBikeId")];
+    const tasks = res.getBody().filter((t) => invalidIds.includes(t.application.applicationId));
+    expect(tasks).to.have.length(0);
+  });
+}

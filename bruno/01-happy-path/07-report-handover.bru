@@ -1,0 +1,20 @@
+meta {
+  name: Report the handover
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{applicationId}}/report-handover
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Insurance policy and bike order run in parallel; the handover wait state exists once both joined.
+  await pollActivity(bru.getVar("applicationId"), "event_handoverReported");
+}
+
+assert {
+  res.status: eq 202
+}

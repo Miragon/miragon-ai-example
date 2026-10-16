@@ -1,0 +1,30 @@
+meta {
+  name: Submit a request for a bike that is not in the catalogue
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerName": "Uma Unknown",
+    "email": "uma@example.com",
+    "age": 30,
+    "monthlyNetIncome": 3000.0,
+    "bikeId": "BIKE-X"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.applicationId: isDefined
+}
+
+vars:post-response {
+  unknownBikeId: res.body.applicationId
+}

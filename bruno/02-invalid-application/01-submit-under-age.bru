@@ -1,0 +1,35 @@
+meta {
+  name: Submit a request from an under-age applicant
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerName": "Tim Teen",
+    "email": "tim@example.com",
+    "age": 16,
+    "monthlyNetIncome": 900.0,
+    "bikeId": "BIKE-900"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.applicationId: isDefined
+}
+
+vars:post-response {
+  underAgeId: res.body.applicationId
+}
+
+docs {
+  The request itself is well-formed, so it is accepted. "Validate application" then finds the
+  applicant under 18 and throws the BPMN error applicationInvalid.
+}

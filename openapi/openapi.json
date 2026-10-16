@@ -2,11 +2,64 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "MiraVelo Bike-Leasing API",
-    "description" : "Endpoints that drive the MiraVelo bike-leasing process: submit a request, read an application, sign the contract, clarify an alternative bike and report the handover. The engine-internal /engine-rest API is intentionally excluded.",
+    "description" : "Endpoints that drive the MiraVelo bike-leasing process: submit and list applications, sign the contract, report the handover, withdraw, and work the back-office inbox (credit check, reversal). The engine-internal /engine-rest API is intentionally excluded.",
     "version" : "1.0"
   },
   "paths" : {
     "/api/bike-leasing" : {
+      "get" : {
+        "tags" : [ "list-leasing-applications-controller" ],
+        "operationId" : "listLeasingApplications",
+        "parameters" : [ {
+          "name" : "status",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "RECEIVED", "CONTRACT_SENT", "CONTRACT_SIGNED", "ORDERED", "ACTIVE", "REJECTED", "WITHDRAWN", "CANCELLED" ]
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A page of leasing applications, newest first",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LeasingApplicationPageDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid paging parameters",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
       "post" : {
         "tags" : [ "submit-leasing-request-controller" ],
         "operationId" : "submitLeasingRequest",
@@ -44,6 +97,55 @@
         }
       }
     },
+    "/api/bike-leasing/{applicationId}/withdraw" : {
+      "post" : {
+        "tags" : [ "withdraw-application-controller" ],
+        "operationId" : "withdrawApplication",
+        "parameters" : [ {
+          "name" : "applicationId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "202" : {
+            "description" : "Accepted: the back office reverses the application"
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Unknown application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "The case is already finished or withdrawn",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/bike-leasing/{applicationId}/sign-contract" : {
       "post" : {
         "tags" : [ "sign-contract-controller" ],
@@ -70,8 +172,67 @@
               }
             }
           },
+          "404" : {
+            "description" : "Unknown application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "The case is not waiting for a signature",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bike-leasing/{applicationId}/reversal" : {
+      "post" : {
+        "tags" : [ "complete-reversal-controller" ],
+        "operationId" : "completeReversal",
+        "parameters" : [ {
+          "name" : "applicationId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "202" : {
+            "description" : "Accepted: the task is completed, the process continues asynchronously"
+          },
+          "400" : {
+            "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Unknown application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "No open reversal for this application",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -109,6 +270,16 @@
               }
             }
           },
+          "404" : {
+            "description" : "Unknown application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "The case is not waiting for the handover",
             "content" : {
@@ -122,10 +293,10 @@
         }
       }
     },
-    "/api/bike-leasing/{applicationId}/clarify-alternative" : {
+    "/api/bike-leasing/{applicationId}/credit-check" : {
       "post" : {
-        "tags" : [ "select-alternative-controller" ],
-        "operationId" : "selectAlternative",
+        "tags" : [ "complete-credit-check-controller" ],
+        "operationId" : "completeCreditCheck",
         "parameters" : [ {
           "name" : "applicationId",
           "in" : "path",
@@ -138,7 +309,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/AlternativeDecisionInput"
+                "$ref" : "#/components/schemas/CreditCheckInput"
               }
             }
           },
@@ -149,7 +320,7 @@
             "description" : "Accepted: the task is completed, the process continues asynchronously"
           },
           "400" : {
-            "description" : "Invalid application id, or an accepted alternative without a bike id",
+            "description" : "Invalid application id",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -159,11 +330,63 @@
             }
           },
           "404" : {
-            "description" : "Unknown application, or no open clarification task",
+            "description" : "Unknown application",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "No open credit check for this application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks" : {
+      "get" : {
+        "tags" : [ "list-open-tasks-controller" ],
+        "operationId" : "listOpenTasks",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/OpenTaskDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bikes" : {
+      "get" : {
+        "tags" : [ "list-bikes-controller" ],
+        "operationId" : "listBikes",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BikeDto"
+                  }
                 }
               }
             }
@@ -213,17 +436,26 @@
   },
   "components" : {
     "schemas" : {
-      "AlternativeDecisionInput" : {
+      "BikeDto" : {
         "type" : "object",
         "properties" : {
-          "alternativeFound" : {
-            "type" : "boolean"
-          },
           "bikeId" : {
-            "type" : [ "string", "null" ]
+            "type" : "string"
+          },
+          "model" : {
+            "type" : "string"
           }
         },
-        "required" : [ "alternativeFound" ]
+        "required" : [ "bikeId", "model" ]
+      },
+      "CreditCheckInput" : {
+        "type" : "object",
+        "properties" : {
+          "solvent" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "solvent" ]
       },
       "LeasingApplicationCreatedDto" : {
         "type" : "object",
@@ -257,13 +489,20 @@
           "bikeId" : {
             "type" : "string"
           },
+          "bikeModel" : {
+            "type" : [ "string", "null" ]
+          },
           "status" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "RECEIVED", "CONTRACT_SENT", "CONTRACT_SIGNED", "ORDERED", "ACTIVE", "REJECTED", "WITHDRAWN", "CANCELLED" ]
+          },
+          "contractId" : {
+            "type" : [ "string", "null" ]
           },
           "orderId" : {
             "type" : [ "string", "null" ]
           },
-          "contractId" : {
+          "policyId" : {
             "type" : [ "string", "null" ]
           },
           "createdAt" : {
@@ -272,6 +511,34 @@
           }
         },
         "required" : [ "age", "applicationId", "bikeId", "createdAt", "customerName", "email", "monthlyNetIncome", "status" ]
+      },
+      "LeasingApplicationPageDto" : {
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/LeasingApplicationDto"
+            }
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "size" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        },
+        "required" : [ "items", "page", "size", "totalElements", "totalPages" ]
       },
       "LeasingRequestInput" : {
         "type" : "object",
@@ -295,6 +562,23 @@
           }
         },
         "required" : [ "age", "bikeId", "customerName", "email", "monthlyNetIncome" ]
+      },
+      "OpenTaskDto" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "CREDIT_CHECK", "REVERSAL" ]
+          },
+          "waitingSince" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "application" : {
+            "$ref" : "#/components/schemas/LeasingApplicationDto"
+          }
+        },
+        "required" : [ "application", "type", "waitingSince" ]
       },
       "ProblemDetail" : {
         "type" : "object",

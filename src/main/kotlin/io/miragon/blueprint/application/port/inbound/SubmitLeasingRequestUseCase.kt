@@ -9,7 +9,6 @@ import io.miragon.blueprint.domain.leasing.Email
 interface SubmitLeasingRequestUseCase {
     fun submit(command: Command): ApplicationId
 
-    /** The request as the customer submits it; the bike is identified by its [bikeId] only. */
     data class Command(
         val customerName: CustomerName,
         val email: Email,

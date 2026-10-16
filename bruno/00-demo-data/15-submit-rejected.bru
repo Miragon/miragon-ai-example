@@ -1,0 +1,34 @@
+meta {
+  name: Submit a case the back office rejects
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerName": "Rita Rejected",
+    "email": "rita@example.com",
+    "age": 27,
+    "monthlyNetIncome": 1100.0,
+    "bikeId": "BIKE-800"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.applicationId: isDefined
+}
+
+vars:post-response {
+  rejectedId: res.body.applicationId
+}
+
+docs {
+  Demo case 5: the back office decides "not solvent", so the case is rejected without a contract.
+}

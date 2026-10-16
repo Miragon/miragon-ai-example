@@ -1,0 +1,25 @@
+meta {
+  name: Decline the credit check of the rejected case
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{rejectedId}}/credit-check
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "solvent": false
+  }
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("rejectedId"), "userTask_checkCreditRating");
+}
+
+assert {
+  res.status: eq 202
+}

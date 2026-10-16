@@ -1,7 +1,9 @@
 package io.miragon.blueprint.adapter.outbound.cibseven
 
+import io.miragon.blueprint.domain.leasing.ActionNotAvailableException
 import org.cibseven.bpm.engine.RuntimeService
 import org.cibseven.bpm.engine.TaskService
+import org.cibseven.bpm.engine.task.Task
 
 /**
  * Small extension helpers over the CIB seven services so the adapters read as intent
@@ -18,7 +20,7 @@ fun RuntimeService.correlateByBusinessKey(messageName: String, businessKey: Stri
 
 /**
  * Completes the single open [taskDefinitionKey] task of the instance carrying [businessKey], passing
- * [variables]. Fails loudly when no such task is waiting.
+ * [variables]. Fails with [ActionNotAvailableException] when no such task is waiting.
  */
 fun TaskService.completeTask(
     businessKey: String,
@@ -29,6 +31,24 @@ fun TaskService.completeTask(
         createTaskQuery()
             .processInstanceBusinessKey(businessKey)
             .taskDefinitionKey(taskDefinitionKey)
-            .singleResult() ?: error("No open '$taskDefinitionKey' task for business key $businessKey")
+            .singleResult()
+            ?: throw ActionNotAvailableException("No open '$taskDefinitionKey' task for business key $businessKey")
     complete(task.id, variables)
+}
+
+/** Lists the open tasks of the given definition keys, oldest first. */
+fun TaskService.findOpenTasks(vararg taskDefinitionKeys: String): List<Task> =
+    createTaskQuery()
+        .taskDefinitionKeyIn(*taskDefinitionKeys)
+        .orderByTaskCreateTime()
+        .asc()
+        .list()
+
+/** Maps each of the given process instance ids to its business key. */
+fun RuntimeService.businessKeysById(processInstanceIds: Collection<String>): Map<String, String> {
+    if (processInstanceIds.isEmpty()) return emptyMap()
+    return createProcessInstanceQuery()
+        .processInstanceIds(processInstanceIds.toSet())
+        .list()
+        .associate { it.id to it.businessKey }
 }

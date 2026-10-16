@@ -7,6 +7,11 @@
   `withdraw` command, no `WITHDRAWN` status, no parallel branches and no inbox; the
   clarify-alternative scenarios poll `/engine-rest` for the open user task instead. The JVM process
   tests are `@SpringBootTest` tests with the CIB seven assertions, not JGiven.
+- **Amended by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md) and
+  [ADR-0018](0018-react-frontend-next-to-the-service.md) (2026-10-16):** the process has a
+  `withdraw` command, a `WITHDRAWN` status, parallel branches and an inbox again; the Bruno
+  scenarios poll the domain, the engine and the inbox (`pollApp`, `pollEngine`, `pollActivity`), and
+  the frontend and its Playwright scenarios poll every 2 s instead of sleeping.
 
 ## Context
 

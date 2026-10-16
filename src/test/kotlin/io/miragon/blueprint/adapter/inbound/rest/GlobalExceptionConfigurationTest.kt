@@ -2,9 +2,13 @@ package io.miragon.blueprint.adapter.inbound.rest
 
 import com.ninjasquad.springmockk.MockkBean
 import io.miragon.blueprint.application.port.inbound.ReportHandoverUseCase
+import io.miragon.blueprint.domain.leasing.ActionNotAvailableException
+import io.miragon.blueprint.domain.leasing.ApplicationId
+import io.miragon.blueprint.domain.leasing.ApplicationNotFoundException
 import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.cibseven.bpm.engine.MismatchingMessageCorrelationException
+import org.cibseven.bpm.engine.OptimisticLockingException
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
@@ -39,10 +43,24 @@ class GlobalExceptionConfigurationTest {
     }
 
     @Test
-    fun `IllegalStateException maps to 404 with the message as detail`() {
+    fun `ActionNotAvailableException maps to 409`() {
+        every { useCase.reportHandover(any()) } throws ActionNotAvailableException("No open task")
+
+        assertProblem(reportHandover(pathVar), status = 409, title = "Action not available in the current state")
+    }
+
+    @Test
+    fun `OptimisticLockingException maps to 409`() {
+        every { useCase.reportHandover(any()) } throws OptimisticLockingException("concurrent update")
+
+        assertProblem(reportHandover(pathVar), status = 409, title = "Action not available in the current state")
+    }
+
+    @Test
+    fun `ApplicationNotFoundException maps to 404 with the message as detail`() {
 
         // given: the service cannot find the application
-        every { useCase.reportHandover(any()) } throws IllegalStateException("Unknown application $pathVar")
+        every { useCase.reportHandover(any()) } throws ApplicationNotFoundException(ApplicationId.of(pathVar))
 
         // when: the POST is performed
         val response = reportHandover(pathVar)

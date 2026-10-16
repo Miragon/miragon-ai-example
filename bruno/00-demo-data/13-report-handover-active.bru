@@ -1,0 +1,19 @@
+meta {
+  name: Report the handover of the active case
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing/{{activeId}}/report-handover
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("activeId"), "event_handoverReported");
+}
+
+assert {
+  res.status: eq 202
+}

@@ -1,0 +1,25 @@
+meta {
+  name: List the active applications
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing?status=ACTIVE&page=0&size=100
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.page: eq 0
+  res.body.size: eq 100
+}
+
+tests {
+  test("the list holds the new lease and only active ones", function () {
+    const items = res.getBody().items;
+    expect(items.map((a) => a.applicationId)).to.include(bru.getVar("applicationId"));
+    expect(items.every((a) => a.status === "ACTIVE")).to.equal(true);
+  });
+}

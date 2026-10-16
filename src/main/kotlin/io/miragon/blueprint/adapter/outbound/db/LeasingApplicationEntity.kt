@@ -31,6 +31,9 @@ data class LeasingApplicationEntity(
     @Column(name = "bike_id", nullable = false)
     val bikeId: String,
 
+    @Column(name = "bike_model")
+    val bikeModel: String? = null,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     val status: LeasingStatus,
@@ -40,6 +43,9 @@ data class LeasingApplicationEntity(
 
     @Column(name = "contract_id")
     val contractId: String? = null,
+
+    @Column(name = "policy_id")
+    val policyId: String? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime,

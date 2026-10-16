@@ -28,10 +28,10 @@ class OpenApiConfiguration {
                     .title("MiraVelo Bike-Leasing API")
                     .version("1.0")
                     .description(
-                        "Endpoints that drive the MiraVelo bike-leasing process: submit a request, " +
-                            "read an application, sign the contract, clarify an alternative bike and " +
-                            "report the handover. The engine-internal /engine-rest API is intentionally " +
-                            "excluded.",
+                        "Endpoints that drive the MiraVelo bike-leasing process: submit and list " +
+                            "applications, sign the contract, report the handover, withdraw, and work " +
+                            "the back-office inbox (credit check, reversal). The engine-internal " +
+                            "/engine-rest API is intentionally excluded.",
                     ),
             )
 }

@@ -1,0 +1,34 @@
+meta {
+  name: Submit a case that will wait for the handover
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/bike-leasing
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customerName": "Otto Ordered",
+    "email": "otto@example.com",
+    "age": 51,
+    "monthlyNetIncome": 5100.0,
+    "bikeId": "BIKE-600"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.applicationId: isDefined
+}
+
+vars:post-response {
+  orderedId: res.body.applicationId
+}
+
+docs {
+  Demo case 3: signed, insured and ordered; it waits for the dealer to report the handover.
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Get the withdrawn application
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{applicationId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq WITHDRAWN
+  res.body.contractId: isString
+}

@@ -1,60 +1,66 @@
 title Bike leasing: make, buy or adapt
-url Back-office task UI URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/11]
+url Back-office task UI URL [https://github.com/miragon-blueprints/miragon-ai-example/blob/main/docs/adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md]
+url Customer frontend URL [https://github.com/miragon-blueprints/miragon-ai-example/blob/main/docs/adr/0018-react-frontend-next-to-the-service.md]
+url Credit check URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/19]
 url Customer notification URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/9]
 url Contract & e-signature URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/8]
 url Dealer integration URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/10]
 url Leasing process model URL [https://github.com/miragon-blueprints/miragon-ai-example/blob/main/docs/use-cases/bike-leasing/process/bike-leasing.bpmn]
-anchor Customer [0.93, 0.4]
-anchor Back office [0.93, 0.6]
-anchor Operations [0.93, 0.8]
-component Bike leasing [0.84, 0.55]
-component Leasing application [0.76, 0.3] (build)
-component Back-office task UI [0.66, 0.6] url(Back-office task UI URL)
-component Process monitoring [0.78, 0.66] (buy)
-component Customer notification [0.58, 0.86] url(Customer notification URL)
+anchor Customer [0.95, 0.4]
+anchor Back office [0.95, 0.56]
+anchor Operations [0.95, 0.8]
+component Bike leasing [0.86, 0.55]
+component Customer frontend [0.8, 0.26] (build) url(Customer frontend URL)
+component Back-office task UI [0.7, 0.36] (build) url(Back-office task UI URL)
+component Process monitoring [0.8, 0.66] (buy)
+component Leasing application [0.57, 0.3] (build)
+component Insurance policy [0.66, 0.77] (market)
+component Customer notification [0.56, 0.86] url(Customer notification URL)
 component Contract & e-signature [0.48, 0.68] url(Contract & e-signature URL)
-component Dealer integration [0.54, 0.38] (market) url(Dealer integration URL)
-component Credit rating rules [0.44, 0.3] (build)
-component Leasing process model [0.32, 0.26] (build) url(Leasing process model URL)
-component Process engine [0.34, 0.62] (buy)
-component Application framework [0.22, 0.8] (buy)
-component Database [0.1, 0.9] (outsource)
+component Dealer integration [0.5, 0.38] (market) url(Dealer integration URL)
+component Credit check [0.42, 0.3] (build) url(Credit check URL)
+component Process engine [0.33, 0.64] (buy)
+component Leasing process model [0.28, 0.27] (build) url(Leasing process model URL)
+component UI framework [0.3, 0.76] (buy)
+component Application framework [0.2, 0.82] (buy)
+component Database [0.08, 0.9] (outsource)
 annotation 1 [0.43, 0.66] Open: make, buy or adapt? See #8
-annotation 2 [0.53, 0.84] Open: which channel? See #9
-annotation 3 [0.54, 0.52] Open: how to integrate? See #10
-annotation 4 [0.74, 0.47] Open: adapt the Tasklist or build an inbox? See #11
-annotation 5 [0.71, 0.715] Adapt (option of #11): Tasklist + own form
-note Doctrine: build what sets us apart\nbuy the standard, adapt on purpose [0.9, 0.14] (color #0B7A55)
-note Assumption: evolution positions are estimates\nno market research yet, see sourcing-decisions.md [0.08, 0.32]
-note Assumption: managed PostgreSQL [0.04, 0.88]
-pipeline Back-office task UI [0.34, 0.7]
-{
-  component Own inbox [0.38] (build)
-  component CIB seven Tasklist [0.66] (buy)
-}
+annotation 2 [0.51, 0.84] Open: which channel? See #9
+annotation 3 [0.45, 0.43] Open: how to integrate? See #10
+annotation 4 [0.37, 0.3] Manual today: automate with the DMN, see #19
+note Doctrine: build what sets us apart\nbuy the standard, adapt on purpose [0.92, 0.12] (color #0B7A55)
+note Decided (ADR-0019): own inbox\nnot the CIB seven Tasklist [0.64, 0.37]
+note Assumption: evolution positions are estimates\nno market research yet, see sourcing-decisions.md [0.14, 0.32]
+note Assumption: insurer as partner, no decision issue yet [0.61, 0.72]
+note Assumption: managed PostgreSQL [0.03, 0.88]
 Customer -> Bike leasing
+Bike leasing -> Customer frontend
 Back office -> Back-office task UI
 Operations -> Process monitoring
-Bike leasing -> Leasing application
+Customer frontend -> Leasing application
+Customer frontend -> UI framework
+Back-office task UI -> Leasing application
+Back-office task UI -> UI framework
 Leasing application -> Leasing process model
-Leasing application -> Credit rating rules
+Leasing application -> Credit check
 Leasing application -> Process engine
 Leasing application -> Contract & e-signature
 Leasing application -> Customer notification
+Leasing application -> Insurance policy
 Leasing application -> Dealer integration
 Leasing application -> Database
 Leasing application -> Application framework
-Back-office task UI -> Process engine
 Process monitoring -> Process engine
 Process engine -> Database
 // MiraVelo bike leasing: the real parts of this example and how we source them.
 // Read it top-down: Customer, Back office and Operations at the top, commodities at the bottom right.
 // Decorators: build = Make, buy = Buy a product, outsource = Buy as a service, market = Partner.
-// No decorator = open decision. Annotations 1 to 4 name the open decisions, GitHub issues #8 to #11.
-// Adapt has no decorator of its own: it is buy plus an "Adapt" annotation. Annotation 5 shows it on
-// the CIB seven Tasklist variant: the bought Tasklist with our own form clarify-alternative.form.
-// Database outsource (managed PostgreSQL) is an assumption: no hosting is decided yet.
+// No decorator = open decision. Annotations 1 to 3 name the open decisions, GitHub issues #8 to #10.
+// Annotation 4: the credit check is a human decision in the inbox today; #19 automates it with the DMN.
+// Back-office task UI was decided as build (ADR-0019, issue #11): the own inbox in the frontend.
+// Adapt has no decorator of its own: it is buy plus an "Adapt" annotation. No component is adapted today.
+// Insurance policy as a partner and Database outsource (managed PostgreSQL) are assumptions.
 // Products: Process engine = CIB seven, Process monitoring = CIB seven Cockpit,
-// Application framework = Spring Boot, Database = PostgreSQL.
-// Notes: green = Doctrine (talk colour legend); the uncoloured notes mark assumptions.
+// Application framework = Spring Boot, UI framework = React and Vite, Database = PostgreSQL.
+// Notes: green = Doctrine (talk colour legend); the uncoloured notes mark decisions and assumptions.
 // Rationale, BPMN element ids and code per component: sourcing-decisions.md next to this file.

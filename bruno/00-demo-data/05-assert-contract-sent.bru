@@ -1,0 +1,21 @@
+meta {
+  name: Assert the case waits for the signature
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/bike-leasing/{{contractSentId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  await pollActivity(bru.getVar("contractSentId"), "event_contractSigned");
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq CONTRACT_SENT
+  res.body.contractId: isString
+}

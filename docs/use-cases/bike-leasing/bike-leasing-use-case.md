@@ -6,18 +6,21 @@ view, then go on with "Where to look next".
 
 ## The problem
 
-A lease involves the customer, MiraVelo's back office, a contract system and a bike dealer. It can
-take weeks: the customer has up to 14 days to sign, and after the handover there is a 14-day
-withdrawal period. At every step someone waits for someone else. If no single process owns the case,
-these things go wrong (each one is answered by a rule in today's model):
+A lease involves the customer, MiraVelo's back office, a contract system, an insurer and a bike
+dealer. At every step someone waits for someone else. If no single process owns the case, these
+things go wrong (each one is answered by a rule in today's model):
 
-- A contract goes to someone who cannot afford the lease. Answer: the credit check comes first.
-- A contract is sent, never signed, and the case stays open forever. Answer: a 14-day signature deadline.
-- The bike is out of stock and the order silently stalls. Answer: the back office clarifies an
-  alternative with the customer, or the contract is cancelled.
-- The dealer's system is down and nobody notices. Answer: the order is retried, then an incident is raised.
-- The lease goes live before the withdrawal period is over. Answer: activation waits 14 days after handover.
-- Nobody can say where a case stands. Answer: every case has a status and a visible process instance.
+- An application with wrong data reaches the contract. Answer: the application is validated first.
+- A contract goes to someone who cannot afford the lease. Answer: the back office checks the credit
+  rating before any contract is sent.
+- A bike is handed over without insurance. Answer: the policy is issued in parallel with the order,
+  and the handover is accepted only when both are done.
+- The dealer's system is down and nobody notices. Answer: the order is retried, then an incident is
+  raised.
+- The customer changes their mind and the case runs on. Answer: the customer can withdraw at any
+  time until the handover, and the back office reverses the case.
+- Nobody can say where a case stands. Answer: every case has a status, a visible process instance
+  and, for the back office, an entry in the inbox when someone has to act.
 
 These points come from the rules in the model. They are not measured incidents.
 
@@ -25,75 +28,93 @@ These points come from the rules in the model. They are not measured incidents.
 
 | Actor | Role in the core |
 |---|---|
-| Customer | submits the leasing request, signs the contract, agrees on an alternative bike |
-| Back office | clarifies an alternative bike with the customer (Tasklist form or REST) |
-| Dealer | confirms availability, takes the bike order, reports the handover |
-| Operations | watches running cases and resolves incidents (Cockpit) |
+| Customer | submits the leasing request, signs the contract, may withdraw the application |
+| Back office | checks the credit rating and reverses withdrawn applications, both in the inbox of the frontend (`/aufgaben`) |
+| Dealer | takes the bike order, reports the handover |
+| Operations | watches running cases and resolves incidents (CIB seven Cockpit) |
 
-The process uses three external systems. In this repo all three are simulated and only log: the
-contract system, the notification channel and the dealer system. The service is headless, with no
-portal yet. In the demo, Bruno or the Swagger UI make the customer's and the dealer's REST calls, and
-the back office works in the CIB seven Tasklist.
+The process uses four external systems. In this repo all four are simulated and only log: the
+contract system, the insurer, the notification channel and the dealer system.
+
+The React frontend (`frontend/`, [ADR-0018](../../adr/0018-react-frontend-next-to-the-service.md))
+shows both sides of the case: the application list (`/`), the request form (`/antraege/neu`), the
+application detail (`/antraege/{id}`) and the back-office inbox (`/aufgaben`). In the demo, the
+detail page also plays the customer's and the dealer's part with its "sign contract", "report
+handover" and "withdraw" buttons. Bruno and the Swagger UI make the same REST calls. The back office
+works in the inbox, not in the CIB seven Tasklist: completing a task there would bypass the domain
+([ADR-0019](../../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
 
 ## Trigger, goal and outcomes
 
 - Trigger: the customer submits a leasing request with name, email, age, monthly net income and the
   bike id (`POST /api/bike-leasing`). The process starts at "Leasing request received".
-- Goal: a solvent customer has signed the contract and has the bike, and the withdrawal period is
-  over. The lease is active.
+- Goal: a valid, solvent customer has signed the contract, the bike is insured and handed over. The
+  lease is active.
 
 | Status | End event | When |
 |---|---|---|
-| ACTIVE | Leasing active | contract signed, bike handed over, withdrawal period over |
-| REJECTED | Application rejected | not solvent, or no signature within 14 days |
-| CANCELLED | Contract cancelled | the bike is unavailable and no acceptable alternative was found |
+| ACTIVE | Leasing active | contract signed, policy issued, bike ordered and handed over |
+| REJECTED | Application rejected | the application is invalid, or the customer is not solvent |
+| CANCELLED | Application cancelled | the customer withdrew and the back office reversed the application |
 
-While the case runs, its status moves RECEIVED → ORDERED → HANDED_OVER.
+While the case runs, its status moves RECEIVED → CONTRACT_SENT → CONTRACT_SIGNED → ORDERED → ACTIVE.
+A withdrawal sets WITHDRAWN at once; the reversal ends it as CANCELLED.
 
 ## The core flow
 
 1. Leasing request received: the case starts (RECEIVED).
-2. Check credit rating: a decision table. Under 18, over 99, or a monthly net income below 1500
-   means not solvent.
-3. Send contract: the contract system issues the contract and the customer is asked to sign.
-4. Contract signed: the process waits up to 14 days for the signature.
-5. Order bike from dealer: the dealer confirms the bike is available and takes the order (ORDERED).
-6. Handover reported: the dealer reports that the customer has the bike (HANDED_OVER).
-7. Await end of withdrawal period: 14 days.
+2. Validate application: the applicant must be at least 18 and the bike must be in the dealer's
+   catalogue. **Assumption:** the reference model names the step but not its rule; this rule is
+   ours ([ADR-0017](../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)).
+3. Check credit rating: the back office decides "solvent" or "not solvent" in the inbox. No rule
+   guides the decision yet ([#19] automates it).
+4. Send contract: the contract system issues the contract and the customer is asked to sign
+   (CONTRACT_SENT).
+5. Contract signed: the process waits for the signature, without a time limit (CONTRACT_SIGNED).
+6. In parallel: Issue insurance policy, and Order bike from dealer (ORDERED once the dealer took the
+   order).
+7. Handover reported: the dealer reports that the customer has the bike. It is accepted only after
+   both parallel steps are done.
 8. Leasing active: the lease is live (ACTIVE).
 
 Variants:
 
-- Not solvent (step 2): "Rejection reason" → "Send rejection" → "Application rejected" (REJECTED).
-- No signature within 14 days (step 4): the same rejection. The contract that was sent is not
-  revoked (open decision [#8]).
-- Bike unavailable (step 5): the back office runs "Clarify alternative with customer".
-  - Alternative found: the alternative bike is ordered (back to step 5).
-  - No alternative: "Trigger reversal" cancels the contract → "Send cancellation confirmation" →
-    "Contract cancelled" (CANCELLED).
-- Dealer outage (step 5): the order is retried 3 times, 10 seconds apart, then an incident appears
+- Application invalid (step 2): "Rejection reason" → "Send rejection" → "Application rejected"
+  (REJECTED).
+- Not solvent (step 3): the same rejection.
+- Withdrawal (any time from RECEIVED to ORDERED): the event sub-process "Application withdrawn"
+  stops whatever runs (status WITHDRAWN). The back office does "Reverse application" in the inbox:
+  it undoes contract, policy and order outside the system and confirms. The case ends in
+  "Application cancelled" (CANCELLED). After the handover, or once the case has ended, a withdrawal
+  is refused (409).
+- Dealer outage (step 6): the order is retried 3 times, 10 seconds apart, then an incident appears
   in the Cockpit. Operations fixes the cause and retries. The case waits; it does not end.
 
-Demo bikes: `BIKE-OOS` is out of stock and `BIKE-FAIL` simulates a dealer outage. Every other bike
-id is available.
+Demo bikes: `BIKE-900`, `BIKE-800` and `BIKE-600` can be ordered; `BIKE-FAIL` simulates a dealer
+outage. Any other bike id makes the application invalid.
+
+An action the current state does not allow (signing twice, reporting the handover too early,
+completing a task that is not open) is refused with 409; an unknown application id answers 404.
 
 ## Deliberately not in the core
 
-The original model did more (see the scope comparison). Each removed capability is a feature issue,
-grouped into stages on the feature map. Every issue is also a designIQ todo, shown on the process
-elements it touches.
+The original model did more (see the scope comparison). Each capability the core lacks is a feature
+issue, grouped into stages on the feature map. Every issue is also a designIQ todo, shown on the
+process elements it touches.
 
 | Stage | Issue | Feature |
 |---|---|---|
-| Stage 1 – Customer follow-up | [#1] | Remind the customer to sign the contract after 7 days |
-| Stage 2 – Insurance | [#2] | Issue the insurance policy alongside the bike order |
-| Stage 3 – Withdrawal | [#3] | Let the customer withdraw the application and reverse completed steps |
+| Stage 1 – Customer follow-up | [#18] | Reject the application when the contract stays unsigned for 14 days |
+| Stage 1 – Customer follow-up | [#1] | Remind the customer to sign after 7 days; needs #18 |
+| Stage 2 – Automation and supply | [#19] | Automate the credit check with the DMN `checkCreditRating` |
+| Stage 2 – Automation and supply | [#20] | Clarify an alternative bike with the customer when the dealer cannot deliver |
+| Stage 3 – Withdrawal | [#21] | Activate the lease only after a 14-day withdrawal period |
+| Stage 3 – Withdrawal | [#3] | Reverse a withdrawn application automatically (compensation) instead of by hand |
 | Stage 3 – Withdrawal | [#4] | Cancel a placed bike order at the dealer (return clarification and cancellation costs); needs #3 |
-| Stage 4 – Portal and back-office views | [#5] | Give the back office an inbox of pending alternative clarifications |
-| Stage 4 – Portal and back-office views | [#6] | List leasing applications for the customer portal |
-| Stage 4 – Portal and back-office views | [#7] | Offer a bike catalogue with models and live dealer availability |
+| Stage 4 – Portal | [#7] | Show live dealer availability in the bike catalogue |
 
-When both #2 and #3 exist, the reversal also cancels the insurance policy.
+The rebase onto the new core delivered [#2] (insurance policy in parallel), [#5] (back-office inbox),
+[#6] (application list) and decided [#11] (own inbox, ADR-0019). These issues close with it.
 
 ## Open decisions
 
@@ -102,10 +123,10 @@ explain the options.
 
 | Issue | Decision | Today |
 |---|---|---|
-| [#8] | Contract issuing and e-signature: make, buy or adapt? | simulated contract system |
+| [#8] | Contract issuing and e-signature: make, buy or adapt? | simulated contract system; the "sign contract" button stands in for the signature |
 | [#9] | Channel for customer notifications | simulated, messages are only logged |
-| [#10] | How to integrate the bike dealer | simulated dealer (BIKE-OOS, BIKE-FAIL) |
-| [#11] | Back-office task UI: adapt the CIB seven Tasklist or build an own inbox | both work today: Tasklist form and REST endpoint |
+| [#10] | How to integrate the bike dealer | simulated dealer with a fixed catalogue (`BIKE-FAIL` for the outage) |
+| [#11] | Back-office task UI | decided: own inbox in the frontend ([ADR-0019](../../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)) |
 
 ## Where to look next
 
@@ -121,10 +142,10 @@ context, so going back a step is part of it.
 | t.BPM table-top model of the core | [bike-leasing-tbpm.bpmn](tbpm/bike-leasing-tbpm.bpmn) |
 | BPM feature map (process plus feature stages) | [bike-leasing-feature-map.bpmn](feature-map/bike-leasing-feature-map.bpmn), [feature-map.md](feature-map/feature-map.md) |
 | C4 system context and containers | [c4-system-context.md](../../architecture/c4-system-context.md), [c4-container.md](../../architecture/c4-container.md) |
-| Executable process and credit decision | [bike-leasing.bpmn](process/bike-leasing.bpmn), [checkCreditRating.dmn](process/checkCreditRating.dmn) |
-| How it is built and deployed, element list | [executable-process.md](process/executable-process.md) |
-| Original model and what changed | [original-bike-leasing.bpmn](original/original-bike-leasing.bpmn), [original-cancel-bike-order.bpmn](original/original-cancel-bike-order.bpmn), [scope-comparison.md](original/scope-comparison.md) |
-| Architecture decisions (ADRs); why this core: ADR-0015 | [adr/](../../adr/), [0015](../../adr/0015-reduce-the-executable-process-to-a-core.md) |
+| Executable process | [bike-leasing.bpmn](process/bike-leasing.bpmn) |
+| How it is built and deployed, element list, deviations from the reference | [executable-process.md](process/executable-process.md) |
+| Original model, frozen credit decision and what changed | [original-bike-leasing.bpmn](original/original-bike-leasing.bpmn), [original-cancel-bike-order.bpmn](original/original-cancel-bike-order.bpmn), [checkCreditRating.dmn](original/checkCreditRating.dmn), [scope-comparison.md](original/scope-comparison.md) |
+| Architecture decisions (ADRs); why this core: ADR-0017 | [adr/](../../adr/), [0017](../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md) |
 | Live demo script | [demo-script.md](../../demo/demo-script.md) |
 | PNG renders, if designIQ is unavailable | [assets/](../../assets/) |
 
@@ -139,3 +160,7 @@ context, so going back a step is part of it.
 [#9]: https://github.com/miragon-blueprints/miragon-ai-example/issues/9
 [#10]: https://github.com/miragon-blueprints/miragon-ai-example/issues/10
 [#11]: https://github.com/miragon-blueprints/miragon-ai-example/issues/11
+[#18]: https://github.com/miragon-blueprints/miragon-ai-example/issues/18
+[#19]: https://github.com/miragon-blueprints/miragon-ai-example/issues/19
+[#20]: https://github.com/miragon-blueprints/miragon-ai-example/issues/20
+[#21]: https://github.com/miragon-blueprints/miragon-ai-example/issues/21

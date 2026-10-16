@@ -6,6 +6,10 @@
   API has five operations (`submitLeasingRequest`, `getLeasingApplication`, `signContract`,
   `selectAlternative`, `reportHandover`); `listLeasingApplications`, the example below, was removed
   with the application list.
+- **Amended by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md) and
+  [ADR-0018](0018-react-frontend-next-to-the-service.md) (2026-10-16):** the API has the operations of
+  the new process again, `listLeasingApplications` included, and the frontend is the first consumer:
+  orval generates its client from `openapi/openapi.json`, and `npm run api:check` gates its drift.
 
 ## Context
 

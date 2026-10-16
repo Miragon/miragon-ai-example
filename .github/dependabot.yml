@@ -24,6 +24,54 @@ updates:
       - "*"
     multi-ecosystem-group: "backend"
 
+  # Frontend (React app + Playwright e2e)
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "build"
+      include: "scope"
+    groups:
+      frontend-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+      frontend-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # Frontend container image (node build + nginx serve stages)
+  - package-ecosystem: "docker"
+    directory: "/frontend"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "build"
+      include: "scope"
+    groups:
+      frontend-docker:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+      frontend-docker-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
   # Dev tooling (bpmnlint and its central plugin) — root-level package.json
   - package-ecosystem: "npm"
     directory: "/"

@@ -1,0 +1,30 @@
+meta {
+  name: Assert the case waits for the credit check
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/tasks
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const id = bru.getVar("awaitingCreditCheckId");
+  await pollApp("/api/tasks",
+    (b) => Array.isArray(b) && b.some((t) => t.application.applicationId === id && t.type === "CREDIT_CHECK"));
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("the case is in the back-office tasks as a credit check", function () {
+    const id = bru.getVar("awaitingCreditCheckId");
+    const task = res.getBody().find((t) => t.application.applicationId === id);
+    expect(task).to.exist;
+    expect(task.type).to.equal("CREDIT_CHECK");
+  });
+}
