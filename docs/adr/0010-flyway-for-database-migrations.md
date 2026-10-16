@@ -2,9 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-20
-- **Amended by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md) and
-  [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** migrations live in
-  `src/main/resources/db/migration/`. The bike catalogue is gone: `V2__drop_bike_portfolio.sql`
+- **Amended by [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** the bike
+  catalogue is gone: `V2__drop_bike_portfolio.sql`
   drops `bike_portfolio` (V1 is unchanged), `BikeCatalogueSeeder` no longer exists, and Flyway owns
   `leasing_application` only.
 

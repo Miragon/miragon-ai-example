@@ -93,7 +93,7 @@ jobs:
       - name: Compute changed backend classes
         id: scope
         run: |
-          SOURCES="src/main/kotlin"
+          SOURCES="service/app/src/main/kotlin"
           CLASSES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD -- "$SOURCES" \
             | grep '\.kt$' \
             | sed -E "s#^$SOURCES/##; s#\.kt\$##; s#/#.#g; s#\$#*#" \
@@ -110,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: pitest-report
-          path: build/reports/pitest
+          path: service/app/build/reports/pitest
           if-no-files-found: warn
 
   bruno:

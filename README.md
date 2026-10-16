@@ -68,7 +68,7 @@ Everything else (tests, containers, reset) is in [CONTRIBUTING.md](CONTRIBUTING.
 
 | Path | Content |
 |---|---|
-| [`src/`](src/main/kotlin/io/miragon/blueprint/) | Spring Boot 4 service in Kotlin, hexagonal, with JavaDelegates on the embedded engine |
+| [`service/`](service/app/src/main/kotlin/io/miragon/blueprint/) | Spring Boot 4 service in Kotlin, hexagonal, with JavaDelegates on the embedded engine, and the reusable architecture rules |
 | [`frontend/`](frontend/AGENTS.md) | React app (Vite, TanStack, Tailwind) with a client generated from the OpenAPI contract |
 | [`docs/`](docs/README.md) | the designIQ workspace: use case, glossary, t.BPM, feature map, the executable model, C4, Wardley Map, ADRs |
 | [`openapi/`](openapi/openapi.json) | the checked-in REST contract |

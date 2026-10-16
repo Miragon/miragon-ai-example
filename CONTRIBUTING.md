@@ -171,7 +171,7 @@ the environment and win over the defaults:
   it), so that the committed `openapi/openapi.json` stays in sync, then regenerate the frontend
   client with `npm --prefix frontend run api:generate`. Both are **drift-gated in CI**.
 - **Changing the database schema?** Flyway owns it. Add a new forward-only migration
-  `V{n}__description.sql` under `src/main/resources/db/migration/` in the same change as the entity
+  `V{n}__description.sql` under `service/app/src/main/resources/db/migration/` in the same change as the entity
   edit, and never edit an applied migration. Hibernate runs `validate`, so a mismatch fails startup.
   See [ADR-0010](docs/adr/0010-flyway-for-database-migrations.md).
 - **Changing a design artifact?** Everything under `docs/` is a designIQ model and must pass the

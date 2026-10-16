@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Glob
 # Skill: create-rest-controller
 
 Generate or update **one** `@RestController` for one inbound port in
-`src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/`. One endpoint per class. See
+`service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/`. One endpoint per class. See
 [ADR-0002](../../../docs/adr/0002-hexagonal-architecture-for-the-backend.md) and
 [ADR-0003](../../../docs/adr/0003-openapi-as-the-checked-in-contract.md).
 
@@ -58,7 +58,7 @@ A **read** controller injects a `*Query` and maps to a `*Dto` (see `ListBikesCon
 
 ## Instructions
 
-1. **Resolve the port** from `$ARGUMENTS`, else `Glob src/main/kotlin/**/application/port/inbound/*`,
+1. **Resolve the port** from `$ARGUMENTS`, else `Glob service/app/src/main/kotlin/**/application/port/inbound/*`,
    list and ask.
 2. **Verb and path:** commands are `POST /api/bike-leasing/{applicationId}/<action>`, reads are `GET`
    (`/api/bike-leasing`, `/api/tasks`, `/api/bikes`). Confirm with the user.

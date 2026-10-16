@@ -26,13 +26,13 @@ model lives under `docs/`: [ADR-0016](../../../adr/0016-docs-is-the-designiq-wor
 ## How it gets into the engine
 
 1. Packaging: Gradle `processResources` copies this folder's `*.bpmn` to `bpmn/` (and any `*.dmn` to
-   `dmn/`) on the classpath ([build.gradle.kts](../../../../build.gradle.kts)).
+   `dmn/`) on the classpath ([build.gradle.kts](../../../../service/app/build.gradle.kts)).
 2. Deployment: at start-up the embedded CIB seven engine deploys `classpath*:**/*.bpmn` and `*.dmn`
    (`camunda.bpm.deployment-resource-pattern` in `application.yaml`). A changed model becomes a new
    process version; running cases stay on the version they started with.
 3. Generated API: bpmn-to-code (`./gradlew generateBpmnModels`, also run before every compile)
    reads `docs/use-cases/bike-leasing/process/*.bpmn` and writes the typed process API to
-   `src/main/kotlin/io/miragon/blueprint/adapter/process/` (`BikeLeasingProcessProcessApi`,
+   `service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/` (`BikeLeasingProcessProcessApi`,
    `ServiceTasks`, `Messages`, `ProcessVariables`, `Errors`). Delegates, adapters and tests use these
    constants, so a renamed or removed id breaks the compile.
 4. Gates on every pull request ([pre-merge.yml](../../../../.github/workflows/pre-merge.yml)):
@@ -41,9 +41,9 @@ model lives under `docs/`: [ADR-0016](../../../adr/0016-docs-is-the-designiq-wor
    end-to-end tests against the running service. A designIQ release opens a pull request, so a model
    change made in designIQ passes the same gates before it reaches main.
 
-The process tests (`src/test/kotlin/io/miragon/blueprint/process/`) cover every path: happy path,
-invalid application, not solvent, withdrawal during the credit check, while the signature is
-awaited and after the order, and the dealer-outage incident. `InvalidApplicationTransactionTest`
+The process tests (`service/app/src/test/kotlin/io/miragon/blueprint/process/`) cover every path:
+happy path, invalid application, not solvent, withdrawal during the credit check, while the
+signature is awaited and after the order, and the dealer-outage incident. `InvalidApplicationTransactionTest`
 shows that an under-age applicant is rejected, not stuck in an incident.
 
 ## Elements

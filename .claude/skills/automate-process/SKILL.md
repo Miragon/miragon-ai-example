@@ -10,7 +10,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob
 Wire the **CIB seven** BPMN model (embedded engine) to the application. Service tasks are
 JavaDelegates invoked by expression; the engine is driven through `RuntimeService`/`TaskService`. See
 [ADR-0002](../../../docs/adr/0002-hexagonal-architecture-for-the-backend.md). Source root:
-`src/main/kotlin/io/miragon/blueprint/`.
+`service/app/src/main/kotlin/io/miragon/blueprint/`.
 
 ## What this creates
 
@@ -25,7 +25,7 @@ JavaDelegates invoked by expression; the engine is driven through `RuntimeServic
 ## IMPORTANT
 
 - **The model lives in `docs/use-cases/bike-leasing/process/bike-leasing.bpmn`.** Edit it there and
-  nowhere else; `src/main/resources` holds no `.bpmn`. `original/` is frozen.
+  nowhere else; `service/app/src/main/resources` holds no `.bpmn`. `original/` is frozen.
 - **Keep element ids stable.** The issues' anchor blocks, the feature map, `executable-process.md` and
   the glossary refer to them; a rename or removal updates every reference in the same change.
 - **Complete BPMNDI**: every new node and flow needs its shape or edge, or designIQ breaks.

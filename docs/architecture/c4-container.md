@@ -83,7 +83,7 @@ The external systems are described in the [system context](c4-system-context.md#
 ## Component view (Level 3)
 
 Inside the Bike-leasing service. Every blue box is a package under
-`src/main/kotlin/io/miragon/blueprint/`; the two grey boxes are CIB seven libraries; the dashed boxes
+`service/app/src/main/kotlin/io/miragon/blueprint/`; the two grey boxes are CIB seven libraries; the dashed boxes
 are the packages of the simulated adapters. Solid arrows: calls or uses. Dotted arrows: implemented
 by. The architecture tests ([ArchitectureTest][arch]) enforce these directions.
 
@@ -189,27 +189,27 @@ Not drawn above; each issue describes its change.
 [fe-docker]: ../../frontend/Dockerfile
 [fe-nginx]: ../../frontend/nginx.conf
 [compose-full]: ../../stack/docker-compose.full.yml
-[build]: ../../build.gradle.kts
+[build]: ../../service/app/build.gradle.kts
 [libs]: ../../gradle/libs.versions.toml
-[yaml]: ../../src/main/resources/application.yaml
-[main]: ../../src/main/kotlin/io/miragon/blueprint/CibsevenBikeLeasingApplication.kt
+[yaml]: ../../service/app/src/main/resources/application.yaml
+[main]: ../../service/app/src/main/kotlin/io/miragon/blueprint/CibsevenBikeLeasingApplication.kt
 [compose]: ../../stack/docker-compose.yml
-[migrations]: ../../src/main/resources/db/migration/
+[migrations]: ../../service/app/src/main/resources/db/migration/
 [openapi]: ../../openapi/openapi.json
-[arch]: ../../src/test/kotlin/io/miragon/blueprint/architecture/ArchitectureTest.kt
-[pkg-rest]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/
-[pkg-delegates]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/
-[pkg-in]: ../../src/main/kotlin/io/miragon/blueprint/application/port/inbound/
-[pkg-service]: ../../src/main/kotlin/io/miragon/blueprint/application/service/
-[pkg-domain]: ../../src/main/kotlin/io/miragon/blueprint/domain/
-[pkg-out]: ../../src/main/kotlin/io/miragon/blueprint/application/port/outbound/
-[pkg-db]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/db/
-[pkg-cib]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/cibseven/
-[pkg-contract]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/contract/
-[pkg-notification]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/notification/
-[pkg-insurance]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/insurance/
-[pkg-dealer]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/dealer/
-[pkg-process]: ../../src/main/kotlin/io/miragon/blueprint/adapter/process/
+[arch]: ../../service/app/src/test/kotlin/io/miragon/blueprint/architecture/ArchitectureTest.kt
+[pkg-rest]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/
+[pkg-delegates]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/
+[pkg-in]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/inbound/
+[pkg-service]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/service/
+[pkg-domain]: ../../service/app/src/main/kotlin/io/miragon/blueprint/domain/
+[pkg-out]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/outbound/
+[pkg-db]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/db/
+[pkg-cib]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/cibseven/
+[pkg-contract]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/contract/
+[pkg-notification]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/notification/
+[pkg-insurance]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/insurance/
+[pkg-dealer]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/dealer/
+[pkg-process]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/
 [i1]: https://github.com/miragon-blueprints/miragon-ai-example/issues/1
 [i3]: https://github.com/miragon-blueprints/miragon-ai-example/issues/3
 [i4]: https://github.com/miragon-blueprints/miragon-ai-example/issues/4

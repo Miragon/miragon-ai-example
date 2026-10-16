@@ -2,8 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-21
-- **Amended by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md) and
-  [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** the core has no
+- **Amended by [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** the core
+  has no
   `withdraw` command, no `WITHDRAWN` status, no parallel branches and no inbox; the
   clarify-alternative scenarios poll `/engine-rest` for the open user task instead. The JVM process
   tests are `@SpringBootTest` tests with the CIB seven assertions, not JGiven.

@@ -19,7 +19,7 @@ Where things live:
 - Executable process: [bike-leasing.bpmn](use-cases/bike-leasing/process/bike-leasing.bpmn)
 - Frozen original and the credit decision (not deployed): [original/](use-cases/bike-leasing/original/)
 - The use case: [bike-leasing-use-case.md](use-cases/bike-leasing/bike-leasing-use-case.md) · all docs: [README.md](README.md)
-- Backend code: [src/main/kotlin/io/miragon/blueprint/](../src/main/kotlin/io/miragon/blueprint/)
+- Backend code: [service/app/src/main/kotlin/io/miragon/blueprint/](../service/app/src/main/kotlin/io/miragon/blueprint/)
   (`domain`, `application`, `adapter`) · frontend: [frontend/src/](../frontend/src/)
 
 ## Naming rules

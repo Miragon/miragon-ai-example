@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Nested
  *   *source-structure* rules — one top-level declaration per file (SRP) and no wildcard imports
  *   ([KotlinSource]).
  *
- * This package is **self-contained**: it needs only ArchUnit, Konsist and JUnit on the test
- * classpath and holds its own copies of the rules, so it can be copied into another service as is.
+ * This module is **self-contained**: it carries both the ArchUnit and Konsist dependencies and its
+ * own copies of the rules, so it can be dropped into a service as a single test dependency.
  */
 abstract class ServiceArchitectureTest(
     private val rootPackage: String,

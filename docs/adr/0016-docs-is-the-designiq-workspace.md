@@ -97,7 +97,7 @@ docs/
   change made in designIQ becomes a tested pull request. The same files read well on GitHub, which
   renders the Markdown and Mermaid.
 - **Negative / trade-offs:** the build depends on a docs path. Moving
-  `docs/use-cases/bike-leasing/process/` means updating `build.gradle.kts` and `package.json`.
+  `docs/use-cases/bike-leasing/process/` means updating `service/app/build.gradle.kts` and `package.json`.
   Markdown and C4 are raw text in designIQ. The unique-stem rule constrains naming.
 - **Neutral:** [`docs/README.md`](../README.md) is the index of the workspace and gives the
   recommended viewing order.

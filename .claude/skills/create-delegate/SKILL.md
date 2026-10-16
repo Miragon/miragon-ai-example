@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Glob
 # Skill: create-delegate
 
 Generate one `@Component` **JavaDelegate** (or listener) in
-`src/main/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/` for a BPMN element. CIB seven runs
+`service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/` for a BPMN element. CIB seven runs
 **embedded**; service tasks call **JavaDelegates by expression**, not Zeebe job workers. See
 [ADR-0002](../../../docs/adr/0002-hexagonal-architecture-for-the-backend.md).
 
@@ -56,11 +56,11 @@ class ValidateApplicationDelegate(
    its `delegateExpression`, its variables and its boundary events; the ProcessApi supplies the typed
    constants.
 2. **Identify the element** by the id/name in `$ARGUMENTS`, else list the service tasks and ask.
-3. **Find the inbound port** (`Glob src/main/kotlin/**/application/port/inbound/*{UseCase,Query}.kt`).
+3. **Find the inbound port** (`Glob service/app/src/main/kotlin/**/application/port/inbound/*{UseCase,Query}.kt`).
    If missing, offer to generate it or run [`automate-process`](../automate-process/SKILL.md).
 4. **Generate or update** the delegate; for an existing file add only what is missing.
 5. **Report and hand off:** confirm the expression matches the bean name (the
    [`review-process`](../../agents/review-process.md) subagent audits this), add a process test in
-   `src/test/kotlin/io/miragon/blueprint/process/` (the `cibseven` package is excluded from pitest on
+   `service/app/src/test/kotlin/io/miragon/blueprint/process/` (the `cibseven` package is excluded from pitest on
    purpose: thin glue, covered by the process tests), and run
    `./gradlew test --tests "io.miragon.blueprint.process.*"`.

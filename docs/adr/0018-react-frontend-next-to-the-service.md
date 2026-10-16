@@ -16,8 +16,8 @@ projects.
 ## Decision
 
 We add a **React frontend in `frontend/`**, ported from the fullstack example and cut to this
-process. It is a separate npm project; Gradle does not build it, so the Kotlin build stays the one
-project at the root ([ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md)).
+process. It is a separate npm project; Gradle does not build it, so the Kotlin build under `service/`
+stays as it is.
 
 - **Stack:** React, Vite, TypeScript, TanStack Router and Query, Tailwind with the Miragon theme,
   radix-based `shared/ui`, react-hook-form and zod, German and English copy.

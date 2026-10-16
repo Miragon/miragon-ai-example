@@ -13,10 +13,11 @@ artifacts that explain it (use case, glossary, t.BPM model, feature map, C4, War
 versioned under `docs/`, the one folder designIQ reads. What the original process could do and this
 one cannot yet is GitHub issues.
 
-- **Backend**: a single Kotlin project built with Gradle at the repo root. It uses Spring Boot 4, a
-  hexagonal structure and the embedded CIB seven 2.2 engine. Service tasks call Spring-bean
-  `JavaDelegate`s by expression (the engine's interface, implemented in Kotlin), **not** external
-  task workers. Package root `io.miragon.blueprint`.
+- **Backend**: a Kotlin service built with Gradle, in `service/app` next to the reusable architecture
+  rules in `service/common-architecture-tests` (the module layout of the other blueprints). It uses
+  Spring Boot 4, a hexagonal structure and the embedded CIB seven 2.2 engine. Service tasks call
+  Spring-bean `JavaDelegate`s by expression (the engine's interface, implemented in Kotlin), **not**
+  external task workers. Package root `io.miragon.blueprint`.
 - **Frontend**: `frontend/`, a separate npm project (React, Vite, TanStack Router/Query, Tailwind,
   Feature-Sliced Design), ported from
   [miragon-blueprints/fullstack-example](https://github.com/miragon-blueprints/fullstack-example)
@@ -29,16 +30,15 @@ one cannot yet is GitHub issues.
   the spec, then `npm run api:generate` in `frontend/`.
 - **The design artifacts** live in `docs/` (`designiq.yml`: `models: docs`). The executable model
   lives there too, next to the use case, and Gradle packages it onto the classpath. See
-  [ADR-0014](docs/adr/0014-one-kotlin-gradle-stack-at-the-repo-root.md) (one Kotlin/Gradle project)
-  and [ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md) (`docs/` as the designIQ workspace).
+  [ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md) (`docs/` as the designIQ workspace).
 
 ## Repository Map
 
-The service, a single Gradle project at the repo root (`build.gradle.kts`, `settings.gradle.kts`,
-`gradle/`):
+The service, a Gradle build with two modules (`build.gradle.kts`, `settings.gradle.kts` and `gradle/`
+at the repo root):
 
 ```
-src/main/kotlin/io/miragon/blueprint/   the bike-leasing service (hexagonal)
+service/app/src/main/kotlin/io/miragon/blueprint/   the bike-leasing service (hexagonal)
   adapter/inbound/rest        REST controllers + OpenAPI / problem-details config
   adapter/inbound/cibseven    JavaDelegates for the service tasks
   adapter/outbound/cibseven   drives the engine: start, correlate, complete and list user tasks
@@ -47,9 +47,9 @@ src/main/kotlin/io/miragon/blueprint/   the bike-leasing service (hexagonal)
   adapter/process             generated *ProcessApi (bpmn-to-code) + engine config
   application/{port,service}  use-case ports and their services
   domain/{leasing,bike}       pure domain model
-src/main/resources/db/migration   Flyway versioned schema migrations
-src/test/kotlin/io/miragon/blueprint/          tests (architecture, domain, services, adapters, process)
-src/test/kotlin/io/miragon/common/architecture/   reusable ArchUnit + Konsist rule suite
+service/app/src/main/resources/db/migration   Flyway versioned schema migrations
+service/app/src/test/kotlin/io/miragon/blueprint/   tests (architecture, domain, services, adapters, process)
+service/common-architecture-tests/   reusable ArchUnit + Konsist rule suite (io.miragon.common.architecture)
 ```
 
 The frontend (`frontend/`, npm, see [frontend/AGENTS.md](frontend/AGENTS.md)):
@@ -160,7 +160,7 @@ CONTRIBUTING "Run it in containers".
 
 - **Executable models live in `docs/use-cases/bike-leasing/process/`** (today only
   `bike-leasing.bpmn`). Gradle packages them onto the classpath as `bpmn/*.bpmn` and `dmn/*.dmn`.
-  Edit them there and nowhere else; `src/main/resources` holds no `.bpmn` or `.dmn` files.
+  Edit them there and nowhere else; `service/app/src/main/resources` holds no `.bpmn` or `.dmn` files.
 - **The executable model has a source model** (ADR-0017).
   Every difference is listed in `executable-process.md`; add a row when you add one.
 - **After editing a `.bpmn`**, run `./gradlew generateBpmnModels` and commit the regenerated
@@ -244,7 +244,7 @@ Delivered by the rebase, to be closed with its merge: #2 (insurance policy), #5 
 
 ## Architecture: the rules are machine-enforced
 
-The backend's hexagonal rules live in `src/test/kotlin/io/miragon/common/architecture` (ArchUnit,
+The backend's hexagonal rules live in the `service/common-architecture-tests` module (ArchUnit,
 plus Konsist for the rules bytecode cannot express) and **fail the build** (see
 [ADR-0007](docs/adr/0007-two-architecture-test-tools-archunit-and-konsist.md)). Read
 `HexagonalArchitectureTest.kt` and `NamingConventionArchitectureTest.kt` before writing code. The hard

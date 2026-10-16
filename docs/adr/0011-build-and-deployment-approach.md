@@ -2,8 +2,6 @@
 
 - **Status:** Accepted
 - **Date:** 2026-08-20
-- **Amended by [ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md) (2026-10-15):** the
-  image is built with `./gradlew bootBuildImage` and configured in the root `build.gradle.kts`.
 
 ## Context
 

@@ -13,7 +13,7 @@ and report what's present, missing or inconsistent. You **report, you do not fix
 [frontend](../../docs/adr/0018-react-frontend-next-to-the-service.md),
 [designIQ workspace](../../docs/adr/0016-docs-is-the-designiq-workspace.md).
 
-Backend paths are relative to `src/main/kotlin/io/miragon/blueprint/`.
+Backend paths are relative to `service/app/src/main/kotlin/io/miragon/blueprint/`.
 
 ## The chain — check each hop and report a finding at every gap
 
