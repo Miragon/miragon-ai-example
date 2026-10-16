@@ -15,8 +15,6 @@ updates:
     patterns:
       - "*"
     multi-ecosystem-group: "backend"
-    ignore:
-      - dependency-name: "org.jetbrains.kotlin*"
 
   - package-ecosystem: "docker-compose"
     directory: "/stack"

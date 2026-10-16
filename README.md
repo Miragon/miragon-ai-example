@@ -47,7 +47,7 @@ the roadmap below.
 
 ## Quick start
 
-Requires JDK 21, Node 24 and Docker or Podman.
+Requires JDK 21, Node (version in `frontend/.nvmrc`) and Docker or Podman.
 
 ```bash
 docker compose -f stack/docker-compose.yml up -d   # PostgreSQL on :5432
@@ -62,7 +62,7 @@ npm --prefix frontend ci && npm --prefix frontend run dev   # frontend on :5173
 | Swagger UI | <http://localhost:8081/swagger-ui.html> | |
 
 Demo cases in every state: `cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local`.
-Everything else (tests, containers, reset) is in [CONTRIBUTING.md](CONTRIBUTING.md).
+All ports and everything else (tests, containers, reset) are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## What's inside
 
@@ -103,7 +103,8 @@ Open sourcing decisions (make, buy or adapt; [sourcing decisions](docs/architect
 - [Executable process](docs/use-cases/bike-leasing/process/executable-process.md): element ids,
   what differs from its source model, how a model change reaches the code
 - [Demo script](docs/demo/demo-script.md): the live demo, step by step
-- [frontend/AGENTS.md](frontend/AGENTS.md): the frontend's structure and rules
+- [service/AGENTS.md](service/AGENTS.md) and [frontend/AGENTS.md](frontend/AGENTS.md): the rules of
+  each area
 
 ## Contributing
 

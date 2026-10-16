@@ -1,4 +1,5 @@
 .claude/logs/
+.claude/settings.local.json
 **/bin/
 .gradle
 **/build/

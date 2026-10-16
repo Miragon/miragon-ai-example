@@ -1,55 +1,83 @@
-# 0002 — Hexagonal architecture for the backend
+# 0002 — Hexagonal backend, enforced by ArchUnit and Konsist
 
 - **Status:** Accepted
-- **Date:** 2026-08-18
-- **Amended by [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** the core
-  has no insurance adapter.
-- **Amended by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md) (2026-10-16):**
-  the insurance adapter is back (`adapter/outbound/insurance`), because the new process issues the
-  policy in parallel with the bike order.
+- **Date:** 2026-10-16
+- **Origin:** Consolidated baseline; earlier history in git.
 
 ## Context
 
-The backend automates a real BPMN process with many collaborators: a process engine, JPA persistence,
-a simulated dealer, notification and contract stubs. If controllers, delegates, and the engine client
-call each other freely, business logic leaks into infrastructure and the process becomes untestable in
-isolation. A blueprint has to demonstrate a structure that stays sane as this fan-out grows — and it
-has to make that structure *checkable*, not merely documented, so a forker (or an AI agent) cannot
-quietly erode it.
+The backend automates a BPMN process with many collaborators: a process engine, JPA persistence, a
+simulated dealer, insurance, notification and contract systems. If controllers, delegates and the
+engine client call each other freely, business logic leaks into infrastructure and the process
+becomes untestable in isolation. A blueprint has to show a structure that stays sane as this fan-out
+grows, and it has to make that structure checkable, so a forker or an AI agent cannot quietly erode
+it.
+
+Architecture rules come in two kinds. Rules about the resolved dependency graph (which package uses
+which, whether a class is an interface, how many inbound ports a class depends on) are visible in
+bytecode. Rules about source shape (how many top-level declarations a file holds, import style) are
+erased by the Kotlin compiler and visible only in source.
 
 ## Decision
 
-We structure `service/app` as a **hexagon (ports & adapters)** under `io.miragon.blueprint`:
+The service is a **hexagon (ports and adapters)** under `io.miragon.blueprint`:
 
-- `domain/` — pure Kotlin value objects and aggregates; no framework imports.
-- `application/port/inbound` — one **`*UseCase`** (state-changing) or **`*Query`** (read) interface per
-  operation. `application/port/outbound` — **`*Repository` / `*Port` / `*Process`** interfaces.
-- `application/service` — one `*Service` implementing exactly one inbound port; it may not call another
-  service or any inbound port.
-- `adapter/inbound/{rest,cibseven}` — driving adapters (REST controllers, BPMN JavaDelegates/listeners).
-- `adapter/outbound/{db,cibseven,dealer,notification,contract,insurance}` — driven adapters.
-- `adapter/process` — the **generated** `*ProcessApi` and shared constants (bpmn-to-code) plus engine config; a technical
-  seam that fits neither side of the split.
+- `domain/`: pure Kotlin value objects and aggregates, no framework imports.
+- `application/port/inbound`: one `*UseCase` (state-changing) or `*Query` (read) interface per
+  operation. `application/port/outbound`: `*Port`, `*Repository` and `*Process` interfaces.
+- `application/service`: one `*Service` per inbound port; it calls no other service and no inbound
+  port.
+- `adapter/inbound/{rest,cibseven}`: driving adapters (REST controllers, JavaDelegates).
+- `adapter/outbound/{db,cibseven,contract,dealer,insurance,notification}`: driven adapters.
+- `adapter/process`: the generated process API (bpmn-to-code, see
+  [ADR-0020](0020-embedded-cib-seven-with-delegates-and-a-generated-process-api.md)) and engine
+  configuration. A technical seam that fits neither side.
+- There is no top-level `config` package. Spring configuration sits beside what it configures
+  (`OpenApiConfiguration` and `GlobalExceptionConfiguration` in `adapter/inbound/rest`,
+  `HistoryCleanupConfiguration` in `adapter/process`).
 
-These rules are **enforced by the reusable ArchUnit + Konsist suite** in
-`service/common-architecture-tests`, wired into every module's tests so `./gradlew build` fails on a
-violation:
+**The rules are machine-enforced with two tools, each for what only it can see.** ArchUnit checks
+bytecode, Konsist checks Kotlin source. Both fail `./gradlew build`.
 
-- `HexagonalArchitectureTest` — the layered-dependency graph (domain depends on nothing; ports are
-  interfaces; an in-adapter offers exactly one use-case; out-adapters never touch inbound ports).
-- `NamingConventionArchitectureTest` — the suffix rules per package (`Controller`, `Delegate`,
-  `Listener`, `PersistenceAdapter`, `UseCase`, `Query`, …).
-- There is deliberately **no `config` package**; Spring configuration lives beside the adapter it
-  configures (`OpenApiConfiguration`, `GlobalExceptionConfiguration`, `HistoryCleanupConfiguration`).
-- The generated `adapter/process` package is **explicitly excluded** from both suites — it is machine-
-  written and does not follow the hand-written conventions.
+The Gradle build has two modules:
+
+- `service/app`: the service.
+- `service/common-architecture-tests`: the reusable rule suite (package
+  `io.miragon.common.architecture`). The blueprint is prepared for more than one service under
+  `service/`, each consuming this one module instead of copying the rules. A service wires the whole
+  suite with one class: `class ArchitectureTest : ServiceArchitectureTest("<root package>")`.
+
+The suite (`ServiceArchitectureTest` bundles the four parts):
+
+- `HexagonalArchitectureTest` (ArchUnit): the layered dependency graph; domain depends only on the
+  language; the application layer depends on no infrastructure; ports are interfaces and independent
+  of services; a service implements exactly one inbound port and uses no other service or inbound
+  port; adapters are inbound or outbound; outbound adapters never touch inbound ports; inbound
+  adapters implement no outbound port; an inbound adapter takes at most one inbound port in its constructor (one use case per
+  controller or delegate).
+- `NamingConventionArchitectureTest` (ArchUnit): the suffixes per package (`UseCase`/`Query`;
+  `Port`/`Repository`/`Process`; `Service`/`Configuration`; `Controller`/`Dto`/`Input`/`Mapper`/
+  `Configuration`; `Delegate`/`Worker`/`Listener`; `PersistenceAdapter`/`Adapter`/`Mapper`/`Entity`/
+  `Repository`).
+- `BasicCodingGuidelinesTest` (ArchUnit): every class in the root package, no package cycles, no
+  `println`.
+- `KotlinSourceGuidelinesTest` (Konsist): at most one top-level class, interface or object per file,
+  and no wildcard imports (except `java.util`).
+
+The generated `adapter.process` package is excluded from the adapter-location rule, the layer
+completeness check, the naming rules and the Konsist rules: it is machine-written and does not follow
+the hand-written conventions.
 
 ## Consequences
 
-- **Positive:** business logic is engine- and framework-agnostic and unit-testable behind ports; the
-  structure is a *fitness function*, not a style guide — agents get instant, local feedback.
-- **Negative / trade-offs:** more indirection (a port + a service + an adapter per operation) than a
-  layered CRUD app; the "one use-case per adapter" rule means many small classes.
-- **Neutral:** the generated-code seam (`adapter/process`) is a permanent, documented exception; see
-  [ADR-0003](0003-openapi-as-the-checked-in-contract.md) for the analogous generated seam on the API
-  contract side.
+- **Positive:** business logic is engine- and framework-agnostic and unit-testable behind ports. The
+  structure is a fitness function, not a style guide: an agent gets local feedback from the build.
+  Each rule is written against the representation where it is natural.
+- **Negative / trade-offs:** more indirection than a layered CRUD app (a port, a service and an
+  adapter per operation), and many small classes. Two DSLs to learn and two dependencies to keep
+  current; a contributor has to know which tool owns which kind of rule. New structural rules go into
+  one of these two tools; we do not add a third architecture framework.
+- **Not covered:** today `service/app/src/test/kotlin/io/miragon/blueprint/ArchitectureTest.kt`
+  is the only consumer of the rule module; the multi-service layout is prepared, not exercised.
+  The generated `adapter/process` is not checked at all. The suite checks production code; test
+  classes follow no layer rules.

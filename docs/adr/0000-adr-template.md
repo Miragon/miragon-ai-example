@@ -1,6 +1,6 @@
 # NNNN — Short title of the decision
 
-- **Status:** Proposed | Accepted | Deprecated | Superseded by [ADR-XXXX](xxxx-....md)
+- **Status:** Proposed | Accepted | Superseded by [ADR-XXXX](xxxx-....md)
 - **Date:** YYYY-MM-DD
 - **Deciders:** (roles / names, optional)
 
@@ -21,7 +21,7 @@ What becomes true once this is in place — the good, the bad, and the merely di
 
 - **Positive:** what gets easier or safer.
 - **Negative / trade-offs:** what gets harder, or what we accept as a cost.
-- **Neutral:** what simply changes.
+- **Not covered:** the limits of the decision — what it deliberately leaves open or out.
 
 ## Implementation notes (optional)
 
@@ -34,9 +34,9 @@ How to use this template:
 - Keep an ADR to roughly one screenful. One decision per record.
 - Commit the ADR in the same commit as the change it documents, so decision and code travel together.
 - Write it in the present tense, and never add "Update" or "Changelog" sections. Once accepted, the
-  record is not rewritten: when the decision itself changes, supersede it with a new ADR and flip this
-  one's Status to "Superseded by …". When a later ADR only makes a detail untrue (a path, a module
-  name), add one bullet "Amended by ADR-NNNN (YYYY-MM-DD): …" under Status/Date, with the ADR
-  linked, that says what to read differently. The reader should never have to reconstruct the
-  current state from a diff.
+  record is not rewritten: when the decision changes, write a new ADR that supersedes it and set this
+  one's Status to "Superseded by …". A small factual correction (a path, a file name) may add one
+  dated note under Status/Date that says what to read differently.
+- Do not invent motives or alternatives. A reason that is reconstructed rather than recorded is
+  marked "(⚠ reconstructed, to be confirmed)".
 -->

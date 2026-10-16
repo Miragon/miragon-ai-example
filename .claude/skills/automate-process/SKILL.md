@@ -1,74 +1,68 @@
 ---
 name: automate-process
-argument-hint: "[<path-to-ProcessApi-or-BPMN-file>]"
-description: Change the executable CIB seven (Camunda 7) BPMN model and generate the hexagonal glue code across all layers — inbound JavaDelegates, inbound/outbound ports, application services, and the process adapter that drives the engine. Use when the user asks to "automate a process", "add a task to the process", "generate glue code for a BPMN process", or "scaffold delegates and adapters". Skips files that already exist; offers to run review-process first.
-allowed-tools: Read, Write, Edit, Bash, Glob
+argument-hint: "[what should change in the process]"
+description: "Change the executable CIB seven BPMN model (docs/use-cases/bike-leasing/process/bike-leasing.bpmn) and wire its glue code across the hexagon: regenerate the typed process API, add ports, services, delegates and process-adapter methods, cover the new paths with process tests and validate the model with bpmnlint, the designIQ validator and a visual check. Use when the user asks to automate a process step, add or change a task, event or gateway, or review the diagram after an edit. Business decisions are asked, never assumed."
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Skill, Agent
 ---
 
 # Skill: automate-process
 
-Wire the **CIB seven** BPMN model (embedded engine) to the application. Service tasks are
-JavaDelegates invoked by expression; the engine is driven through `RuntimeService`/`TaskService`. See
-[ADR-0002](../../../docs/adr/0002-hexagonal-architecture-for-the-backend.md). Source root:
+The model is the business's artifact; this skill changes it technically. Source root of the glue:
 `service/app/src/main/kotlin/io/miragon/blueprint/`.
 
-## What this creates
+## Rules
 
-| Layer | Package (`io.miragon.blueprint.…`) | What |
-|---|---|---|
-| Inbound delegates | `adapter.inbound.cibseven` | one `*Delegate : BaseDelegate` per service task |
-| Outbound adapter | `adapter.outbound.cibseven` | `LeasingProcessAdapter`, one method per message / user task |
-| Inbound ports | `application.port.inbound` | one `*UseCase`/`*Query` per delegate or endpoint |
-| Outbound port | `application.port.outbound` | `LeasingProcess` (start + one method per message / user task) |
-| Application services | `application.service` | one `*Service` per inbound port |
+- **Only `docs/use-cases/bike-leasing/process/bike-leasing.bpmn` changes.** `original/` is frozen, the
+  t.BPM model and the feature map are documentation.
+- **Business decisions are questions.** A new gateway condition, deadline, error path or user task
+  owner comes from the issue or the original model; otherwise ask before editing.
+- **Keep element ids stable**; a rename updates the feature map, glossary, `executable-process.md` and
+  the issues' anchor blocks in the same change.
+- **Complete BPMNDI** for every new node and flow (standard sizes: task 100×80, event 36×36,
+  gateway 50×50), or designIQ breaks.
+- **Process variables stay minimal:** ids, not copies of domain data. The engine is not a database.
+- **Engine limits:** a service task is a delegate by expression (`#{beanName}`, enforced by
+  `ServiceTaskDelegateExpressionRule`); asynchronous continuations (`asyncBefore`) are where retries
+  and incidents happen; a timer cycle restarts on redeploy.
+- **Constants come from the generated API** (`BikeLeasingProcessProcessApi.FlowNodes.<Node>`, with
+  `.ELEMENT_ID`, `Variables`, `Next`; the shared `Messages`, `Errors`, `ServiceTasks`, and
+  `Escalations` once the model has one), never raw strings. `adapter/process` is generated: never
+  edit it.
 
-## IMPORTANT
+## Steps
 
-- **The model lives in `docs/use-cases/bike-leasing/process/bike-leasing.bpmn`.** Edit it there and
-  nowhere else; `service/app/src/main/resources` holds no `.bpmn`. `original/` is frozen.
-- **Keep element ids stable.** The issues' anchor blocks, the feature map, `executable-process.md` and
-  the glossary refer to them; a rename or removal updates every reference in the same change.
-- **Complete BPMNDI**: every new node and flow needs its shape or edge, or designIQ breaks.
-- **String constants come from the generated API**, never raw literals: `FlowNodes.<Node>.Variables`,
-  the shared `Messages`/`Errors`, `FlowNodes.<UserTask>.ELEMENT_ID`. Regenerate with
-  `./gradlew generateBpmnModels` and commit `adapter/process` (never hand-edited).
-- Process tests assert the walked path as a `ProcessPath` over `FlowNodes` (see
-  `BikeLeasingProcessTest`), never as a hand-written element-id list.
+1. **Review first.** Run the agent `review-process` on the current model and report blocking findings
+   before changing anything.
+2. **Agree the change.** Restate it in business terms (which element, which path, which outcome) with
+   the open questions. Wait for the answer.
+3. **Edit the model**, then regenerate and lint (the PostToolUse hook lints every edit too):
+   ```bash
+   ./gradlew generateBpmnModels
+   npm run lint:bpmn
+   ```
+4. **Glue code**, skipping what exists:
 
-## Instructions
+   | Layer | Package (`io.miragon.blueprint.…`) | What |
+   |---|---|---|
+   | Domain | `domain.{leasing,bike}` | a value object per new variable (`ApplicationId`, `BikeId`) |
+   | Inbound port | `application.port.inbound` | one `*UseCase`/`*Query` per delegate or endpoint |
+   | Service | `application.service` | one `*Service` per inbound port |
+   | Delegate | `adapter.inbound.cibseven` | skills `create-delegate` and `test-delegate` |
+   | Outbound port | `application.port.outbound` | `LeasingProcess`: one method per message or user-task completion |
+   | Process adapter | `adapter.outbound.cibseven` | `LeasingProcessAdapter`, using `ProcessEngineExtensions.kt` |
 
-### Step 0 — Offer the review first
-Ask whether to run the [`review-process`](../../agents/review-process.md) subagent first. If yes, stop
-here; the user restarts this skill afterwards.
-
-### Step 1 — Change the model (if asked) and regenerate
-Edit the `.bpmn`, then:
-```bash
-./gradlew generateBpmnModels
-npm run lint:bpmn
-```
-Extract from `BikeLeasingProcessProcessApi.kt`: `PROCESS_ID`, `FlowNodes.*` (ids, `Variables`,
-`Next`), and the shared `Messages.*` / `ServiceTasks.*` / `Errors.*`.
-
-### Step 2 — Domain types
-Scan `domain/{leasing,bike}/` for a value object per process variable (`APPLICATION_ID` →
-`ApplicationId`, `BIKE_ID` → `BikeId`). Create a missing one before generating ports. Ask if a name
-does not map to a sensible type.
-
-### Step 3 — Ports, services, delegates, adapter
-- Inbound port per service task / endpoint, domain-typed params. Skip existing.
-- Outbound `LeasingProcess`: add one method per new message or user-task completion.
-- One `@Service` per inbound port (ArchUnit: exactly one), body `TODO("Add implementation")`.
-- Delegates per [`create-delegate`](../create-delegate/SKILL.md).
-- Adapter: `override` each new method in `LeasingProcessAdapter`, using the typed constants and the
-  business-key helpers in `ProcessEngineExtensions.kt`.
-
-### Step 4 — Report and hand off
-List every file created/skipped. Remind the user to fill the service `TODO`s, run
-[`review-process`](../../agents/review-process.md), add tests, and run:
-```bash
-./gradlew test --tests "io.miragon.blueprint.process.*"
-npx --yes @miragon/design-iq-validator@5.3.0 --root . bike-leasing
-```
-If elements changed, update `executable-process.md`, the feature map and the glossary in the same
-change, and refresh the PNG in `docs/assets/`.
+5. **Process tests.** Derive the scenarios from the model's paths: every new outgoing flow of a
+   gateway, every boundary event, every event subprocess gets a test in
+   `service/app/src/test/kotlin/io/miragon/blueprint/adapter/process/` that asserts the walked path as a
+   `ProcessPath` (see `BikeLeasingProcessTest`). The job executor is off in tests:
+   `executeJobFor` in `adapter/process/JobExecutionUtils.kt` fires async continuations; a timer needs
+   its own helper querying `managementService.createJobQuery().timers()`, and a due date is asserted
+   against a fixed `ClockUtil` time.
+   ```bash
+   ./gradlew test --tests "io.miragon.blueprint.adapter.process.*"
+   ```
+6. **Validate the model** with the three nets in [references/visual-check.md](references/visual-check.md).
+7. **Documentation in the same change:** a row in `executable-process.md` for every difference from the
+   source model, the feature map and glossary if elements changed, the PNG in `docs/assets/`.
+8. **Report** files created or skipped, the scenarios tested, the validation verdict and the
+   questions still open. Run `review-process` once more on the result.

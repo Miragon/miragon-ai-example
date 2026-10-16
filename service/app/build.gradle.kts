@@ -89,13 +89,12 @@ pitest {
         listOf(
             "io.miragon.blueprint.adapter.process.*",
             "io.miragon.blueprint.CibsevenBikeLeasingApplication*",
-            "io.miragon.blueprint.adapter.inbound.cibseven.*",
         ),
     )
     excludedTestClasses.set(
         listOf(
-            "io.miragon.blueprint.process.*",
-            "io.miragon.blueprint.architecture.*",
+            "io.miragon.blueprint.adapter.process.*",
+            "io.miragon.blueprint.ArchitectureTest",
         ),
     )
     threads.set(Runtime.getRuntime().availableProcessors())

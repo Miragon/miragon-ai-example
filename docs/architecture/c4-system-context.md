@@ -94,7 +94,7 @@ brackets are the executable ones.
 [insurance-adapter]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/insurance/LoggingInsuranceAdapter.kt
 [dealer-port]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/outbound/BikeDealerPort.kt
 [dealer-adapter]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/dealer/BikeDealerAdapter.kt
-[incident]: ../../service/app/src/test/kotlin/io/miragon/blueprint/process/DealerOutageIncidentTest.kt
+[incident]: ../../service/app/src/test/kotlin/io/miragon/blueprint/adapter/process/DealerOutageIncidentTest.kt
 [i8]: https://github.com/miragon-blueprints/miragon-ai-example/issues/8
 [i9]: https://github.com/miragon-blueprints/miragon-ai-example/issues/9
 [i10]: https://github.com/miragon-blueprints/miragon-ai-example/issues/10

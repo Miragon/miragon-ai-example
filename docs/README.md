@@ -42,7 +42,7 @@ How to view, in the tables below:
 | Scope: original vs. core vs. issues     | [scope-comparison.md][scope]             | Markdown · designIQ text · GitHub |
 | Open feature and decision issues        | [issues labelled todo][issues]           | GitHub · designIQ todos           |
 
-The executable model is the simplified core ([ADR-0017][a17]). It and the frozen original both show the title "MiraVelo Bike Leasing" (process
+The executable model is the simplified core ([executable-process.md][exec]). It and the frozen original both show the title "MiraVelo Bike Leasing" (process
 id `bikeLeasingProcess`). Tell them apart by the model id, which is the file name: `bike-leasing` is
 the one that runs, `original-bike-leasing` is the 43-node reference. The decision table
 `checkCreditRating.dmn` is not deployed; it waits in `original/` for feature #19.
@@ -76,49 +76,38 @@ the one that runs, `original-bike-leasing` is the 43-node reference. The decisio
 ## Decisions
 
 An Architecture Decision Record (ADR) captures one decision. It is dated and numbered, and it is
-never renumbered. Once accepted it is not rewritten: a reversal gets a new ADR, and a later change
-that makes a detail untrue adds a dated "Amended by" note under the status. New ADRs are copied from
+never renumbered. The collection is a baseline as of 2026-10-16; earlier records are in git. An
+accepted ADR is not rewritten: a changed decision gets a new ADR that supersedes it, and a small
+factual correction may add a dated note under the status. New ADRs are copied from
 [0000-adr-template.md][a00]. All ADRs are Markdown (designIQ text, GitHub). Procedures are not
-decisions, so they live in CONTRIBUTING.md and AGENTS.md.
+decisions, so they live in CONTRIBUTING.md and the AGENTS.md files.
 
-| ADR         | Decision                                              | Status                               |
-|-------------|-------------------------------------------------------|--------------------------------------|
-| [0001][a01] | Record architecture decisions                         | Accepted                             |
-| [0002][a02] | Hexagonal architecture for the backend                | Accepted, amended (0015, 0017)       |
-| [0003][a03] | OpenAPI as the checked-in, drift-gated contract       | Accepted, amended (0015, 0017, 0018) |
-| [0004][a04] | Mutation testing as a blocking PR gate                | Accepted, amended (0015, 0017)       |
-| [0005][a05] | AGENTS.md as the single source of agent instructions  | Accepted                             |
-| [0006][a06] | Fixed ports for v1, portless as the upgrade path      | Accepted, amended (0018)             |
-| [0007][a07] | Two architecture-test tools: ArchUnit and Konsist     | Accepted                             |
-| [0008][a08] | Deliberately track the latest major versions          | Accepted                             |
-| [0009][a09] | Actuator probes and Prometheus metrics                | Accepted                             |
-| [0010][a10] | Flyway for database schema migrations                 | Accepted, amended (0015, 0017)       |
-| [0011][a11] | Build and deployment: OCI image with `bootBuildImage` | Accepted                             |
-| [0012][a12] | Poll for eventual consistency in end-to-end tests     | Accepted, amended (0015, 0017)       |
-| [0015][a15] | Reduce the executable process to a core               | Superseded by 0017                   |
-| [0016][a16] | `docs/` is the designIQ workspace                     | Accepted, amended (0017)             |
-| [0017][a17] | Rebase onto the simplified event-subprocess process   | Accepted                             |
-| [0018][a18] | React frontend next to the service                    | Accepted                             |
-| [0019][a19] | Back-office task UI: own inbox in the frontend        | Accepted                             |
+| ADR         | Decision                                                             | Status   |
+|-------------|----------------------------------------------------------------------|----------|
+| [0001][a01] | Record decisions in ADRs, instructions for agents in AGENTS.md       | Accepted |
+| [0002][a02] | Hexagonal backend, enforced by ArchUnit and Konsist                  | Accepted |
+| [0003][a03] | OpenAPI as the checked-in contract                                   | Accepted |
+| [0004][a04] | Mutation testing as a blocking gate at 80                            | Accepted |
+| [0008][a08] | Track the latest stable major versions                               | Accepted |
+| [0010][a10] | Flyway owns the database schema                                      | Accepted |
+| [0011][a11] | Operability and delivery: OCI images, probes and metrics             | Accepted |
+| [0016][a16] | `docs/` is the designIQ workspace                                    | Accepted |
+| [0018][a18] | React frontend next to the service                                   | Accepted |
+| [0019][a19] | Back-office task UI: own inbox in the frontend                       | Accepted |
+| [0020][a20] | Embedded CIB seven, delegates by expression, a generated process API | Accepted |
 
 [a00]: adr/0000-adr-template.md
 [a01]: adr/0001-record-architecture-decisions.md
 [a02]: adr/0002-hexagonal-architecture-for-the-backend.md
 [a03]: adr/0003-openapi-as-the-checked-in-contract.md
 [a04]: adr/0004-mutation-testing-as-a-blocking-pr-gate.md
-[a05]: adr/0005-agents-md-as-the-single-source.md
-[a06]: adr/0006-fixed-ports-for-v1-portless-as-the-upgrade.md
-[a07]: adr/0007-two-architecture-test-tools-archunit-and-konsist.md
 [a08]: adr/0008-track-the-latest-major-versions.md
-[a09]: adr/0009-actuator-probes-and-prometheus-metrics.md
 [a10]: adr/0010-flyway-for-database-migrations.md
 [a11]: adr/0011-build-and-deployment-approach.md
-[a12]: adr/0012-polling-for-eventual-consistency-in-e2e-tests.md
-[a15]: adr/0015-reduce-the-executable-process-to-a-core.md
 [a16]: adr/0016-docs-is-the-designiq-workspace.md
-[a17]: adr/0017-rebase-onto-the-simplified-event-subprocess-process.md
 [a18]: adr/0018-react-frontend-next-to-the-service.md
 [a19]: adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md
+[a20]: adr/0020-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
 
 ## Demo
 

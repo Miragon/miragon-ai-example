@@ -1,72 +1,62 @@
 # 0003 — OpenAPI as the checked-in contract
 
 - **Status:** Accepted
-- **Date:** 2026-08-18
-- **Amended by [ADR-0015](0015-reduce-the-executable-process-to-a-core.md) (2026-10-15):** the core
-  API has five operations (`submitLeasingRequest`, `getLeasingApplication`, `signContract`,
-  `selectAlternative`, `reportHandover`); `listLeasingApplications`, the example below, was removed
-  with the application list.
-- **Amended by [ADR-0017](0017-rebase-onto-the-simplified-event-subprocess-process.md) and
-  [ADR-0018](0018-react-frontend-next-to-the-service.md) (2026-10-16):** the API has the operations of
-  the new process again, `listLeasingApplications` included, and the frontend is the first consumer:
-  orval generates its client from `openapi/openapi.json`, and `npm run api:check` gates its drift.
+- **Date:** 2026-10-16
+- **Origin:** Consolidated baseline; earlier history in git.
 
 ## Context
 
-The Kotlin backend exposes a REST API that other parties consume — API clients, generated SDKs,
-documentation tooling, and integration tests. That boundary can be described three ways: (a) hand-write
-a spec and hope the code matches it; (b) let each consumer hand-write its own types and hope they match
-the backend; (c) derive the contract from the code. Options (a) and (b) drift silently — the first
-symptom is a runtime 400 at the caller. We want the contract to be *impossible* to desync, and we want
-a new contributor to be able to read it without running anything.
+The Kotlin service exposes a REST API, and the React frontend in `frontend/` consumes it; other
+clients, documentation tooling and the Bruno scenarios use it too. That boundary can be described
+three ways: hand-write a spec and hope the code matches it; let each consumer hand-write its own types
+and hope they match; or derive the contract from the code. The first two drift silently, and the
+first symptom is a runtime 400 at the caller. We want the contract to be impossible to desync, and
+readable without running anything.
 
 ## Decision
 
-The **backend is the single source of truth**, and the contract is **generated but committed**:
+The **service is the source of truth**, and the contract is **generated but committed**:
 
-1. **springdoc** serves a live OpenAPI document from the annotated controllers
-   (`@Operation(operationId = …)` gives each endpoint a stable client method name).
-2. `OpenApiSpecExportTest` — a code generator wearing a JUnit costume — fetches `/v3/api-docs`,
-   re-serialises it **deterministically** (keys sorted, fixed two-space LF indenter, trailing newline,
-   `servers` block dropped so the random test port can't cause churn) and writes
-   **`openapi/openapi.json`** at the repo root. It runs inside `./gradlew build`.
-3. CI regenerates the spec and runs **`git diff --exit-code`** on `openapi/openapi.json` — a **drift
-   gate**. If a controller changed and the committed spec wasn't updated, the build fails.
+1. **springdoc** serves the OpenAPI document from the annotated controllers. Every operation has an
+   explicit `@Operation(operationId = …)`, so generated client method names stay stable.
+2. `OpenApiSpecExportTest` fetches `/v3/api-docs`, re-serialises it deterministically (keys sorted,
+   fixed two-space LF indenter, trailing newline, `servers` block dropped so the random test port
+   causes no churn) and writes **`openapi/openapi.json`** at the repo root. It runs inside
+   `./gradlew build`.
+3. CI runs **`git diff --exit-code -- openapi/openapi.json`** after the build, a drift gate: a
+   controller change without a regenerated spec fails the PR.
+4. The **frontend's client is generated from the committed file.** orval generates the API client,
+   the MSW mocks and the zod schemas into `frontend/src/shared/api/generated` (`npm --prefix frontend
+   run api:generate`). CI runs `npm --prefix frontend run api:check`, which regenerates and fails
+   when the committed client differs.
 
-The committed JSON is the **artifact any consumer builds against**: an API client or generated SDK, a
-docs renderer, or a contract/mock for integration tests. Consumers regenerate from the checked-in file,
-so they never need a running backend to build, and every API change is visible in the PR diff.
+So a REST change travels in one PR: controller, `openapi.json`, regenerated frontend client.
 
-## Why generated-but-committed beats the alternatives
-
-- **vs. hand-written spec/types:** eliminates the drift class entirely — the gate fails the PR, not the
-  caller at runtime.
-- **vs. generated-at-build (not committed):** the committed JSON is reviewable in every PR diff (an API
-  change is *visible*), consumers can build without booting the backend, and offline/agent workflows
-  keep working. The cost — a checked-in generated file — is paid down by the drift gate that keeps it
-  honest.
+**Why generated-but-committed:** against hand-written specs or types, it removes the drift class: the
+gate fails the PR, not the caller at runtime. Against generated-at-build, the committed JSON makes
+every API change visible in the PR diff, and consumers build without booting the service.
 
 ## Consequences
 
-- **Positive:** one contract, a single gated source of truth; API changes are visible in review; every
-  consumer is decoupled from a running backend.
-- **Negative / trade-offs:** a generated file lives in git; forgetting to regenerate is an *expected*
-  failure mode — the gate is what makes that safe, so it must never be disabled.
-- **Neutral:** determinism is a hard requirement of the export test — any non-deterministic serialisation
-  would make the gate flap.
+- **Positive:** one contract, gated on both sides; API changes are visible in review; the frontend
+  and other consumers never need a running service to build.
+- **Negative / trade-offs:** two generated artefacts live in git (`openapi.json` and the frontend
+  client). Forgetting to regenerate is an expected failure mode; the gates make it safe, so they must
+  not be disabled. Determinism of the export is a hard requirement, or the gate flaps.
+- **Not covered:** the spec covers `/api/**` only (`springdoc.paths-to-match`); the engine REST API
+  `/engine-rest`, the CIB seven webapps and `/actuator` are not part of the contract. The gates prove
+  that code, spec and client agree, not that the API is backwards compatible: a breaking change is
+  caught in review, not by a tool.
 
 ## Implementation notes
 
-Two things bite when this runs on the embedded CIB seven engine:
-
-- **Swagger UI vs. the CIB seven webclient.** The webapp registers its own resource handlers *and* its
-  own `OpenAPI` bean. `OpenApiConfiguration`'s bean is marked `@Primary` so springdoc serves ours for
-  `/api/**` (the spec export checks this at build time). `/camunda`, `/webapp`, `/swagger-ui.html` and
-  `/v3/api-docs` coexist on the running app; the test profile disables the webapps, so that part is
-  checked by hand. If a future upgrade breaks it, swap to `springdoc-openapi-starter-webmvc-api` (spec
-  only, no UI) — a consumer only needs `/v3/api-docs`.
-- **Jackson 3 date-time.** Spring Boot 4 ships Jackson 3, which defaults `WRITE_DATES_AS_TIMESTAMPS` on,
-  and the webclient serves `/api` with its own mapper that ignores global config. springdoc types the
-  fields as `string/date-time`, so DTO date fields are pinned with `@JsonFormat(shape = STRING)` to keep
-  payload and contract in sync. Operation ids are set explicitly (`@Operation(operationId = …)`) so the
-  generated client method names stay clean and stable (e.g. `listLeasingApplications`).
+- **Swagger UI and the CIB seven webclient.** The webapp registers its own resource handlers and its
+  own `OpenAPI` bean. `OpenApiConfiguration`'s bean is `@Primary`, so springdoc serves ours for
+  `/api/**`. `/camunda`, `/webapp`, `/swagger-ui.html` and `/v3/api-docs` coexist on the running app;
+  the test profile disables the webapps, so that part is checked by hand. If an upgrade breaks it,
+  `springdoc-openapi-starter-webmvc-api` (spec only, no UI) is the fallback; a consumer only needs
+  `/v3/api-docs`.
+- **Jackson 3 date-time.** Spring Boot 4 ships Jackson 3, which writes dates as timestamps by
+  default, and the webclient serves `/api` with its own mapper that ignores global config. springdoc
+  types the fields as `string/date-time`, so DTO date fields are pinned with
+  `@JsonFormat(shape = STRING)` to keep payload and contract in sync.

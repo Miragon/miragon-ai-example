@@ -1,13 +1,25 @@
 # frontend/AGENTS.md
 
 The React app for customers and the back office. It has its own toolchain (npm, Vite, FSD,
-Tailwind), hence its own file. Read the root `AGENTS.md` first for the process and the contract.
+Tailwind), hence its own file; the root `AGENTS.md` covers the process and the contract.
+
+## Map
+
+```
+src/app        router, routes, styles
+src/pages      application-list, application-detail, submit-application, task-inbox, not-found
+src/widgets    app-shell, application table/summary/actions, leasing-progress, task-inbox-list
+src/features   one write each: submit, sign, handover, withdraw, credit check, reversal
+src/entities   reads: leasing-application, bike, user-task
+src/shared     generated API client (orval), ui kit, i18n (de/en)
+e2e/           Playwright scenarios against the running stack
+```
 
 ## Stack
 
 React 19 · TanStack Router (file routes) + Query · Tailwind v4 (`@theme`, CSS-first) · radix-ui +
 cva shadcn-style primitives · react-hook-form + zod · orval-generated client · Vitest + MSW ·
-Playwright. npm only, Node 24 (`.nvmrc`, `engines`), every version pinned exact (`.npmrc`
+Playwright. npm only, Node in the version from `.nvmrc`, every version pinned exact (`.npmrc`
 `save-exact=true`).
 
 ## Feature-Sliced Design (enforced)
@@ -67,3 +79,12 @@ utilities (`text-h1` … `text-klein`) and the palette (`blau`, `gruen`, semanti
 `dev build typecheck test api:generate api:check e2e`. The dev server runs on 5173 and proxies
 `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda` and `/webapp` to the backend on 8081 (`nginx.conf` does the
 same in the container). Playwright specs in `e2e/` drive the real app against a running backend.
+
+## End-to-end tests
+
+The engine advances asynchronously, so a spec never sleeps (`waitForTimeout`, `setTimeout`). It waits
+for the visible outcome with web-first assertions (`await expect(locator).toHaveText(…)`), which retry
+until the timeout. Locate by role, label or accessible name, the way a user finds things. Build state through
+the UI with the helpers in `e2e/helpers/ui.ts` (reuse them before writing new ones) and name cases with
+`uniqueName`, because the list and the inbox are shared between tests. Run one spec with
+`npm run e2e -- e2e/<name>.spec.ts`.

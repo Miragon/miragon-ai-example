@@ -5,7 +5,7 @@ repository. Each step says what to open, what to do, what to say and what the au
 rehearsal actually showed is in [rehearsal-log.md](rehearsal-log.md).
 
 > **Not rehearsed yet (2026-10-16):** this script was rewritten for the new process and the
-> frontend ([ADR-0017][a17], [ADR-0018][a18], [ADR-0019][a19]). The stack and its tests were checked
+> frontend ([executable-process.md][exec], [ADR-0018][a18], [ADR-0019][a19]). The stack and its tests were checked
 > on that day; the walk-through and every designIQ step were not. Rehearse once before the first
 > live run and record it in the rehearsal log.
 
@@ -279,12 +279,14 @@ Do not run an agent live unless you rehearsed it; show the files and tell the pa
 
 **Do:**
 
-1. AGENTS.md, "Features and Decisions": a feature follows its acceptance criteria through every
+1. AGENTS.md, "Implementing a Feature": a feature follows its acceptance criteria through every
    layer (model, regenerated process API, code, tests, contract, frontend client and UI, Bruno,
    Playwright), and the feature map, glossary and `executable-process.md` change in the same PR.
-2. `.claude/`: skills for recurring work (`automate-process`, `create-delegate`,
-   `create-rest-controller`, `sync-api-client`, `create-feature-slice`, `verify-model-visually`,
-   `create-adr`) and two review agents (`review-process`, `review-vertical-slice`).
+2. `.claude/`: workflow skills (`implement-issue` with its plan-approval stop, `automate-process`,
+   `review-change`, `test-in-browser`, `create-adr`), layer skills with a production and a test
+   pattern each (`create-rest-controller`, `create-persistence-adapter`, `create-feature-slice`,
+   `create-delegate`, `test-delegate`) and two review agents (`review-process`,
+   `review-vertical-slice`).
 3. The gates that refuse a wrong change: the typed process API, ArchUnit and Konsist, mutation
    testing at 80, the drift-gated `openapi.json` and generated client, bpmnlint, Bruno and
    Playwright against the running stack, all in CI; the designIQ validator runs locally.
@@ -319,7 +321,7 @@ the agent what a feature touches, and it refuses what breaks the rules."
 - **What if the business edits the executable model in designIQ?** The release becomes a pull request
   and CI tests it. A developer adds engine attributes and regenerates the process API in that PR.
 - **Why is the process so small?** On purpose: a model a business audience reads in one
-  look ([ADR-0017][a17]). The [scope comparison](../use-cases/bike-leasing/original/scope-comparison.md)
+  look ([executable-process.md][exec]). The [scope comparison](../use-cases/bike-leasing/original/scope-comparison.md)
   maps every capability of the 43-node original to the core or to an issue.
 - **Why not the CIB seven Tasklist?** A Tasklist form writes process variables past the domain; the
   own inbox completes tasks through validated domain endpoints ([ADR-0019][a19]). The trade-off: no
@@ -328,7 +330,7 @@ the agent what a feature touches, and it refuses what breaks the rules."
   the frozen original (compensation false positives); workshop models warn about open stickies.
 - **Are todos stored in designIQ?** No, they are GitHub issues; closing one removes the badge.
 - **Why CIB seven?** A Buy decision: the open-source community fork of Camunda 7, embedded, with
-  Cockpit included. There is no ADR for it yet.
+  Cockpit included. Embedding it in the service is [ADR-0020][a20].
 
 ### Known limits
 
@@ -356,6 +358,7 @@ Then `<designIQ>` is `http://localhost:8301`: no todos, no release pull requests
 Afterwards, `docker volume rm miravelo-designiq-data`.
 
 [a16]: ../adr/0016-docs-is-the-designiq-workspace.md
-[a17]: ../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md
 [a18]: ../adr/0018-react-frontend-next-to-the-service.md
 [a19]: ../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md
+[a20]: ../adr/0020-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
+[exec]: ../use-cases/bike-leasing/process/executable-process.md
