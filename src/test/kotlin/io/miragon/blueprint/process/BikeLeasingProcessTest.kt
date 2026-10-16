@@ -76,12 +76,9 @@ class BikeLeasingProcessTest {
 
         process.completeCreditCheck(id, solvent = true)
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
 
         process.correlateContractSigned(id)
         processEngine.executeJobFor(FlowNodes.EventContractSigned)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskIssueInsurancePolicy)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
         processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
 
         process.correlateHandoverReported(id)
@@ -191,7 +188,6 @@ class BikeLeasingProcessTest {
         val instance = runtimeService.findProcessInstance(id)
         process.completeCreditCheck(id, solvent = true)
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
         assertThat(instance).isWaitingAt(FlowNodes.EventContractSigned.ELEMENT_ID)
 
         process.correlateApplicationWithdrawn(id)
@@ -216,11 +212,8 @@ class BikeLeasingProcessTest {
         val instance = runtimeService.findProcessInstance(id)
         process.completeCreditCheck(id, solvent = true)
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
         process.correlateContractSigned(id)
         processEngine.executeJobFor(FlowNodes.EventContractSigned)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskIssueInsurancePolicy)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
         processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
         assertThat(instance).isWaitingAt(FlowNodes.EventHandoverReported.ELEMENT_ID)
 

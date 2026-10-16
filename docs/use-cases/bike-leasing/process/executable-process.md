@@ -64,11 +64,11 @@ shows that an under-age applicant is rejected, not stuck in an incident.
 | event_applicationInvalid | error boundary event (interrupting) | Application invalid | error `applicationInvalid` (`Error_ApplicationInvalid`) | – | on serviceTask_validateApplication → flow_applicationInvalid |
 | userTask_checkCreditRating | user task | Check credit rating | completed by `POST /api/bike-leasing/{id}/credit-check` (`{ "solvent": … }`) | after | output `solvent`; inbox task type `CREDIT_CHECK`; no form |
 | gateway_isSolvent | exclusive gateway | Solvent? | `${!solvent}` → "No" (`flow_notSolvent`) | – | default `flow_solvent` → Send contract |
-| serviceTask_sendContract | service task | Send contract | delegate `#{sendContractDelegate}` | after | issues the contract (ContractPort), asks the customer to sign; status CONTRACT_SENT |
+| serviceTask_sendContract | service task | Send contract | delegate `#{sendContractDelegate}` | – | issues the contract (ContractPort), asks the customer to sign; status CONTRACT_SENT |
 | event_contractSigned | message catch event | Contract signed | message `miravelo.contractSigned` (`POST /api/bike-leasing/{id}/sign-contract`) | after | no time limit ([#18]); status CONTRACT_SIGNED |
 | gateway_fork | parallel gateway (split) | (unnamed) | | – | insurance and order in parallel |
-| serviceTask_issueInsurancePolicy | service task | Issue insurance policy | delegate `#{issueInsurancePolicyDelegate}` | after | InsurancePort; stores policyId |
-| serviceTask_orderBike | service task | Order bike from dealer | delegate `#{orderBikeDelegate}` | before, after | retries `R3/PT10S`; stores orderId; status ORDERED; `BIKE-FAIL` → incident |
+| serviceTask_issueInsurancePolicy | service task | Issue insurance policy | delegate `#{issueInsurancePolicyDelegate}` | – | InsurancePort; stores policyId |
+| serviceTask_orderBike | service task | Order bike from dealer | delegate `#{orderBikeDelegate}` | before | retries `R3/PT10S`; stores orderId; status ORDERED; `BIKE-FAIL` → incident |
 | gateway_join | parallel gateway (join) | (unnamed) | | – | the handover is accepted only after both branches |
 | event_handoverReported | message catch event | Handover reported | message `miravelo.handoverReported` (`POST /api/bike-leasing/{id}/report-handover`) | after | the REST call sets ACTIVE |
 | endEvent_leasingActive | none end event | Leasing active | | – | |
@@ -95,7 +95,8 @@ the engine.
 
 | What | Reference (`03-bike-leasing-event-subprocess-simplified.bpmn`) | Executable copy | Why |
 |---|---|---|---|
-| Order bike from dealer | external task, `camunda:type="external"`, topic `orderBike`; asyncAfter | delegate `#{orderBikeDelegate}`; asyncBefore and asyncAfter; `failedJobRetryTimeCycle` `R3/PT10S` | the engine stays embedded and every service task follows the same pattern; the retry cycle drives the incident demo (`BIKE-FAIL`) |
+| Order bike from dealer | external task, `camunda:type="external"`, topic `orderBike`; asyncAfter | delegate `#{orderBikeDelegate}`; asyncBefore, no asyncAfter; `failedJobRetryTimeCycle` `R3/PT10S` | the engine stays embedded and every service task follows the same pattern; the retry cycle drives the incident demo (`BIKE-FAIL`) |
+| Send contract, Issue insurance policy | asyncAfter | no asyncAfter | CONTRACT_SENT commits together with the wait at Contract signed; the policy is issued inline before the join, so the order job sets ORDERED and reaches Handover reported in one transaction. The frontend never offers "sign" or "report handover" before the process waits for it (`StatusMatchesWaitStateTest`) |
 | Error boundary on Validate application | `boundary_applicationInvalid` | `event_applicationInvalid` | `@miragon/rules/element-id-naming` (bpmnlint) |
 | Sequence flow ids | generated (`Flow_0cq39pq`, `E01`, …) | descriptive `flow_*` (list above) | the same bpmnlint rule; readable ids in tests and anchors |
 | History time to live | `180` | `P180D` | the same 180 days, as an ISO 8601 duration |

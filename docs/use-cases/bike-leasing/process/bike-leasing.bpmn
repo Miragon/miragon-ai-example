@@ -33,7 +33,7 @@
       <bpmn:outgoing>flow_solvent</bpmn:outgoing>
       <bpmn:outgoing>flow_notSolvent</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="serviceTask_sendContract" name="Send contract" camunda:asyncAfter="true" camunda:delegateExpression="#{sendContractDelegate}">
+    <bpmn:serviceTask id="serviceTask_sendContract" name="Send contract" camunda:delegateExpression="#{sendContractDelegate}">
       <bpmn:incoming>flow_solvent</bpmn:incoming>
       <bpmn:outgoing>flow_contractSentToSigned</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -47,11 +47,11 @@
       <bpmn:outgoing>flow_forkToInsurance</bpmn:outgoing>
       <bpmn:outgoing>flow_forkToOrder</bpmn:outgoing>
     </bpmn:parallelGateway>
-    <bpmn:serviceTask id="serviceTask_issueInsurancePolicy" name="Issue insurance policy" camunda:asyncAfter="true" camunda:delegateExpression="#{issueInsurancePolicyDelegate}">
+    <bpmn:serviceTask id="serviceTask_issueInsurancePolicy" name="Issue insurance policy" camunda:delegateExpression="#{issueInsurancePolicyDelegate}">
       <bpmn:incoming>flow_forkToInsurance</bpmn:incoming>
       <bpmn:outgoing>flow_insuranceToJoin</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="serviceTask_orderBike" name="Order bike from dealer" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:delegateExpression="#{orderBikeDelegate}">
+    <bpmn:serviceTask id="serviceTask_orderBike" name="Order bike from dealer" camunda:asyncBefore="true" camunda:delegateExpression="#{orderBikeDelegate}">
       <bpmn:extensionElements>
         <camunda:failedJobRetryTimeCycle>R3/PT10S</camunda:failedJobRetryTimeCycle>
       </bpmn:extensionElements>

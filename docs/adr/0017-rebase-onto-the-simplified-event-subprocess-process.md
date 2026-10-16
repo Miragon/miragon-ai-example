@@ -42,6 +42,9 @@ lists each difference:
   and the retry cycle `R3/PT10S` for the incident demo.
 - The boundary event `boundary_applicationInvalid` is named `event_applicationInvalid`, and the
   sequence flows get descriptive `flow_*` ids, as `@miragon/rules/element-id-naming` requires.
+- `Send contract`, `Issue insurance policy` and `Order bike from dealer` have no `asyncAfter`, so
+  the status a step sets commits together with the wait state that follows (the frontend offers an
+  action only when the process waits for it).
 - `historyTimeToLive` is `P180D`, and the rejection merge is named `Rejection reason`.
 
 The rule behind `Validate application` is not in the reference. **Assumption:** an application is

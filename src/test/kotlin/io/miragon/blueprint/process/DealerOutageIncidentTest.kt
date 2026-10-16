@@ -77,7 +77,6 @@ class DealerOutageIncidentTest {
         processEngine.executeJobFor(FlowNodes.ServiceTaskValidateApplication)
         process.completeCreditCheck(application.id, solvent = true)
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
-        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
         process.correlateContractSigned(application.id)
         processEngine.executeJobFor(FlowNodes.EventContractSigned)
 

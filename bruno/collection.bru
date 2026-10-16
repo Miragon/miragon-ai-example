@@ -45,8 +45,9 @@ script:pre-request {
       predicate, opts);
   };
 
-  // Wait until the instance with this business key (the applicationId) rests on activityId. Every
-  // flow node is asyncAfter, so a read-model status alone does not prove the next wait state exists.
+  // Wait until the instance with this business key (the applicationId) rests on activityId: events
+  // and user tasks continue asynchronously, so a read-model status alone does not prove every wait
+  // state exists.
   globalThis.pollActivity = function (businessKey, activityId, opts) {
     return globalThis.pollEngine(
       '/process-instance?businessKey=' + businessKey + '&activityIdIn=' + activityId,
