@@ -20,7 +20,7 @@ if (typeof window !== "undefined") {
 
 // Start the MSW server for the whole test run; reset per test so `server.use(...)` overrides and
 // sonner's module-global toasts don't leak into the next test.
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterEach(() => {
   server.resetHandlers();
   toast.dismiss();
