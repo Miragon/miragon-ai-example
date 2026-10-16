@@ -9,7 +9,7 @@ file covers how to work on it.
 ```bash
 git clone git@github.com:miragon-blueprints/miragon-ai-example.git
 cd miragon-ai-example
-npm ci && npm run hooks:install   # bpmnlint + the pre-commit hook
+npm ci && npm run hooks:install   # bpmnlint, bpmn-cli, operate + the pre-commit hook
 npm --prefix frontend ci          # the frontend
 ```
 
@@ -51,9 +51,9 @@ So: <http://localhost:5173> (the frontend), <http://localhost:8081/webapp/#/seve
 <http://localhost:8081/swagger-ui.html> and <http://localhost:8081/actuator/health> (status `UP`).
 
 This table is the only place the ports are listed; `frontend/vite.config.ts`,
-`frontend/playwright.config.ts` and `.conductor/settings.toml` must match it. The ports are fixed on
-purpose: under Conductor the workspace runs `nonconcurrent`, so only one worktree runs the stack at a
-time. Per-worktree URLs (portless) would only cover the Vite server; the backend, Postgres and the
+`frontend/playwright.config.ts`, `.conductor/settings.toml` and `.operate.json` must match it. The
+ports are fixed on purpose: under Conductor the workspace runs `nonconcurrent`, so only one worktree
+runs the stack at a time. Per-worktree URLs (portless) would only cover the Vite server; the backend, Postgres and the
 shared engine schema would still collide.
 
 ## Commands
@@ -70,6 +70,8 @@ From the repo root:
 | Regenerate the frontend API client after a contract change | `npm --prefix frontend run api:generate` |
 | Frontend end-to-end tests (running stack and dev server) | `npm --prefix frontend run e2e` |
 | Lint the executable BPMN models | `npm run lint:bpmn` |
+| Read, change, validate or render a BPMN model | `npx bpmn show <file>`, `npx bpmn guide --short` |
+| Where a running case waits, open incidents (running backend) | `npx operate inspect --business-key <applicationId>`, `npx operate status` |
 | Validate the designIQ models under `docs/` | `npx --yes @miragon/design-iq-validator@5.3.0 --root .` |
 | Build the OCI image | `./gradlew bootBuildImage` |
 
@@ -228,6 +230,10 @@ merged by hand. `.github/dependabot.yml` carries no `ignore` entries. When an up
 yet, comment `@dependabot ignore this major version` (or `minor version` / `dependency`) on its pull
 request and open an issue for the blocker, so the update comes back once it is fixable
 ([ADR-0005](docs/adr/0005-track-the-latest-major-versions.md)).
+
+bpmn-cli and operate are not covered by Dependabot. Bump each one by hand in two places together:
+its exact version in the root `package.json` and the `ref` of its marketplace in
+`.claude/settings.json`.
 
 ## Reporting bugs / requesting features
 

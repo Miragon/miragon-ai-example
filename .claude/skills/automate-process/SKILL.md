@@ -18,8 +18,8 @@ The model is the business's artifact; this skill changes it technically. Source 
   owner comes from the issue or the original model; otherwise ask before editing.
 - **Keep element ids stable**; a rename updates the feature map, glossary, `executable-process.md` and
   the issues' anchor blocks in the same change.
-- **Complete BPMNDI** for every new node and flow (standard sizes: task 100×80, event 36×36,
-  gateway 50×50), or designIQ breaks.
+- **Edit the model only through bpmn-cli** (skill `bpmn-cli:bpmn`), never as XML. It draws the BPMNDI
+  designIQ needs and, with `BPMN_KEEP_FLOW_IDS=1` from `.claude/settings.json`, keeps the flow ids.
 - **Process variables stay minimal:** ids, not copies of domain data. The engine is not a database.
 - **Engine limits:** a service task is a delegate by expression (`#{beanName}`, enforced by
   `ServiceTaskDelegateExpressionRule`); asynchronous continuations (`asyncBefore`) are where retries
@@ -35,7 +35,8 @@ The model is the business's artifact; this skill changes it technically. Source 
    before changing anything.
 2. **Agree the change.** Restate it in business terms (which element, which path, which outcome) with
    the open questions. Wait for the answer.
-3. **Edit the model**, then regenerate and lint (the PostToolUse hook lints every edit too):
+3. **Edit the model**: read it with `bpmn show`, change it in one `bpmn apply` batch, check it with
+   `bpmn validate` (every bpmn-cli write also runs the `.bpmnlintrc`). Then regenerate and lint:
    ```bash
    ./gradlew generateBpmnModels
    npm run lint:bpmn

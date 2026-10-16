@@ -36,7 +36,8 @@ bruno/                        REST scenarios + 00-demo-data
 stack/                        Postgres dev stack, full container stack
 .github/                      pre-merge + nightly pipelines, Dependabot
 .githooks/                    pre-commit: bpmnlint on staged .bpmn, lint-staged in frontend/
-.claude/                      skills, review agents, settings and hooks (see .claude/README.md)
+.claude/                      skills, review agents, settings, plugins and hooks (see .claude/README.md)
+.operate.json                 operate's engine profile: the local engine on :8081
 ```
 
 Setup, ports and the full command list are in [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -114,6 +115,17 @@ CI runs the build, bpmnlint, both drift checks (contract, process API), the diff
 | `test-in-browser` | check a flow in the running app with Playwright MCP, with screenshots |
 | `create-adr` | record a decision in `docs/adr/` |
 | agents `review-process`, `review-vertical-slice` | read-only audits of the model's glue and of one feature end to end |
+
+Two CLIs come as Claude Code plugins (`.claude/settings.json`) and pinned in the root `package.json`:
+
+- **bpmn-cli** (`npx bpmn`, skill `bpmn-cli:bpmn`) for every change to a `.bpmn`: semantic edits, no
+  XML by hand. `BPMN_KEEP_FLOW_IDS=1` keeps flow ids stable; a hook blocks writes to `original/`.
+  The workshop models are not lint targets: their bpmnlint findings in its output are expected.
+- **operate** (`npx operate`, skill `operate:operate`, `/operate:status`) for the local engine. Run
+  `npx operate guide` before using it. It reads and repairs (`inspect --business-key <applicationId>`,
+  `status`, `incident`, history, `retry`). It never deploys (the service deploys the models from its
+  classpath, a hand deploy is a version the generated process API does not know) and never moves a case
+  (user tasks, messages): the app's API does that, or the domain data and the engine drift apart.
 
 ## Working with GitHub
 

@@ -46,6 +46,13 @@ Read-only reviewers with their own context.
   as well: it also inspects shell commands (`cat .env`, `source ./stack/.env`).
 - `hooks/lint-bpmn.sh` (PostToolUse) runs bpmnlint after every edit of an executable `.bpmn` and
   hands the findings back to Claude. It changes nothing.
+- `settings.json` also enables two pinned plugins, `bpmn-cli@miragon-bpmn` (skill `bpmn-cli:bpmn`) and
+  `operate@miragon` (skill `operate:operate`, `/operate:status`), from marketplaces fixed to a release
+  tag. Claude Code installs them once you trust the folder; cloud sessions do not load them. Its `env`
+  sets `BPMN_KEEP_FLOW_IDS=1`, so bpmn-cli keeps flow ids stable.
+- `hooks/block-frozen-models.js` (PreToolUse, Node) refuses a bpmn-cli command that would change a
+  model in `docs/use-cases/bike-leasing/original/`: the `Edit` deny rule does not see shell commands.
+  Reading it (`show`, `find`, `metrics`, `render`, `validate`) passes.
 - `../.mcp.json` provides the Playwright MCP server (pinned) for `test-in-browser`.
 
 ## What goes where
