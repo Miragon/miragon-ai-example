@@ -1,20 +1,21 @@
 # Conductor workspace settings for the CIB seven embedded bike-leasing blueprint.
 #
 # This stack binds fixed ports (Postgres 5432, backend 8081 — which also serves the embedded CIB
-# seven webapp/Cockpit and engine-rest), so only one workspace can run the app at a time — hence
-# run_mode = "nonconcurrent". portless is deliberately deferred: it only wraps a JS dev server, while
-# both of this stack's collisions are Postgres and the Spring/engine schema. See
-# docs/adr/0006-fixed-ports-for-v1-portless-as-the-upgrade.md.
+# seven webapp/Cockpit and engine-rest — and Vite 5173), so only one workspace can run the app at a
+# time — hence run_mode = "nonconcurrent". portless is deliberately deferred: it only wraps the JS
+# dev server, while two of this stack's three collisions are Postgres and the Spring/engine schema.
+# See docs/adr/0006-fixed-ports-for-v1-portless-as-the-upgrade.md.
 
 "$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
 
 [scripts]
 run_mode = "nonconcurrent"
 
-# One-time setup per workspace: install BPMN linting tooling + git hooks.
+# One-time setup per workspace: install BPMN linting tooling + git hooks, and the frontend deps.
 setup = """
 npm ci
 npm run hooks:install
+npm --prefix frontend ci
 """
 
 # Tear down the local Postgres container when a workspace is archived.
@@ -40,4 +41,24 @@ icon = "check"
 # Bruno API smoke tests against a running local stack.
 [scripts.run.smoke]
 command = "cd bruno && npx --yes @usebruno/cli@4.0.0 run . --env local -r"
+icon = "flask"
+
+# The React frontend (Vite dev server on 5173, proxies the backend paths to 8081).
+[scripts.run.frontend]
+command = "npm --prefix frontend run dev"
+icon = "monitor"
+
+# Full local dev stack: Postgres + backend + Vite (current branch).
+[scripts.run.full-dev]
+command = '''
+docker compose -f stack/docker-compose.yml up -d && \
+npx --yes concurrently@10.0.6 --kill-others --names backend,frontend --prefix-colors blue,magenta \
+  "./gradlew bootRun" \
+  "npm --prefix frontend run dev"
+'''
+icon = "layers"
+
+# Playwright browser end-to-end tests (chromium) against a running full-dev stack.
+[scripts.run.e2e]
+command = "npm --prefix frontend run e2e"
 icon = "flask"
