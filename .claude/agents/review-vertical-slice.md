@@ -45,7 +45,7 @@ Backend paths are relative to `service/app/src/main/kotlin/io/miragon/blueprint/
 ## How to work
 
 - Search by the feature's nouns/verbs (`SignContract`, `signContract`, `sign-contract`,
-  `event_contractSigned`). Read only what you need to confirm a hop.
+  `receiveTask_contractSigned`). Read only what you need to confirm a hop.
 - Per hop state **present / missing / inconsistent** with path and symbol; for an inconsistency, say
   what doesn't line up.
 - Read-only `git`/`grep`/`ls` only.

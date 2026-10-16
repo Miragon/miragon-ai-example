@@ -6,6 +6,7 @@ process context.
 
 - Model: [bike-leasing-feature-map.bpmn](bike-leasing-feature-map.bpmn) (t.BPM workshop mode, not executable)
 - The core alone: [bike-leasing-tbpm.bpmn](../tbpm/bike-leasing-tbpm.bpmn). It has the same steps, names and ids.
+  One exception, see the notes on the ids: "Contract signed".
 - What runs: [bike-leasing.bpmn](../process/bike-leasing.bpmn), the executable model
 - Where the features come from: the issues, and the original via
   [scope-comparison.md](../original/scope-comparison.md) (capabilities C1 to C19)
@@ -22,8 +23,8 @@ process context.
   - #18, after "Send contract": the signature wait races a 14-day timer; the "14 days" path joins
     "Rejection reason".
   - #1, above "Send contract": a reminder after 7 days. The timer on "Send contract" is workshop
-    shorthand (an automated task ends at once); #1 names the two real options, and a note sticky
-    says so.
+    shorthand (an automated task ends at once); in the executable model it sits on the receive task
+    "Contract signed", and a note sticky says so.
   - #20, on the order branch: "Bike available?" → "Clarify alternative with customer" → re-order,
     or reverse and end with "Contract cancelled" (a terminate end, so the insurance branch does not
     keep waiting).
@@ -63,8 +64,8 @@ The anchors are the designIQ todo anchors in the executable model
 | Core | — | Insure and order in parallel (delivered [#2]) | `gateway_fork`, `serviceTask_issueInsurancePolicy`, `serviceTask_orderBike`, `gateway_join` | — | C7, C8, C18 | — |
 | Core | — | Hand over and activate | `event_handoverReported`, `endEvent_leasingActive` | — | C16, C17 | — |
 | Core | — | Withdraw, reverse by hand (inbox: delivered [#5], decided [#11]) | `subProcess_applicationWithdrawn`, `startEvent_applicationWithdrawn`, `userTask_reverseApplication`, `endEvent_applicationCancelled` | — | C12 | — |
-| 1 | [#18] | Signature deadline (14 days) | `gateway_awaitSignature` (event-based), `event_signatureDeadline` (14 days), `flow_deadlineToRejection` | `serviceTask_sendContract`, `event_contractSigned`, `gateway_rejectionJoin` | C6 | core; #8 for the open question |
-| 1 | [#1] | Signature reminder (7 days) | `event_signatureReminder` (7 days), `serviceTask_sendReminderMail`, `endEvent_prospectReminded` | `serviceTask_sendContract`, `event_contractSigned` | C5 | #18 |
+| 1 | [#18] | Signature deadline (14 days) | `gateway_awaitSignature` (event-based), `event_signatureDeadline` (14 days), `flow_deadlineToRejection` | `receiveTask_contractSigned`, `gateway_rejectionJoin` | C6 | core; #8 for the open question |
+| 1 | [#1] | Signature reminder (7 days) | `event_signatureReminder` (7 days), `serviceTask_sendReminderMail`, `endEvent_prospectReminded` | `receiveTask_contractSigned` | C5 | core |
 | 2 | [#19] | Credit check by DMN | note on `userTask_checkCreditRating` (it becomes the business rule task `businessRuleTask_checkCreditRating`) | `userTask_checkCreditRating`, `gateway_isSolvent` | C2 | core |
 | 2 | [#20] | Alternative bike when the dealer cannot deliver | `gateway_bikeSourceJoin`, `gateway_bikeAvailable`, `userTask_clarifyAlternative`, `gateway_alternativeFound`, `event_triggerReversal`, `serviceTask_confirmContractCancellation`, `endEvent_contractCancelled` (terminate) | `serviceTask_orderBike` | C9, C11 | #3 (its compensation handlers); shares the availability check with #7 |
 | 3 | [#21] | Withdrawal period before activation | `event_withdrawalPeriodElapsed` (14 days) | `event_handoverReported`, `endEvent_leasingActive` | C17 | core |
@@ -76,6 +77,9 @@ Notes on the ids:
 
 - Core ids are the executable ids; `tbpm_gateway_applicationValid` comes from the t.BPM model and
   stands for the error boundary `event_applicationInvalid`.
+- `event_contractSigned` on the map and in the t.BPM model is the business event "Contract signed".
+  The executable model waits for the same message in the receive task `receiveTask_contractSigned`,
+  because the timers of #18 and #1 attach to it as boundary events.
 - Feature ids come from the issues and the original. `gateway_bikeAvailable` is the gateway variant
   #20 names (option 2); #20 still chooses between it and the error boundary `event_bikeUnavailable`.
 - Ids that exist only on the map start with `fmap_`. The #3 sub-process and its start and end
@@ -94,7 +98,7 @@ Notes on the ids:
 
 | Decision | Issue | Sticky on | Anchored elements in the executable model |
 |---|---|---|---|
-| Contract & e-signature: make, buy or adapt? | [#8] | Send contract | `serviceTask_sendContract`, `event_contractSigned` |
+| Contract & e-signature: make, buy or adapt? | [#8] | Send contract | `serviceTask_sendContract`, `receiveTask_contractSigned` |
 | Customer notification channel? | [#9] | Send rejection | `serviceTask_sendContract`, `serviceTask_sendRejection` |
 | Dealer integration? | [#10] | Handover reported | `serviceTask_orderBike`, `event_handoverReported` |
 

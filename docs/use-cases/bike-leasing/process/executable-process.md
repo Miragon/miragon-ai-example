@@ -10,7 +10,7 @@ The executable model is a copy of the simplified event-subprocess variant of the
 that Miragon maintains (the source model): 20 flow nodes, two user tasks (`Check credit rating`,
 `Reverse application`), an interrupting event sub-process for the withdrawal, and no DMN, timer,
 compensation or called process. The flow-node ids of the source model are kept, except the error
-boundary. The copy here differs only where the engine or this repo's gates require it, and every
+boundary and "Contract signed". The copy here differs only where the engine or this repo's gates require it, and every
 difference is listed in "Deviations from the source model"; add a row when you add one.
 
 The original model of this repo is not the source model. It is frozen in `../original/` as the
@@ -66,7 +66,7 @@ shows that an under-age applicant is rejected, not stuck in an incident.
 | userTask_checkCreditRating | user task | Check credit rating | completed by `POST /api/bike-leasing/{id}/credit-check` (`{ "solvent": … }`) | after | output `solvent`; inbox task type `CREDIT_CHECK`; no form |
 | gateway_isSolvent | exclusive gateway | Solvent? | `${!solvent}` → "No" (`flow_notSolvent`) | – | default `flow_solvent` → Send contract |
 | serviceTask_sendContract | service task | Send contract | delegate `#{sendContractDelegate}` | – | issues the contract (ContractPort), asks the customer to sign; status CONTRACT_SENT |
-| event_contractSigned | message catch event | Contract signed | message `miravelo.contractSigned` (`POST /api/bike-leasing/{id}/sign-contract`) | after | no time limit ([#18]); status CONTRACT_SIGNED |
+| receiveTask_contractSigned | receive task | Contract signed | message `miravelo.contractSigned` (`POST /api/bike-leasing/{id}/sign-contract`) | after | no time limit ([#18]); status CONTRACT_SIGNED; a task, so the timers of [#1] and [#18] can attach as boundary events |
 | gateway_fork | parallel gateway (split) | (unnamed) | | – | insurance and order in parallel |
 | serviceTask_issueInsurancePolicy | service task | Issue insurance policy | delegate `#{issueInsurancePolicyDelegate}` | – | InsurancePort; stores policyId |
 | serviceTask_orderBike | service task | Order bike from dealer | delegate `#{orderBikeDelegate}` | before | retries `R3/PT10S`; stores orderId; status ORDERED; `BIKE-FAIL` → incident |
@@ -99,6 +99,7 @@ the engine.
 | Order bike from dealer | external task, `camunda:type="external"`, topic `orderBike`; asyncAfter | delegate `#{orderBikeDelegate}`; asyncBefore, no asyncAfter; `failedJobRetryTimeCycle` `R3/PT10S` | the engine stays embedded and every service task follows the same pattern; the retry cycle drives the incident demo (`BIKE-FAIL`) |
 | Send contract, Issue insurance policy | asyncAfter | no asyncAfter | CONTRACT_SENT commits together with the wait at Contract signed; the policy is issued inline before the join, so the order job sets ORDERED and reaches Handover reported in one transaction. The frontend never offers "sign" or "report handover" before the process waits for it (`StatusMatchesWaitStateTest`) |
 | Error boundary on Validate application | `boundary_applicationInvalid` | `event_applicationInvalid` | `@miragon/rules/element-id-naming` (bpmnlint) |
+| Contract signed | message catch event `event_contractSigned` | receive task `receiveTask_contractSigned`, same message | BPMN attaches boundary events only to activities, and the reminder of [#1] and the deadline of [#18] are timers on this wait; the id follows `@miragon/rules/element-id-naming` |
 | Sequence flow ids | generated (`Flow_0cq39pq`, `E01`, …) | descriptive `flow_*` (list above) | the same bpmnlint rule; readable ids in tests and anchors |
 | History time to live | `180` | `P180D` | the same 180 days, as an ISO 8601 duration |
 | Rejection merge | `gateway_rejectionJoin` unnamed | named "Rejection reason" | the merge rule of the glossary; the name the issues use |
@@ -133,20 +134,20 @@ anchor block, or the todo loses its place on the canvas.
 
 | Issue | Anchored elements (the `element:` lines of the issue body) |
 |---|---|
-| [#18] Signature deadline | serviceTask_sendContract, event_contractSigned, gateway_rejectionJoin |
-| [#1] Signature reminder | serviceTask_sendContract, event_contractSigned |
+| [#18] Signature deadline | receiveTask_contractSigned, gateway_rejectionJoin |
+| [#1] Signature reminder | receiveTask_contractSigned |
 | [#19] Credit check by DMN | userTask_checkCreditRating, gateway_isSolvent |
 | [#20] Alternative bike | serviceTask_orderBike |
 | [#21] Withdrawal period | event_handoverReported, endEvent_leasingActive |
 | [#3] Automatic reversal | subProcess_applicationWithdrawn, userTask_reverseApplication, serviceTask_sendContract, serviceTask_issueInsurancePolicy |
 | [#4] Bike order cancellation | serviceTask_orderBike |
 | [#7] Live dealer availability | serviceTask_orderBike |
-| [#8] Contract & e-signature | serviceTask_sendContract, event_contractSigned |
+| [#8] Contract & e-signature | serviceTask_sendContract, receiveTask_contractSigned |
 | [#9] Customer notification | serviceTask_sendContract, serviceTask_sendRejection |
 | [#10] Dealer integration | serviceTask_orderBike, event_handoverReported |
 
-Busiest elements: serviceTask_sendContract (#1, #3, #8, #9, #18), serviceTask_orderBike (#4, #7,
-#10, #20), event_contractSigned (#1, #8, #18).
+Busiest elements: serviceTask_sendContract (#3, #8, #9), serviceTask_orderBike (#4, #7, #10,
+#20), receiveTask_contractSigned (#1, #8, #18).
 
 [#2], [#5], [#6] and [#11] are delivered or decided by the rebase and close with it; their anchor
 blocks still name the elements of the previous core.

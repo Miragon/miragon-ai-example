@@ -11,7 +11,7 @@ get {
 }
 
 script:pre-request {
-  await pollActivity(bru.getVar("contractSentId"), "event_contractSigned");
+  await pollActivity(bru.getVar("contractSentId"), "receiveTask_contractSigned");
 }
 
 assert {
