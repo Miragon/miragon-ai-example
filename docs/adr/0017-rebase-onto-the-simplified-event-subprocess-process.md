@@ -2,6 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-16
+- **Amended (2026-10-16):** links to the private source repository were removed; the decision is
+  unchanged.
 - **Deciders:** Marco (@emaarco)
 - **Supersedes:** [ADR-0015](0015-reduce-the-executable-process-to-a-core.md)
 
@@ -16,14 +18,12 @@ and in Bruno.
 
 The example should show how Miragon automates a process with AI in the loop: a process a business
 audience understands in one look, a UI on top of it, and visible room for the next features.
-Miragon already maintains the MiraVelo reference models in
-[Miragon/miravelo-reference](https://github.com/Miragon/miravelo-reference/tree/541f8e0dda1672aad18b5d84b45cdfae807efe8b/bpmn/bike-leasing).
-Its stage `03-bike-leasing-event-subprocess-simplified.bpmn` is exactly such a process.
+Miragon already maintains a simplified event-subprocess variant of the MiraVelo process. It is
+exactly such a process.
 
 ## Decision
 
-The executable `bikeLeasingProcess` is the reference model
-`03-bike-leasing-event-subprocess-simplified.bpmn` (20 flow nodes):
+The executable `bikeLeasingProcess` is that simplified model (20 flow nodes):
 
 - `Leasing request received` → `Validate application` (error `Application invalid` → rejection)
   → `Check credit rating` (**user task**) → `Solvent?`.

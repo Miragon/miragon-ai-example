@@ -7,10 +7,8 @@ imports it (see [ADR-0005](docs/adr/0005-agents-md-as-the-single-source.md)).
 
 An example of Miragon's way of automating a process with AI agents: the **MiraVelo bike-leasing**
 process as an executable BPMN model on an embedded CIB seven engine, behind an enforced hexagonal
-architecture, with a React frontend for customers and the back office. The process is the reference
-model `03-bike-leasing-event-subprocess-simplified` from
-[Miragon/miravelo-reference](https://github.com/Miragon/miravelo-reference)
-([ADR-0017](docs/adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)). The design
+architecture, with a React frontend for customers and the back office. Why the process looks the way it
+does is [ADR-0017](docs/adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)). The design
 artifacts that explain it (use case, glossary, t.BPM model, feature map, C4, Wardley Map, ADRs) are
 versioned under `docs/`, the one folder designIQ reads. What the original process could do and this
 one cannot yet is GitHub issues.
@@ -163,7 +161,7 @@ CONTRIBUTING "Run it in containers".
 - **Executable models live in `docs/use-cases/bike-leasing/process/`** (today only
   `bike-leasing.bpmn`). Gradle packages them onto the classpath as `bpmn/*.bpmn` and `dmn/*.dmn`.
   Edit them there and nowhere else; `src/main/resources` holds no `.bpmn` or `.dmn` files.
-- **The executable model derives from the reference model** `03-bike-leasing-event-subprocess-simplified`.
+- **The executable model has a source model** (ADR-0017).
   Every difference is listed in `executable-process.md`; add a row when you add one.
 - **After editing a `.bpmn`**, run `./gradlew generateBpmnModels` and commit the regenerated
   `adapter/process` files. Then run `npm run lint:bpmn` and the `process.*` tests.

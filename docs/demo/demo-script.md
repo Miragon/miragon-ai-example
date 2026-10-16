@@ -195,8 +195,7 @@ adapt turns a dashed box into a real system."
 1. The workshop steps, now with engine semantics: the error boundary "Application invalid", the two
    user tasks, the parallel gateway, and the event subprocess "Application withdrawn" that
    interrupts the case wherever it is.
-2. It is Miragon's reference model `03-bike-leasing-event-subprocess-simplified`; every difference
-   is listed in `executable-process.md`.
+2. Every difference from its source model is listed in `executable-process.md`.
 3. Hosted designIQ only: "Todos" lists the open issues; the badge on "Send contract" narrows it to
    #1, #3, #8, #9 and #18.
 4. Cockpit, "MiraVelo Bike Leasing": the same diagram, deployed from the same file, with the demo
@@ -319,7 +318,7 @@ the agent what a feature touches, and it refuses what breaks the rules."
   generated from the same file ([ADR-0016][a16]).
 - **What if the business edits the executable model in designIQ?** The release becomes a pull request
   and CI tests it. A developer adds engine attributes and regenerates the process API in that PR.
-- **Why is the process so small?** On purpose: a reference model a business audience reads in one
+- **Why is the process so small?** On purpose: a model a business audience reads in one
   look ([ADR-0017][a17]). The [scope comparison](../use-cases/bike-leasing/original/scope-comparison.md)
   maps every capability of the 43-node original to the core or to an issue.
 - **Why not the CIB seven Tasklist?** A Tasklist form writes process variables past the domain; the

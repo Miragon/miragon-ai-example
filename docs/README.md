@@ -42,8 +42,7 @@ How to view, in the tables below:
 | Scope: original vs. core vs. issues     | [scope-comparison.md][scope]             | Markdown · designIQ text · GitHub |
 | Open feature and decision issues        | [issues labelled todo][issues]           | GitHub · designIQ todos           |
 
-The executable model is Miragon's reference model `03-bike-leasing-event-subprocess-simplified`
-([ADR-0017][a17]). It and the frozen original both show the title "MiraVelo Bike Leasing" (process
+The executable model is the simplified core ([ADR-0017][a17]). It and the frozen original both show the title "MiraVelo Bike Leasing" (process
 id `bikeLeasingProcess`). Tell them apart by the model id, which is the file name: `bike-leasing` is
 the one that runs, `original-bike-leasing` is the 43-node reference. The decision table
 `checkCreditRating.dmn` is not deployed; it waits in `original/` for feature #19.

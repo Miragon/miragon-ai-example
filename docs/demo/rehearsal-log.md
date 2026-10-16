@@ -265,8 +265,8 @@ Checklist for Thomas:
 
 ## 2026-10-16: new process and frontend, script not rehearsed yet
 
-What changed: the executable process was rebased onto Miragon's reference model
-`03-bike-leasing-event-subprocess-simplified` ([ADR-0017](../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)),
+What changed: the executable process was rebased onto a simplified
+event-subprocess model ([ADR-0017](../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)),
 a React frontend was added ([ADR-0018](../adr/0018-react-frontend-next-to-the-service.md)), and the
 back office works both user tasks in the frontend inbox ([ADR-0019](../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
 The [demo script](demo-script.md) was rewritten for it. A review then added the status
