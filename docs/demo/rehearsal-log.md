@@ -281,12 +281,13 @@ were, as a record of that day.
 
 Checked on 2026-10-16 by the AI agents (Claude) that made the change, on the development machine:
 
-- ✅ `./gradlew build` green on the rebased process; after the review commit `9d99c76`,
-  `./gradlew test` green.
+- ✅ `./gradlew build pitest` green: mutation score 90 % (gate 80). After the later review fixes
+  (`86d38c6`, `52b5e6b`) `./gradlew test` is green again.
 - ✅ Bruno, full collection against the running stack (`run . --env local -r`, which includes
   `00-demo-data`): 66/66 requests, 137/137 assertions.
-- ✅ Playwright, chromium, against the live stack and the dev server: 4/4 scenarios (happy path,
-  invalid application, not solvent, withdrawal).
+- ✅ Playwright, chromium, against the live stack and the dev server: 5/5 scenarios (happy path,
+  invalid application, not solvent, withdrawal, application list), also with `--repeat-each=3`
+  (15/15).
 - ✅ designIQ validator: `sourcing-map` reports no findings. The architecture files, the C4 PNGs and
   the sourcing-map PNG were refreshed; the map PNG was exported from the Wardley Maps Modeler web
   app ("Export · PNG (2×)").
