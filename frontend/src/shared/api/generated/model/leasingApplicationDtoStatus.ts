@@ -12,6 +12,7 @@ export type LeasingApplicationDtoStatus = typeof LeasingApplicationDtoStatus[key
 export const LeasingApplicationDtoStatus = {
   RECEIVED: 'RECEIVED',
   CONTRACT_SENT: 'CONTRACT_SENT',
+  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
   ORDERED: 'ORDERED',
   ACTIVE: 'ACTIVE',
   REJECTED: 'REJECTED',

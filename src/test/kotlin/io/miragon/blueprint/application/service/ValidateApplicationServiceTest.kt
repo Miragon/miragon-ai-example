@@ -1,6 +1,7 @@
 package io.miragon.blueprint.application.service
 
 import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
+import io.miragon.blueprint.domain.leasing.ApplicationNotFoundException
 import io.miragon.blueprint.domain.leasing.ApplicationInvalidException
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
 import io.mockk.every
@@ -36,7 +37,7 @@ class ValidateApplicationServiceTest {
         every { repository.findById(application.id) } returns null
 
         assertThatThrownBy { underTest.validate(application.id) }
-            .isInstanceOf(IllegalStateException::class.java)
-            .hasMessageContaining("Unknown application")
+            .isInstanceOf(ApplicationNotFoundException::class.java)
+            .hasMessage("Unknown application ${application.id.value}")
     }
 }

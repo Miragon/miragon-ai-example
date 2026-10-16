@@ -2,6 +2,8 @@ package io.miragon.blueprint.application.service
 
 import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
 import io.miragon.blueprint.application.port.outbound.LeasingProcess
+import io.miragon.blueprint.domain.leasing.ActionNotAvailableException
+import io.miragon.blueprint.domain.leasing.ApplicationNotFoundException
 import io.miragon.blueprint.domain.leasing.LeasingStatus
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
 import io.mockk.Runs
@@ -35,11 +37,23 @@ class WithdrawApplicationServiceTest {
     }
 
     @Test
-    fun `withdraw keeps the status when the process refuses the withdrawal`() {
+    fun `withdraw refuses a finished application before touching the process`() {
         val application = testLeasingApplication(status = LeasingStatus.ACTIVE)
-        every { process.correlateApplicationWithdrawn(application.id) } throws IllegalStateException("finished")
+        every { repository.findById(application.id) } returns application
 
-        assertThatThrownBy { underTest.withdraw(application.id) }.hasMessage("finished")
+        assertThatThrownBy { underTest.withdraw(application.id) }
+            .isInstanceOf(ActionNotAvailableException::class.java)
+            .hasMessage("An application in status ACTIVE cannot be withdrawn")
+        verify(exactly = 0) { process.correlateApplicationWithdrawn(any()) }
         verify(exactly = 0) { repository.save(any()) }
+    }
+
+    @Test
+    fun `withdraw refuses an unknown application`() {
+        val application = testLeasingApplication()
+        every { repository.findById(application.id) } returns null
+
+        assertThatThrownBy { underTest.withdraw(application.id) }.isInstanceOf(ApplicationNotFoundException::class.java)
+        verify(exactly = 0) { process.correlateApplicationWithdrawn(any()) }
     }
 }

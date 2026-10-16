@@ -33,7 +33,7 @@ function LanguageSwitch() {
   );
 }
 
-/** External link to an embedded CIB seven webapp (cockpit, tasklist), flagged as opening a new tab. */
+/** External link to the embedded CIB seven Cockpit, flagged as opening a new tab. */
 function WebappLink({ href, label }: { href: string; label: string }) {
   return (
     <a
@@ -95,7 +95,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {item.label}
               </Link>
             ))}
-            <WebappLink href="/camunda/app/tasklist/" label={copy.nav.tasklist} />
             <WebappLink href="/camunda/app/cockpit/" label={copy.nav.cockpit} />
             <LanguageSwitch />
           </nav>

@@ -38,7 +38,17 @@ class CompleteReversalController(
             ),
             ApiResponse(
                 responseCode = "404",
-                description = "Unknown application, or no open reversal",
+                description = "Unknown application",
+                content = [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "No open reversal for this application",
                 content = [
                     Content(
                         mediaType = "application/problem+json",

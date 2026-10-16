@@ -35,8 +35,8 @@ class ReportHandoverServiceTest {
         underTest.reportHandover(id)
 
         // then: the message is correlated and the application is persisted with ACTIVE
-        verify { process.correlateHandoverReported(id) }
         verify { repository.findById(id) }
+        verify { process.correlateHandoverReported(id) }
         verify { repository.save(match { it.status == LeasingStatus.ACTIVE }) }
         confirmVerified(process, repository)
     }
@@ -46,6 +46,7 @@ class ReportHandoverServiceTest {
 
         // given: a correlation that throws
         val id = ApplicationId(UUID.fromString("123e4567-e89b-12d3-a456-426614174001"))
+        every { repository.findById(id) } returns testLeasingApplication(id = id, status = LeasingStatus.ORDERED)
         every { process.correlateHandoverReported(id) } throws RuntimeException("no token")
 
         // when / then: the exception propagates without touching the repository
@@ -54,7 +55,7 @@ class ReportHandoverServiceTest {
         } catch (_: RuntimeException) {}
 
         verify { process.correlateHandoverReported(id) }
-        verify(exactly = 0) { repository.findById(any()) }
+        verify { repository.findById(id) }
         verify(exactly = 0) { repository.save(any()) }
         confirmVerified(process, repository)
     }

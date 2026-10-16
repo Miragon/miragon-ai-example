@@ -3,6 +3,7 @@ import type { Copy } from "@/shared/i18n";
 export const LEASING_STATUSES = [
   "RECEIVED",
   "CONTRACT_SENT",
+  "CONTRACT_SIGNED",
   "ORDERED",
   "ACTIVE",
   "REJECTED",
@@ -28,6 +29,7 @@ export function statusLabel(status: LeasingStatus | string, copy: Copy): string 
 const TONES: Record<LeasingStatus, StatusTone> = {
   RECEIVED: "info",
   CONTRACT_SENT: "info",
+  CONTRACT_SIGNED: "info",
   ORDERED: "info",
   ACTIVE: "success",
   REJECTED: "danger",

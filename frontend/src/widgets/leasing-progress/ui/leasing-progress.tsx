@@ -7,12 +7,19 @@ import type { LeasingStatus } from "@/entities/leasing-application";
  * The step rail of the BPMN happy path with abgelehnt / zurückgezogen / storniert as off-ramps.
  * A status is a milestone already reached, so its step is done and the next one is in progress.
  */
-const MAIN_PATH: readonly LeasingStatus[] = ["RECEIVED", "CONTRACT_SENT", "ORDERED", "ACTIVE"];
+const MAIN_PATH: readonly LeasingStatus[] = [
+  "RECEIVED",
+  "CONTRACT_SENT",
+  "CONTRACT_SIGNED",
+  "ORDERED",
+  "ACTIVE",
+];
 
 function mainStepLabel(status: LeasingStatus, copy: Copy): string {
   const labels: Partial<Record<LeasingStatus, string>> = {
     RECEIVED: copy.progress.received,
     CONTRACT_SENT: copy.progress.contractSent,
+    CONTRACT_SIGNED: copy.progress.contractSigned,
     ORDERED: copy.progress.ordered,
     ACTIVE: copy.progress.active,
   };

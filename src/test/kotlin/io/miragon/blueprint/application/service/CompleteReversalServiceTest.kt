@@ -2,6 +2,7 @@ package io.miragon.blueprint.application.service
 
 import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
 import io.miragon.blueprint.application.port.outbound.LeasingProcess
+import io.miragon.blueprint.domain.leasing.ApplicationNotFoundException
 import io.miragon.blueprint.domain.leasing.LeasingStatus
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
 import io.mockk.Runs
@@ -39,7 +40,7 @@ class CompleteReversalServiceTest {
         val application = testLeasingApplication()
         every { repository.findById(application.id) } returns null
 
-        assertThatThrownBy { underTest.completeReversal(application.id) }.isInstanceOf(IllegalStateException::class.java)
+        assertThatThrownBy { underTest.completeReversal(application.id) }.isInstanceOf(ApplicationNotFoundException::class.java)
         verify(exactly = 0) { process.completeReversal(any()) }
     }
 }

@@ -10,6 +10,10 @@ describe("availableActions", () => {
     expect(availableActions("CONTRACT_SENT")).toEqual(["sign", "withdraw"]);
   });
 
+  it("offers only withdraw while the policy is issued and the bike is ordered", () => {
+    expect(availableActions("CONTRACT_SIGNED")).toEqual(["withdraw"]);
+  });
+
   it("offers handover and withdraw once ordered", () => {
     expect(availableActions("ORDERED")).toEqual(["handover", "withdraw"]);
   });

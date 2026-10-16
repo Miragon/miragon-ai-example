@@ -11,7 +11,7 @@ export const listLeasingApplicationsQueryPageDefault = 0;
 export const listLeasingApplicationsQuerySizeDefault = 20;
 
 export const ListLeasingApplicationsQueryParams = zod.object({
-  "status": zod.enum(['RECEIVED', 'CONTRACT_SENT', 'ORDERED', 'ACTIVE', 'REJECTED', 'WITHDRAWN', 'CANCELLED']).optional(),
+  "status": zod.enum(['RECEIVED', 'CONTRACT_SENT', 'CONTRACT_SIGNED', 'ORDERED', 'ACTIVE', 'REJECTED', 'WITHDRAWN', 'CANCELLED']).optional(),
   "page": zod.int().default(listLeasingApplicationsQueryPageDefault),
   "size": zod.int().default(listLeasingApplicationsQuerySizeDefault)
 })

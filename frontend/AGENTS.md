@@ -42,7 +42,7 @@ utilities (`text-h1` … `text-klein`) and the palette (`blau`, `gruen`, semanti
 
 ## State, forms, copy
 
-- **Polling is the point.** Every action returns 202 and the engine advances asynchronously, so the
+- **Polling is the point.** Every action except the submit (200) returns 202 and the engine advances asynchronously, so the
   detail page polls every 2 s until `isTerminal` (`ACTIVE | REJECTED | CANCELLED`) and the inbox polls
   every 2 s. Don't "fix" this away.
 - **Query keys** come from orval; `entities/leasing-application/api/keys.ts` adds the `all`

@@ -11,8 +11,8 @@ post {
 }
 
 assert {
-  res.status: eq 404
-  res.body.title: eq Resource not found
+  res.status: eq 409
+  res.body.title: eq Action not available in the current state
 }
 
 docs {

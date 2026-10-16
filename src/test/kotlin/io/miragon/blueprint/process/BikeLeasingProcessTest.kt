@@ -210,6 +210,33 @@ class BikeLeasingProcessTest {
         verify(exactly = 0) { orderBikeUseCase.orderBike(any()) }
     }
 
+    @Test
+    fun `withdrawal after the order - the back office reverses what was already done`() {
+        val id = submitUntilCreditCheck()
+        val instance = runtimeService.findProcessInstance(id)
+        process.completeCreditCheck(id, solvent = true)
+        processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskSendContract)
+        process.correlateContractSigned(id)
+        processEngine.executeJobFor(FlowNodes.EventContractSigned)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskIssueInsurancePolicy)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
+        processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
+        assertThat(instance).isWaitingAt(FlowNodes.EventHandoverReported.ELEMENT_ID)
+
+        process.correlateApplicationWithdrawn(id)
+        processEngine.executeJobFor(FlowNodes.StartEventApplicationWithdrawn)
+        process.completeReversal(id)
+        processEngine.executeJobFor(FlowNodes.UserTaskReverseApplication)
+
+        assertThat(instance)
+            .isEnded
+            .hasPassedInOrder(pathOfTheReversal())
+            .hasNotPassed(FlowNodes.EndEventLeasingActive.ELEMENT_ID)
+        verify(exactly = 1) { issueInsurancePolicyUseCase.issuePolicy(id) }
+        verify(exactly = 1) { orderBikeUseCase.orderBike(id) }
+    }
+
     private fun submitUntilCreditCheck(): ApplicationId {
         val id = submit()
         processEngine.executeJobFor(FlowNodes.StartEventLeasingRequestReceived)

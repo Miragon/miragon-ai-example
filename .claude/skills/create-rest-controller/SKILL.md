@@ -20,7 +20,7 @@ Generate or update **one** `@RestController` for one inbound port in
 class CompleteCreditCheckController(
     private val useCase: CompleteCreditCheckUseCase,
 ) {
-    @Operation(operationId = "completeCreditCheck", responses = [/* 202, 400, 404 as ProblemDetail */])
+    @Operation(operationId = "completeCreditCheck", responses = [/* 202, 400, 404, 409 as ProblemDetail */])
     @PostMapping("/{applicationId}/credit-check")
     fun completeCreditCheck(
         @PathVariable applicationId: String,
@@ -49,8 +49,10 @@ A **read** controller injects a `*Query` and maps to a `*Dto` (see `ListBikesCon
 - Request → `*Input`, response → `*Dto`, nested in the controller unless shared.
 - Return `ResponseEntity<T>`; a command that continues asynchronously answers **202**.
 - Errors are RFC 9457 problem details from `GlobalExceptionConfiguration`: `IllegalArgumentException`
-  → 400, `IllegalStateException` → 404, `MismatchingMessageCorrelationException` → 409. Document them
-  in `@Operation(responses = …)`.
+  → 400, `ApplicationNotFoundException` → 404, `ActionNotAvailableException`,
+  `MismatchingMessageCorrelationException` and `OptimisticLockingException` → 409. Look the
+  application up first (404), then let the domain guard the state (409). Document them in
+  `@Operation(responses = …)`.
 - **Always set `@Operation(operationId = "…")`** (camelCase): orval derives the hook name from it.
 - No new top-level `config` package; cross-cutting `@Configuration` goes in `adapter.inbound.rest`.
 

@@ -106,11 +106,48 @@ class LeasingApplicationTest {
     }
 
     @Test
-    fun `the terminal and withdrawal transitions set their status`() {
+    fun `the terminal transitions set their status`() {
         val application = testLeasingApplication()
         assertThat(application.activate().status).isEqualTo(LeasingStatus.ACTIVE)
         assertThat(application.reject().status).isEqualTo(LeasingStatus.REJECTED)
-        assertThat(application.withdraw().status).isEqualTo(LeasingStatus.WITHDRAWN)
         assertThat(application.cancel().status).isEqualTo(LeasingStatus.CANCELLED)
+    }
+
+    @Test
+    fun `signContract moves a sent contract to CONTRACT_SIGNED`() {
+        val sent = testLeasingApplication(status = LeasingStatus.CONTRACT_SENT)
+        assertThat(sent.signContract()).isEqualTo(sent.copy(status = LeasingStatus.CONTRACT_SIGNED))
+    }
+
+    @Test
+    fun `signContract is only available while a contract is waiting for the signature`() {
+        LeasingStatus.entries.filter { it != LeasingStatus.CONTRACT_SENT }.forEach { status ->
+            assertThatThrownBy { testLeasingApplication(status = status).signContract() }
+                .isInstanceOf(ActionNotAvailableException::class.java)
+                .hasMessage("No contract is waiting for a signature")
+        }
+    }
+
+    @Test
+    fun `withdraw is available while the application is running`() {
+        val running = listOf(
+            LeasingStatus.RECEIVED,
+            LeasingStatus.CONTRACT_SENT,
+            LeasingStatus.CONTRACT_SIGNED,
+            LeasingStatus.ORDERED,
+        )
+        running.forEach { status ->
+            assertThat(testLeasingApplication(status = status).withdraw().status).isEqualTo(LeasingStatus.WITHDRAWN)
+        }
+    }
+
+    @Test
+    fun `withdraw is refused once the application is finished or already withdrawn`() {
+        val closed = listOf(LeasingStatus.ACTIVE, LeasingStatus.REJECTED, LeasingStatus.WITHDRAWN, LeasingStatus.CANCELLED)
+        closed.forEach { status ->
+            assertThatThrownBy { testLeasingApplication(status = status).withdraw() }
+                .isInstanceOf(ActionNotAvailableException::class.java)
+                .hasMessage("An application in status $status cannot be withdrawn")
+        }
     }
 }

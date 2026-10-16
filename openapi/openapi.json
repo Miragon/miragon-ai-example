@@ -16,7 +16,7 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "enum" : [ "RECEIVED", "CONTRACT_SENT", "ORDERED", "ACTIVE", "REJECTED", "WITHDRAWN", "CANCELLED" ]
+            "enum" : [ "RECEIVED", "CONTRACT_SENT", "CONTRACT_SIGNED", "ORDERED", "ACTIVE", "REJECTED", "WITHDRAWN", "CANCELLED" ]
           }
         }, {
           "name" : "page",
@@ -123,6 +123,16 @@
               }
             }
           },
+          "404" : {
+            "description" : "Unknown application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
           "409" : {
             "description" : "The case is already finished or withdrawn",
             "content" : {
@@ -154,6 +164,16 @@
           },
           "400" : {
             "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Unknown application",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -202,7 +222,17 @@
             }
           },
           "404" : {
-            "description" : "Unknown application, or no open reversal",
+            "description" : "Unknown application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "No open reversal for this application",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -232,6 +262,16 @@
           },
           "400" : {
             "description" : "Invalid application id",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Unknown application",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -290,7 +330,17 @@
             }
           },
           "404" : {
-            "description" : "Unknown application, or no open credit check",
+            "description" : "Unknown application",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "No open credit check for this application",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -444,7 +494,7 @@
           },
           "status" : {
             "type" : "string",
-            "enum" : [ "RECEIVED", "CONTRACT_SENT", "ORDERED", "ACTIVE", "REJECTED", "WITHDRAWN", "CANCELLED" ]
+            "enum" : [ "RECEIVED", "CONTRACT_SENT", "CONTRACT_SIGNED", "ORDERED", "ACTIVE", "REJECTED", "WITHDRAWN", "CANCELLED" ]
           },
           "contractId" : {
             "type" : [ "string", "null" ]

@@ -1,7 +1,10 @@
 package io.miragon.blueprint.adapter.inbound.rest
 
+import io.miragon.blueprint.domain.leasing.ActionNotAvailableException
+import io.miragon.blueprint.domain.leasing.ApplicationNotFoundException
 import mu.KotlinLogging
 import org.cibseven.bpm.engine.MismatchingMessageCorrelationException
+import org.cibseven.bpm.engine.OptimisticLockingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -28,17 +31,23 @@ class GlobalExceptionConfiguration {
         return problem(HttpStatus.BAD_REQUEST, "Invalid request", exception.message)
     }
 
-    /** Unknown aggregate — the services signal a missing application with [IllegalStateException]. */
-    @ExceptionHandler(IllegalStateException::class)
-    fun handleIllegalState(exception: IllegalStateException): ProblemDetail {
-        log.debug { "Unprocessable: ${exception.message}" }
+    @ExceptionHandler(ApplicationNotFoundException::class)
+    fun handleNotFound(exception: ApplicationNotFoundException): ProblemDetail {
+        log.debug { "Not found: ${exception.message}" }
         return problem(HttpStatus.NOT_FOUND, "Resource not found", exception.message)
     }
 
-    /** Action not available — the process token is no longer at the expected wait state. */
-    @ExceptionHandler(MismatchingMessageCorrelationException::class)
-    fun handleMismatchingCorrelation(exception: MismatchingMessageCorrelationException): ProblemDetail {
-        log.debug { "Mismatching correlation: ${exception.message}" }
+    /**
+     * Action not available — the application's status forbids it, the process token is no longer at
+     * the expected wait state, no such task is open, or a job changed the instance concurrently.
+     */
+    @ExceptionHandler(
+        ActionNotAvailableException::class,
+        MismatchingMessageCorrelationException::class,
+        OptimisticLockingException::class,
+    )
+    fun handleActionNotAvailable(exception: RuntimeException): ProblemDetail {
+        log.debug { "Action not available: ${exception.message}" }
         return problem(HttpStatus.CONFLICT, "Action not available in the current state", exception.message)
     }
 

@@ -10,6 +10,7 @@ export type LeasingAction = "sign" | "handover" | "withdraw";
 const ACTIONS_BY_STATUS: Record<LeasingStatus, LeasingAction[]> = {
   RECEIVED: ["withdraw"],
   CONTRACT_SENT: ["sign", "withdraw"],
+  CONTRACT_SIGNED: ["withdraw"],
   ORDERED: ["handover", "withdraw"],
   ACTIVE: [],
   REJECTED: [],

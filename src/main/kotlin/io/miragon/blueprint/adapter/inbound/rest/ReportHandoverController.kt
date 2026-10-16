@@ -34,6 +34,16 @@ class ReportHandoverController(
                 ],
             ),
             ApiResponse(
+                responseCode = "404",
+                description = "Unknown application",
+                content = [
+                    Content(
+                        mediaType = "application/problem+json",
+                        schema = Schema(implementation = ProblemDetail::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
                 responseCode = "409",
                 description = "The case is not waiting for the handover",
                 content = [

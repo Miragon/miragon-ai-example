@@ -12,6 +12,7 @@ export type ListLeasingApplicationsStatus = typeof ListLeasingApplicationsStatus
 export const ListLeasingApplicationsStatus = {
   RECEIVED: 'RECEIVED',
   CONTRACT_SENT: 'CONTRACT_SENT',
+  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
   ORDERED: 'ORDERED',
   ACTIVE: 'ACTIVE',
   REJECTED: 'REJECTED',

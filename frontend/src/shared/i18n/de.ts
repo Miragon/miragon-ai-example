@@ -12,7 +12,6 @@ export const de = {
     tasks: "aufgaben",
     newApplication: "neuer antrag",
     cockpit: "cockpit",
-    tasklist: "tasklist",
     language: "sprache",
   },
   common: {
@@ -25,6 +24,7 @@ export const de = {
   status: {
     RECEIVED: "eingegangen",
     CONTRACT_SENT: "vertrag versendet",
+    CONTRACT_SIGNED: "vertrag unterschrieben",
     ORDERED: "bestellt",
     ACTIVE: "aktiv",
     REJECTED: "abgelehnt",
@@ -82,6 +82,7 @@ export const de = {
     title: "prozessverlauf",
     received: "eingegangen",
     contractSent: "vertrag versendet",
+    contractSigned: "vertrag unterschrieben",
     ordered: "bestellt",
     active: "aktiv",
     rejected: "abgelehnt",
@@ -100,6 +101,7 @@ export const de = {
     handoverSuccess: "übergabe wurde gemeldet.",
     withdrawSuccess: "antrag wurde zurückgezogen.",
     creditCheckPendingNote: "das back office prüft gerade die bonität.",
+    orderPendingNote: "versicherung und bestellung laufen, danach meldet der händler die übergabe.",
     reversalPendingTitle: "antrag zurückgezogen",
     reversalPendingNote:
       "das back office wickelt den antrag in den aufgaben rück, dann wechselt der status auf storniert.",

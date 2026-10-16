@@ -2,6 +2,7 @@ package io.miragon.blueprint.adapter.outbound.cibseven
 
 import io.miragon.blueprint.adapter.process.BikeLeasingProcessProcessApi.FlowNodes
 import io.miragon.blueprint.adapter.process.Messages
+import io.miragon.blueprint.domain.leasing.ActionNotAvailableException
 import io.miragon.blueprint.domain.leasing.ApplicationId
 import io.miragon.blueprint.domain.leasing.BackOfficeTask
 import io.miragon.blueprint.domain.leasing.BackOfficeTaskType
@@ -84,7 +85,7 @@ class LeasingProcessAdapterTest {
         openTaskQuery(null)
 
         assertThatThrownBy { underTest.completeReversal(id) }
-            .isInstanceOf(IllegalStateException::class.java)
+            .isInstanceOf(ActionNotAvailableException::class.java)
             .hasMessage("No open 'userTask_reverseApplication' task for business key ${id.value}")
         verify(exactly = 0) { taskService.complete(any(), any()) }
     }

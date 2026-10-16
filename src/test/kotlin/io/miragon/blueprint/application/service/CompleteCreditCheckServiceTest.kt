@@ -2,6 +2,7 @@ package io.miragon.blueprint.application.service
 
 import io.miragon.blueprint.application.port.outbound.LeasingApplicationRepository
 import io.miragon.blueprint.application.port.outbound.LeasingProcess
+import io.miragon.blueprint.domain.leasing.ApplicationNotFoundException
 import io.miragon.blueprint.domain.leasing.testLeasingApplication
 import io.mockk.Runs
 import io.mockk.confirmVerified
@@ -36,7 +37,7 @@ class CompleteCreditCheckServiceTest {
         every { repository.findById(application.id) } returns null
 
         assertThatThrownBy { underTest.completeCreditCheck(application.id, solvent = true) }
-            .isInstanceOf(IllegalStateException::class.java)
+            .isInstanceOf(ApplicationNotFoundException::class.java)
         verify(exactly = 0) { process.completeCreditCheck(any(), any()) }
     }
 }

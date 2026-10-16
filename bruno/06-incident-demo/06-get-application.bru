@@ -12,7 +12,7 @@ get {
 
 assert {
   res.status: eq 200
-  res.body.status: eq CONTRACT_SENT
+  res.body.status: eq CONTRACT_SIGNED
   res.body.policyId: isString
   res.body.orderId: isNull
 }

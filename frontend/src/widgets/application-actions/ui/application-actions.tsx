@@ -46,6 +46,9 @@ export function ApplicationActions({
           {status === "RECEIVED" ? (
             <p className="text-body text-schwarz/70">{copy.actions.creditCheckPendingNote}</p>
           ) : null}
+          {status === "CONTRACT_SIGNED" ? (
+            <p className="text-body text-schwarz/70">{copy.actions.orderPendingNote}</p>
+          ) : null}
           {actions.length > 0 ? (
             <div className="flex flex-wrap gap-3">
               {actions.includes("sign") ? (

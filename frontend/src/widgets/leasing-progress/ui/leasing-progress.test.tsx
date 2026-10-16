@@ -10,7 +10,7 @@ describe("LeasingProgress", () => {
     expect(circleOf("eingegangen").className).toContain("bg-success");
     expect(circleOf("vertrag versendet").className).toContain("bg-success");
     expect(screen.getByText("vertrag versendet").className).not.toContain("font-medium");
-    expect(screen.getByText("bestellt").className).toContain("font-medium");
+    expect(screen.getByText("vertrag unterschrieben").className).toContain("font-medium");
     expect(circleOf("aktiv").className).toContain("bg-grau");
   });
 

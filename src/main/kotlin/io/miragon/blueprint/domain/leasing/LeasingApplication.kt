@@ -34,6 +34,11 @@ data class LeasingApplication(
     fun sendContract(contractId: ContractId): LeasingApplication =
         copy(contractId = contractId, status = LeasingStatus.CONTRACT_SENT)
 
+    fun signContract(): LeasingApplication {
+        if (status != LeasingStatus.CONTRACT_SENT) throw ActionNotAvailableException("No contract is waiting for a signature")
+        return copy(status = LeasingStatus.CONTRACT_SIGNED)
+    }
+
     fun documentOrder(orderId: OrderId): LeasingApplication =
         copy(orderId = orderId, status = LeasingStatus.ORDERED)
 
@@ -43,12 +48,18 @@ data class LeasingApplication(
 
     fun reject(): LeasingApplication = copy(status = LeasingStatus.REJECTED)
 
-    fun withdraw(): LeasingApplication = copy(status = LeasingStatus.WITHDRAWN)
+    fun withdraw(): LeasingApplication {
+        if (status !in WITHDRAWABLE) throw ActionNotAvailableException("An application in status $status cannot be withdrawn")
+        return copy(status = LeasingStatus.WITHDRAWN)
+    }
 
     fun cancel(): LeasingApplication = copy(status = LeasingStatus.CANCELLED)
 
     companion object {
         const val ADULT_AGE = 18
+
+        private val WITHDRAWABLE =
+            setOf(LeasingStatus.RECEIVED, LeasingStatus.CONTRACT_SENT, LeasingStatus.CONTRACT_SIGNED, LeasingStatus.ORDERED)
 
         fun receive(
             id: ApplicationId,

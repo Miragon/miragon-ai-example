@@ -10,7 +10,6 @@ export const en: Copy = {
     tasks: "tasks",
     newApplication: "new application",
     cockpit: "cockpit",
-    tasklist: "tasklist",
     language: "language",
   },
   common: {
@@ -23,6 +22,7 @@ export const en: Copy = {
   status: {
     RECEIVED: "received",
     CONTRACT_SENT: "contract sent",
+    CONTRACT_SIGNED: "contract signed",
     ORDERED: "ordered",
     ACTIVE: "active",
     REJECTED: "rejected",
@@ -80,6 +80,7 @@ export const en: Copy = {
     title: "process flow",
     received: "received",
     contractSent: "contract sent",
+    contractSigned: "contract signed",
     ordered: "ordered",
     active: "active",
     rejected: "rejected",
@@ -98,6 +99,8 @@ export const en: Copy = {
     handoverSuccess: "the handover was reported.",
     withdrawSuccess: "the application was withdrawn.",
     creditCheckPendingNote: "the back office is checking the credit rating.",
+    orderPendingNote:
+      "the insurance policy and the order are on their way, then the dealer reports the handover.",
     reversalPendingTitle: "application withdrawn",
     reversalPendingNote:
       "the back office reverses the application in the tasks, then the status changes to cancelled.",
