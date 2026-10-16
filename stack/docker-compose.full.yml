@@ -3,7 +3,7 @@
 #
 # Build the service image first:  ./gradlew bootBuildImage
 # Then:                           docker compose -f stack/docker-compose.full.yml up --build
-# Frontend on http://localhost:8090 · service on http://localhost:8081 · Cockpit on :8090/camunda.
+# Frontend on http://localhost:8090 · service on http://localhost:8081 · Cockpit on :8090/webapp/#/seven/auth/start.
 
 name: bikeleasing-full
 

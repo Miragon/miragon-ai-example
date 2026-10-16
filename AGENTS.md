@@ -120,12 +120,12 @@ npm --prefix frontend ci && npm --prefix frontend run dev
 
 | What | Port |
 |---|---|
-| Frontend (Vite dev server, proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda` to 8081) | 5173 |
+| Frontend (Vite dev server, proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda`, `/webapp` to 8081) | 5173 |
 | Frontend in a container (nginx, `stack/docker-compose.full.yml`) | 8090 |
 | Postgres | 5432 |
 | Backend (REST + `/engine-rest`) | 8081 |
-| CIB seven Cockpit / Tasklist / Admin | 8081/camunda (admin/admin) |
-| CIB seven webclient (new UI) | 8081/webapp (admin/admin) |
+| CIB seven webclient: Cockpit / Tasklist / Admin (entry point, linked as "cockpit" in the frontend) | 8081/webapp/#/seven/auth/start (admin/admin) |
+| CIB seven classic webapps | 8081/camunda (admin/admin) |
 | OpenAPI spec · Swagger UI | 8081/v3/api-docs · 8081/swagger-ui.html |
 | Actuator (health/liveness/readiness · prometheus) | 8081/actuator |
 

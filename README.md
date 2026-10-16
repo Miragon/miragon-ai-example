@@ -54,7 +54,7 @@ npm --prefix frontend ci && npm --prefix frontend run dev   # frontend on :5173
 | What | URL | Login |
 |---|---|---|
 | Frontend (applications, new application, back-office inbox) | <http://localhost:5173> | |
-| CIB seven Cockpit (operations) | <http://localhost:8081/camunda> | admin / admin |
+| CIB seven Cockpit (operations) | <http://localhost:8081/webapp/#/seven/auth/start> | admin / admin |
 | Swagger UI | <http://localhost:8081/swagger-ui.html> | |
 
 Demo cases in every state: `cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local`.

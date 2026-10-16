@@ -10,8 +10,8 @@ then the components inside the service. It draws only what runs today.
 A C4 container is a unit you deploy and run on its own. The system has three:
 
 - the **Frontend**, a React single-page app ([ADR-0018][adr18]). In development the Vite dev server
-  serves it on port 5173 and proxies `/api`, `/v3/api-docs`, `/engine-rest` and `/camunda` to the
-  service, so the browser sees one origin. In a container, nginx serves the built app and proxies the
+  serves it on port 5173 and proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda` and `/webapp`
+  to the service, so the browser sees one origin. In a container, nginx serves the built app and proxies the
   same paths ([Dockerfile][fe-docker], [nginx.conf][fe-nginx]; port 8090 in
   [docker-compose.full.yml][compose-full]).
 - the **Bike-leasing service**. The REST API, the CIB seven process engine and the CIB seven webapps

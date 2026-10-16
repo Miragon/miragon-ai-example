@@ -47,7 +47,7 @@ step                             min  clock  open
 9  Closing                        1    31
 ```
 
-Cockpit: http://localhost:8081/camunda/app/cockpit/default/ (admin/admin). The fallback for every
+Cockpit: http://localhost:8081/webapp/#/seven/auth/start (admin/admin; the "cockpit" link in the frontend opens it). The fallback for every
 picture is [docs/assets/](../assets/). Running late? Show only the system context in step 4, and
 skip the parts marked "optional" in step 6.
 

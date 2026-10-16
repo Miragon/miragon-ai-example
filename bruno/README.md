@@ -23,7 +23,7 @@ npx --yes @usebruno/cli@4.0.0 run . --env local -r
 | `06-incident-demo` | the dealer is down for `BIKE-FAIL`: the order job runs out of retries and raises an incident (about 30 s) |
 
 Run `00-demo-data` on its own to prepare a live demo: the frontend list and the inbox at
-`http://localhost:5173` then show cases in every state, and Cockpit at `http://localhost:8081/camunda`
+`http://localhost:5173` then show cases in every state, and Cockpit at `http://localhost:8081/webapp/#/seven/auth/start`
 (admin/admin) shows the running instances. Every run adds six new cases; reset the database
 (`docker compose -f stack/docker-compose.yml down -v`) for a clean demo:
 

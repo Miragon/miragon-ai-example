@@ -41,12 +41,12 @@ npm --prefix frontend run dev
 | Frontend (Vite dev server) | 5173 |
 | Postgres | 5432 |
 | Backend (REST + `/engine-rest`) | 8081 |
-| CIB seven Cockpit / Tasklist / Admin | 8081/camunda (admin/admin) |
-| CIB seven webclient (new UI) | 8081/webapp (admin/admin) |
+| CIB seven webclient: Cockpit / Tasklist / Admin (entry point) | 8081/webapp/#/seven/auth/start (admin/admin) |
+| CIB seven classic webapps | 8081/camunda (admin/admin) |
 | OpenAPI spec · Swagger UI | 8081/v3/api-docs · 8081/swagger-ui.html |
 | Actuator (health · liveness/readiness · prometheus) | 8081/actuator |
 
-So: <http://localhost:5173> (the frontend), <http://localhost:8081/camunda>, <http://localhost:8081/webapp>,
+So: <http://localhost:5173> (the frontend), <http://localhost:8081/webapp/#/seven/auth/start> (Cockpit),
 <http://localhost:8081/swagger-ui.html> and <http://localhost:8081/actuator/health> (status `UP`).
 
 Under Conductor the ports are fixed and the workspace runs `nonconcurrent` (see

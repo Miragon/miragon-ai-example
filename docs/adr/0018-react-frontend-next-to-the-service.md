@@ -27,8 +27,8 @@ project at the root ([ADR-0014](0014-one-kotlin-gradle-stack-at-the-repo-root.md
 - **Structure:** Feature-Sliced Design, checked by steiger and ESLint import rules; knip finds dead
   code.
 - **Tests:** Vitest with MSW for units and pages, Playwright end to end against the running stack.
-- **Dev serving:** Vite on port **5173** proxies `/api`, `/v3/api-docs`, `/engine-rest` and
-  `/camunda` to the service on 8081, so the browser sees one origin and the service needs no CORS.
+- **Dev serving:** Vite on port **5173** proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda`
+  and `/webapp` to the service on 8081, so the browser sees one origin and the service needs no CORS.
 
 ## Consequences
 

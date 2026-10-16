@@ -65,5 +65,5 @@ utilities (`text-h1` … `text-klein`) and the palette (`blau`, `gruen`, semanti
 
 `npm run verify` runs `format:check → lint → lint:fsd → lint:deadcode → typecheck → test`. Others:
 `dev build typecheck test api:generate api:check e2e`. The dev server runs on 5173 and proxies
-`/api`, `/v3/api-docs`, `/engine-rest` and `/camunda` to the backend on 8081 (`nginx.conf` does the
+`/api`, `/v3/api-docs`, `/engine-rest`, `/camunda` and `/webapp` to the backend on 8081 (`nginx.conf` does the
 same in the container). Playwright specs in `e2e/` drive the real app against a running backend.

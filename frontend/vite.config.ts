@@ -24,6 +24,7 @@ export default defineConfig({
       "/v3/api-docs": BACKEND,
       "/engine-rest": BACKEND,
       "/camunda": BACKEND,
+      "/webapp": BACKEND,
     },
   },
 });

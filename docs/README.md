@@ -153,7 +153,7 @@ decisions, so they live in CONTRIBUTING.md and AGENTS.md.
 - Open issues labelled `todo` and `process:bike-leasing` appear in designIQ as todos on the
   executable process, pinned to the element they extend.
 - Running instances of the executable process show in the CIB seven Cockpit of the running
-  service (http://localhost:8081/camunda, admin/admin). Customers and the back office work in the
+  service (http://localhost:8081/webapp/#/seven/auth/start, admin/admin). Customers and the back office work in the
   frontend (http://localhost:5173), the back office in its inbox ([ADR-0019][a19]).
 
 Recommended demo order:

@@ -46,7 +46,7 @@ REST API.
 | Question | Answer in this example |
 |---|---|
 | Where does the customer submit the request? | In the frontend (`/antraege/neu`), which calls the REST API `/api/bike-leasing`. The same page lists the applications and shows each one with its actions (sign, withdraw). |
-| Which roles work at the edge of the process? | The back office decides the credit check and confirms the reversal in the frontend inbox (`/aufgaben`, [ADR-0019][adr19]). Operations watches running cases and incidents in the CIB seven Cockpit at `/camunda`. |
+| Which roles work at the edge of the process? | The back office decides the credit check and confirms the reversal in the frontend inbox (`/aufgaben`, [ADR-0019][adr19]). Operations watches running cases and incidents in the CIB seven Cockpit of the webclient (`/webapp/#/seven/auth/start`). |
 | Which systems deliver or receive data? | Contract system, notification channel, insurer and dealer system, all simulated. Make, buy or adapt is open for three of them: [#8 Contract & e-signature][i8], [#9 Customer notification][i9], [#10 Dealer integration][i10]. **Assumption:** the insurer is a partner whose integration has no decision issue yet. |
 | Where does the process control live? | In the CIB seven engine embedded in the service ([container view](c4-container.md)). The credit check is no external system and no rule: a person decides it in the inbox. Automating it with the DMN `checkCreditRating` is [#19][i19]. |
 

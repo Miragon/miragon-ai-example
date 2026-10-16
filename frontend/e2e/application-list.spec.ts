@@ -28,3 +28,12 @@ test("application list: a new application shows up under its status and opens fr
   await expect(page).toHaveURL(new RegExp(`/antraege/${applicationId}$`));
   await expectStatus(page, "eingegangen");
 });
+
+test("the cockpit link opens the CIB seven webclient through the dev proxy", async ({ page }) => {
+  await page.goto("/");
+  const cockpit = page.getByRole("link", { name: /cockpit/ });
+  await expect(cockpit).toHaveAttribute("href", "/webapp/#/seven/auth/start");
+
+  const webclient = await page.request.get("/webapp/");
+  expect(webclient.ok()).toBe(true);
+});
