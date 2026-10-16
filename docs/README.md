@@ -1,7 +1,7 @@
 # Documentation
 
 This folder is the designIQ workspace of the repository. The root `designiq.yml` says
-`models: docs` ([ADR-0016][a16]). It holds the business and architecture material for the MiraVelo
+`models: docs` ([ADR-0008][a08]). It holds the business and architecture material for the MiraVelo
 bike-leasing use case, the decisions, the demo, and the executable process model that the service
 deploys.
 
@@ -88,26 +88,26 @@ decisions, so they live in CONTRIBUTING.md and the AGENTS.md files.
 | [0002][a02] | Hexagonal backend, enforced by ArchUnit and Konsist                  | Accepted |
 | [0003][a03] | OpenAPI as the checked-in contract                                   | Accepted |
 | [0004][a04] | Mutation testing as a blocking gate at 80                            | Accepted |
-| [0008][a08] | Track the latest stable major versions                               | Accepted |
-| [0010][a10] | Flyway owns the database schema                                      | Accepted |
-| [0011][a11] | Operability and delivery: OCI images, probes and metrics             | Accepted |
-| [0016][a16] | `docs/` is the designIQ workspace                                    | Accepted |
-| [0018][a18] | React frontend next to the service                                   | Accepted |
-| [0019][a19] | Back-office task UI: own inbox in the frontend                       | Accepted |
-| [0020][a20] | Embedded CIB seven, delegates by expression, a generated process API | Accepted |
+| [0005][a05] | Track the latest stable major versions                               | Accepted |
+| [0006][a06] | Flyway owns the database schema                                      | Accepted |
+| [0007][a07] | Operability and delivery: OCI images, probes and metrics             | Accepted |
+| [0008][a08] | `docs/` is the designIQ workspace                                    | Accepted |
+| [0009][a09] | React frontend next to the service                                   | Accepted |
+| [0010][a10] | Back-office task UI: own inbox in the frontend                       | Accepted |
+| [0011][a11] | Embedded CIB seven, delegates by expression, a generated process API | Accepted |
 
 [a00]: adr/0000-adr-template.md
 [a01]: adr/0001-record-architecture-decisions.md
 [a02]: adr/0002-hexagonal-architecture-for-the-backend.md
 [a03]: adr/0003-openapi-as-the-checked-in-contract.md
 [a04]: adr/0004-mutation-testing-as-a-blocking-pr-gate.md
-[a08]: adr/0008-track-the-latest-major-versions.md
-[a10]: adr/0010-flyway-for-database-migrations.md
-[a11]: adr/0011-build-and-deployment-approach.md
-[a16]: adr/0016-docs-is-the-designiq-workspace.md
-[a18]: adr/0018-react-frontend-next-to-the-service.md
-[a19]: adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md
-[a20]: adr/0020-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
+[a05]: adr/0005-track-the-latest-major-versions.md
+[a06]: adr/0006-flyway-for-database-migrations.md
+[a07]: adr/0007-build-and-deployment-approach.md
+[a08]: adr/0008-docs-is-the-designiq-workspace.md
+[a09]: adr/0009-react-frontend-next-to-the-service.md
+[a10]: adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md
+[a11]: adr/0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
 
 ## Demo
 
@@ -138,7 +138,7 @@ decisions, so they live in CONTRIBUTING.md and the AGENTS.md files.
   executable process, pinned to the element they extend.
 - Running instances of the executable process show in the CIB seven Cockpit of the running
   service (http://localhost:8081/webapp/#/seven/auth/start, admin/admin). Customers and the back office work in the
-  frontend (http://localhost:5173), the back office in its inbox ([ADR-0019][a19]).
+  frontend (http://localhost:5173), the back office in its inbox ([ADR-0010][a10]).
 
 Recommended demo order:
 

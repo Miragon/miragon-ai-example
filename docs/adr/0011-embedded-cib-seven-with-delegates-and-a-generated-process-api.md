@@ -1,4 +1,4 @@
-# 0020 — Embedded CIB seven, delegates by expression, a generated process API
+# 0011 — Embedded CIB seven, delegates by expression, a generated process API
 
 - **Status:** Accepted
 - **Date:** 2026-10-16
@@ -51,7 +51,7 @@ Reasons:
   "Deviations from the source model").
 - One deployable with no separate engine or worker process; the service changes domain state and
   completes a user task in one transaction (as the inbox relies on,
-  [ADR-0019](0019-back-office-task-ui-own-inbox-in-the-frontend.md)) (⚠ reconstructed, to be
+  [ADR-0010](0010-back-office-task-ui-own-inbox-in-the-frontend.md)) (⚠ reconstructed, to be
   confirmed).
 - Generated constants turn a model change that breaks the code into a compile error instead of a
   runtime failure (⚠ reconstructed, to be confirmed).

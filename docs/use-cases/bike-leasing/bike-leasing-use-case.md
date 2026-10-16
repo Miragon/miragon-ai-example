@@ -36,13 +36,13 @@ These points come from the rules in the model. They are not measured incidents.
 The process uses four external systems. In this repo all four are simulated and only log: the
 contract system, the insurer, the notification channel and the dealer system.
 
-The React frontend (`frontend/`, [ADR-0018](../../adr/0018-react-frontend-next-to-the-service.md))
+The React frontend (`frontend/`, [ADR-0009](../../adr/0009-react-frontend-next-to-the-service.md))
 shows both sides of the case: the application list (`/`), the request form (`/antraege/neu`), the
 application detail (`/antraege/{id}`) and the back-office inbox (`/aufgaben`). In the demo, the
 detail page also plays the customer's and the dealer's part with its "sign contract", "report
 handover" and "withdraw" buttons. Bruno and the Swagger UI make the same REST calls. The back office
 works in the inbox, not in the CIB seven Tasklist: completing a task there would bypass the domain
-([ADR-0019](../../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
+([ADR-0010](../../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md)).
 
 ## Trigger, goal and outcomes
 
@@ -114,7 +114,7 @@ process elements it touches.
 | Stage 4 – Portal | [#7] | Show live dealer availability in the bike catalogue |
 
 The rebase onto the new core delivered [#2] (insurance policy in parallel), [#5] (back-office inbox),
-[#6] (application list) and decided [#11] (own inbox, ADR-0019). These issues close with it.
+[#6] (application list) and decided [#11] (own inbox, ADR-0010). These issues close with it.
 
 ## Open decisions
 
@@ -126,7 +126,7 @@ explain the options.
 | [#8] | Contract issuing and e-signature: make, buy or adapt? | simulated contract system; the "sign contract" button stands in for the signature |
 | [#9] | Channel for customer notifications | simulated, messages are only logged |
 | [#10] | How to integrate the bike dealer | simulated dealer with a fixed catalogue (`BIKE-FAIL` for the outage) |
-| [#11] | Back-office task UI | decided: own inbox in the frontend ([ADR-0019](../../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)) |
+| [#11] | Back-office task UI | decided: own inbox in the frontend ([ADR-0010](../../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md)) |
 
 ## Where to look next
 

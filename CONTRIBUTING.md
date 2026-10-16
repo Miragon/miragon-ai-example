@@ -9,7 +9,7 @@ file covers how to work on it.
 ```bash
 git clone git@github.com:miragon-blueprints/miragon-ai-example.git
 cd miragon-ai-example
-npm ci && npm run hooks:install   # bpmnlint + the pre-commit hook
+npm ci && npm run hooks:install   # bpmnlint, bpmn-cli, operate + the pre-commit hook
 npm --prefix frontend ci          # the frontend
 ```
 
@@ -51,9 +51,9 @@ So: <http://localhost:5173> (the frontend), <http://localhost:8081/webapp/#/seve
 <http://localhost:8081/swagger-ui.html> and <http://localhost:8081/actuator/health> (status `UP`).
 
 This table is the only place the ports are listed; `frontend/vite.config.ts`,
-`frontend/playwright.config.ts` and `.conductor/settings.toml` must match it. The ports are fixed on
-purpose: under Conductor the workspace runs `nonconcurrent`, so only one worktree runs the stack at a
-time. Per-worktree URLs (portless) would only cover the Vite server; the backend, Postgres and the
+`frontend/playwright.config.ts`, `.conductor/settings.toml` and `.operate.json` must match it. The
+ports are fixed on purpose: under Conductor the workspace runs `nonconcurrent`, so only one worktree
+runs the stack at a time. Per-worktree URLs (portless) would only cover the Vite server; the backend, Postgres and the
 shared engine schema would still collide.
 
 ## Commands
@@ -70,6 +70,8 @@ From the repo root:
 | Regenerate the frontend API client after a contract change | `npm --prefix frontend run api:generate` |
 | Frontend end-to-end tests (running stack and dev server) | `npm --prefix frontend run e2e` |
 | Lint the executable BPMN models | `npm run lint:bpmn` |
+| Read, change, validate or render a BPMN model | `npx bpmn show <file>`, `npx bpmn guide --short` |
+| Where a running case waits, open incidents (running backend) | `npx operate inspect --business-key <applicationId>`, `npx operate status` |
 | Validate the designIQ models under `docs/` | `npx --yes @miragon/design-iq-validator@5.3.0 --root .` |
 | Build the OCI image | `./gradlew bootBuildImage` |
 
@@ -116,7 +118,7 @@ start Postgres and the service again, and load `00-demo-data` again.
 
 The dev loop above runs the backend from source. To run it as a container instead, build the OCI
 image (Spring buildpacks, no Dockerfile) and run it against the Postgres compose stack. The rationale
-is in [ADR-0011](docs/adr/0011-build-and-deployment-approach.md).
+is in [ADR-0007](docs/adr/0007-build-and-deployment-approach.md).
 
 Build the image. It produces `miravelo/cibseven-embedded-example:1.0-SNAPSHOT`:
 
@@ -196,10 +198,10 @@ the environment and win over the defaults:
 - **Changing the database schema?** Flyway owns it. Add a new forward-only migration
   `V{n}__description.sql` under `service/app/src/main/resources/db/migration/` in the same change as the entity
   edit, and never edit an applied migration. Hibernate runs `validate`, so a mismatch fails startup.
-  See [ADR-0010](docs/adr/0010-flyway-for-database-migrations.md).
+  See [ADR-0006](docs/adr/0006-flyway-for-database-migrations.md).
 - **Changing a design artifact?** Everything under `docs/` is a designIQ model and must pass the
   designIQ validator. The executable process validates clean; the only accepted errors are the known
-  ones on the frozen original ([ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md)). Keep file stems unique under
+  ones on the frozen original ([ADR-0008](docs/adr/0008-docs-is-the-designiq-workspace.md)). Keep file stems unique under
   `docs/`, keep BPMN diagrams complete (BPMNDI), and write Markdown that reads well as plain text.
 
 ## Before opening a PR
@@ -227,7 +229,11 @@ Dependabot proposes updates; patch and minor updates merge automatically once CI
 merged by hand. `.github/dependabot.yml` carries no `ignore` entries. When an update cannot be taken
 yet, comment `@dependabot ignore this major version` (or `minor version` / `dependency`) on its pull
 request and open an issue for the blocker, so the update comes back once it is fixable
-([ADR-0008](docs/adr/0008-track-the-latest-major-versions.md)).
+([ADR-0005](docs/adr/0005-track-the-latest-major-versions.md)).
+
+bpmn-cli and operate are not covered by Dependabot. Bump each one by hand in two places together:
+its exact version in the root `package.json` and the `ref` of its marketplace in
+`.claude/settings.json`.
 
 ## Reporting bugs / requesting features
 

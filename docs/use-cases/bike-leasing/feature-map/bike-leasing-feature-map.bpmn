@@ -17,7 +17,7 @@
   </bpmn:collaboration>
   <bpmn:process id="fmap_process_bikeLeasing" name="Bike leasing — feature map" isExecutable="false">
     <bpmn:extensionElements>
-      <bpmiq:sticky id="fmap_sticky_f11Decided" text="#11 decided (ADR-0019): both human tasks are in the frontend inbox" x="175" y="362" kind="note" width="230" height="56" />
+      <bpmiq:sticky id="fmap_sticky_f11Decided" text="#11 decided (ADR-0010): both human tasks are in the frontend inbox" x="175" y="362" kind="note" width="230" height="56" />
       <bpmiq:sticky id="fmap_sticky_f19CreditCheckDmn" text="#19 Credit check by DMN (Stage 2)" x="440" y="362" kind="note" width="160" height="56" />
       <bpmiq:sticky id="fmap_sticky_f1Shorthand" text="Shorthand: 7 days after sending. #1 lists two ways to model it." x="465" y="280" kind="note" width="190" height="62" />
       <bpmiq:sticky id="fmap_sticky_f1SignatureReminder" text="#1 Signature reminder (Stage 1)" x="925" y="270" kind="note" width="145" height="56" />

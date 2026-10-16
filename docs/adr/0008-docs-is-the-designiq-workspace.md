@@ -1,4 +1,4 @@
-# 0016 — `docs/` is the designIQ workspace
+# 0008 — `docs/` is the designIQ workspace
 
 - **Status:** Accepted
 - **Date:** 2026-10-16

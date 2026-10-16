@@ -1,4 +1,4 @@
-# 0010 — Flyway owns the database schema
+# 0006 — Flyway owns the database schema
 
 - **Status:** Accepted
 - **Date:** 2026-10-16

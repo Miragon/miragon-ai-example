@@ -23,10 +23,13 @@ The executable model validates clean; the frozen original keeps its 9 known erro
 ## 3. The rendered image
 
 ```bash
-npx --yes bpmn-to-image@0.10.0 --scale 2 <path-to-bpmn>:.context/verify/<name>.png
+npx bpmn render <path-to-bpmn> --problems -o .context/verify/<name>.png
 ```
 
-A model that does not render is a finding. Read the PNG, not `<dc:Bounds>`, and check in order:
+`--problems` numbers the layout problems bpmn-cli finds in the picture. Its drawing is close to
+bpmn-js, not identical: the PNG in `docs/assets/` keeps coming from
+`npx --yes bpmn-to-image@0.10.0 --scale 2 <path-to-bpmn>:<png>`. A model that does not render is a
+finding. Read the PNG, not `<dc:Bounds>`, and check in order:
 
 - **Visibility:** every element drawn; a flow ending in empty space means a missing shape. Expected off
   the main flow: the event subprocess *Application withdrawn* and the error boundary *Application

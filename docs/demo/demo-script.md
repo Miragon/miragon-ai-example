@@ -5,7 +5,7 @@ repository. Each step says what to open, what to do, what to say and what the au
 rehearsal actually showed is in [rehearsal-log.md](rehearsal-log.md).
 
 > **Not rehearsed yet (2026-10-16):** this script was rewritten for the new process and the
-> frontend ([executable-process.md][exec], [ADR-0018][a18], [ADR-0019][a19]). The stack and its tests were checked
+> frontend ([executable-process.md][exec], [ADR-0009][a09], [ADR-0010][a10]). The stack and its tests were checked
 > on that day; the walk-through and every designIQ step were not. Rehearse once before the first
 > live run and record it in the rehearsal log.
 
@@ -130,7 +130,7 @@ on the canvas.
 3. The three "Open" annotations: #8 Contract & e-signature, #9 Customer notification, #10 Dealer
    integration. Select "Contract & e-signature", then the "Open link" icon in its context pad (a
    tooltip, not a label): issue #8 opens.
-4. One decision is taken: the note "Decided (ADR-0019): own inbox". The Tasklist with our own form
+4. One decision is taken: the note "Decided (ADR-0010): own inbox". The Tasklist with our own form
    was the Adapt option; the own inbox won, because task data then goes through the domain.
 5. Annotation 4: the credit check is manual today. That comes back in step 7.
 
@@ -216,7 +216,7 @@ process API is generated from it. Code that names a removed step no longer compi
 1. "neuer antrag" (new application): "Ada Audience", `ada@example.com`, age 35, monthly net income
    3500, bike "Gravel Explorer 900", "antrag absenden". Status "eingegangen" (received).
 2. "aufgaben" (tasks): a "bonitätsprüfung" (credit check) for Ada with age, income and bike. Open it
-   ("bearbeiten") and choose "solvent". This is our own inbox, not the Tasklist ([ADR-0019][a19]):
+   ("bearbeiten") and choose "solvent". This is our own inbox, not the Tasklist ([ADR-0010][a10]):
    the decision goes through a domain endpoint, not into process variables.
 3. Ada's page (via "anträge"): "vertrag versendet" (contract sent); the terminal logs "Notifying
    ada@example.com: Please review and sign your leasing contract".
@@ -317,20 +317,20 @@ the agent what a feature touches, and it refuses what breaks the rules."
 
 - **Is the BPMN in designIQ really the deployed one?** Yes: Gradle packages
   `docs/use-cases/bike-leasing/process/*.bpmn`, the engine deploys it, and the process API is
-  generated from the same file ([ADR-0016][a16]).
+  generated from the same file ([ADR-0008][a08]).
 - **What if the business edits the executable model in designIQ?** The release becomes a pull request
   and CI tests it. A developer adds engine attributes and regenerates the process API in that PR.
 - **Why is the process so small?** On purpose: a model a business audience reads in one
   look ([executable-process.md][exec]). The [scope comparison](../use-cases/bike-leasing/original/scope-comparison.md)
   maps every capability of the 43-node original to the core or to an issue.
 - **Why not the CIB seven Tasklist?** A Tasklist form writes process variables past the domain; the
-  own inbox completes tasks through validated domain endpoints ([ADR-0019][a19]). The trade-off: no
+  own inbox completes tasks through validated domain endpoints ([ADR-0010][a10]). The trade-off: no
   assignment, claiming, permissions or login yet.
 - **What does the validator report?** The executable model validates clean. The known errors are on
   the frozen original (compensation false positives); workshop models warn about open stickies.
 - **Are todos stored in designIQ?** No, they are GitHub issues; closing one removes the badge.
 - **Why CIB seven?** A Buy decision: the open-source community fork of Camunda 7, embedded, with
-  Cockpit included. Embedding it in the service is [ADR-0020][a20].
+  Cockpit included. Embedding it in the service is [ADR-0011][a11].
 
 ### Known limits
 
@@ -357,8 +357,8 @@ docker run --rm -p 8301:8080 -e LIVE_AUTH=none -e LIVE_PUBLIC_URL=http://localho
 Then `<designIQ>` is `http://localhost:8301`: no todos, no release pull requests, no co-editing.
 Afterwards, `docker volume rm miravelo-designiq-data`.
 
-[a16]: ../adr/0016-docs-is-the-designiq-workspace.md
-[a18]: ../adr/0018-react-frontend-next-to-the-service.md
-[a19]: ../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md
-[a20]: ../adr/0020-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
+[a08]: ../adr/0008-docs-is-the-designiq-workspace.md
+[a09]: ../adr/0009-react-frontend-next-to-the-service.md
+[a10]: ../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md
+[a11]: ../adr/0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
 [exec]: ../use-cases/bike-leasing/process/executable-process.md

@@ -10,8 +10,8 @@ feature (e.g. "sign contract", "check credit rating", "withdraw application"), y
 and report what's present, missing or inconsistent. You **report, you do not fix.** Relevant decisions:
 [hexagon](../../docs/adr/0002-hexagonal-architecture-for-the-backend.md),
 [contract](../../docs/adr/0003-openapi-as-the-checked-in-contract.md),
-[frontend](../../docs/adr/0018-react-frontend-next-to-the-service.md),
-[designIQ workspace](../../docs/adr/0016-docs-is-the-designiq-workspace.md).
+[frontend](../../docs/adr/0009-react-frontend-next-to-the-service.md),
+[designIQ workspace](../../docs/adr/0008-docs-is-the-designiq-workspace.md).
 
 Backend paths are relative to `service/app/src/main/kotlin/io/miragon/blueprint/`.
 

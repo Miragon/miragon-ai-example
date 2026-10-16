@@ -11,3 +11,4 @@
 .vscode
 .context
 node_modules/
+.bpmn-render/

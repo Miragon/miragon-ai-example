@@ -111,7 +111,7 @@ tasks.withType<BootJar> {
 }
 
 // OCI image for the backend, built by Spring's Cloud Native Buildpacks integration — no Dockerfile to
-// maintain (layered, non-root by default). See docs/adr/0011 and the "Run it in containers" section of
+// maintain (layered, non-root by default). See docs/adr/0007 and the "Run it in containers" section of
 // CONTRIBUTING.md. Build with `./gradlew bootBuildImage`.
 tasks.named<BootBuildImage>("bootBuildImage") {
     imageName.set("miravelo/cibseven-embedded-example:${project.version}")
