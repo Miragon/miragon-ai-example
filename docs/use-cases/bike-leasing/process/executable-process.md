@@ -6,15 +6,9 @@ view is in [bike-leasing-use-case.md](../bike-leasing-use-case.md).
 
 ## Provenance
 
-The executable model is the MiraVelo reference model
-`03-bike-leasing-event-subprocess-simplified.bpmn` from Miragon/miravelo-reference, taken at commit
-`541f8e0dda1672aad18b5d84b45cdfae807efe8b`:
-
-https://github.com/Miragon/miravelo-reference/blob/541f8e0dda1672aad18b5d84b45cdfae807efe8b/bpmn/bike-leasing/03-bike-leasing-event-subprocess-simplified.bpmn
-
 Why this model: [ADR-0017](../../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md).
-The flow-node ids of the reference are kept, except the error boundary. The copy here differs only
-where the engine or this repo's gates require it (see "Deviations from the reference").
+The flow-node ids of the source model are kept, except the error boundary. The copy here differs only
+where the engine or this repo's gates require it (see "Deviations from the source model").
 
 ## What is deployed
 
@@ -91,9 +85,9 @@ Process variables: applicationId (also the business key), bikeId, bikeModel, sol
 customer's name, email, age and income stay in the database (`leasing_application`) and never enter
 the engine.
 
-## Deviations from the reference
+## Deviations from the source model
 
-| What | Reference (`03-bike-leasing-event-subprocess-simplified.bpmn`) | Executable copy | Why |
+| What | Source model | Executable copy | Why |
 |---|---|---|---|
 | Order bike from dealer | external task, `camunda:type="external"`, topic `orderBike`; asyncAfter | delegate `#{orderBikeDelegate}`; asyncBefore, no asyncAfter; `failedJobRetryTimeCycle` `R3/PT10S` | the engine stays embedded and every service task follows the same pattern; the retry cycle drives the incident demo (`BIKE-FAIL`) |
 | Send contract, Issue insurance policy | asyncAfter | no asyncAfter | CONTRACT_SENT commits together with the wait at Contract signed; the policy is issued inline before the join, so the order job sets ORDERED and reaches Handover reported in one transaction. The frontend never offers "sign" or "report handover" before the process waits for it (`StatusMatchesWaitStateTest`) |
@@ -101,9 +95,9 @@ the engine.
 | Sequence flow ids | generated (`Flow_0cq39pq`, `E01`, …) | descriptive `flow_*` (list above) | the same bpmnlint rule; readable ids in tests and anchors |
 | History time to live | `180` | `P180D` | the same 180 days, as an ISO 8601 duration |
 | Rejection merge | `gateway_rejectionJoin` unnamed | named "Rejection reason" | the merge rule of the glossary; the name the issues use |
-| Validation rule | not defined | age ≥ 18 and bike in the dealer catalogue | **Assumption** (ADR-0017); the reference names the step only |
+| Validation rule | not defined | age ≥ 18 and bike in the dealer catalogue | **Assumption** (ADR-0017); the source model names the step only |
 
-Everything else (flow-node ids and names, messages, the error, the variables) is as in the reference.
+Everything else (flow-node ids and names, messages, the error, the variables) is as in the source model.
 
 ## t.BPM element ↔ executable element
 
@@ -185,7 +179,7 @@ AGENTS.md.
    The designIQ validator must still report 0 errors.
 5. When behaviour changes, update the process test paths (`ProcessPath`), the Bruno scenarios, the
    frontend, [bike-leasing-use-case.md](../bike-leasing-use-case.md), this file (elements and, if
-   the reference is left further behind, the deviations), the glossary, the feature map and the
+   the source model is left further behind, the deviations), the glossary, the feature map and the
    affected issue anchors.
 
 [#1]: https://github.com/miragon-blueprints/miragon-ai-example/issues/1

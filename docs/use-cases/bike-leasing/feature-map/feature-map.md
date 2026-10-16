@@ -44,7 +44,7 @@ process context.
 
 | Stage | Features | Why in this order (derived from the issues) |
 |---|---|---|
-| Core (runs today) | apply, validate and check credit by hand; conclude the contract; reject; insure and order in parallel; hand over; withdraw and reverse by hand | The reference model `03-bike-leasing-event-subprocess-simplified` ([ADR-0017](../../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)), with a frontend and an inbox for both human tasks. |
+| Core (runs today) | apply, validate and check credit by hand; conclude the contract; reject; insure and order in parallel; hand over; withdraw and reverse by hand | The simplified event-subprocess model ([ADR-0017](../../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)), with a frontend and an inbox for both human tasks. |
 | Stage 1 – Customer follow-up | [#18], [#1] | A sent contract no longer waits forever. #18 needs only the core; #1 depends on #18, whose modelling choice decides where the reminder attaches. |
 | Stage 2 – Automation and supply | [#19], [#20] | #19 needs only the core and takes the routine credit checks out of the inbox. #20 brings back the business outcome "out of stock"; its "no alternative" path reuses the compensation handlers of #3, so it lands after #3 or brings them itself. |
 | Stage 3 – Withdrawal | [#21], [#3], [#4] | #21 needs only the core; a withdrawal during the period works with today's manual reversal. #3 makes the reversal automatic. #4 needs #3: only the automatic reversal compensates a placed order. |

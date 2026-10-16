@@ -64,7 +64,7 @@ A withdrawal sets WITHDRAWN at once; the reversal ends it as CANCELLED.
 
 1. Leasing request received: the case starts (RECEIVED).
 2. Validate application: the applicant must be at least 18 and the bike must be in the dealer's
-   catalogue. **Assumption:** the reference model names the step but not its rule; this rule is
+   catalogue. **Assumption:** the source model names the step but not its rule; this rule is
    ours ([ADR-0017](../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)).
 3. Check credit rating: the back office decides "solvent" or "not solvent" in the inbox. No rule
    guides the decision yet ([#19] automates it).
@@ -143,7 +143,7 @@ context, so going back a step is part of it.
 | BPM feature map (process plus feature stages) | [bike-leasing-feature-map.bpmn](feature-map/bike-leasing-feature-map.bpmn), [feature-map.md](feature-map/feature-map.md) |
 | C4 system context and containers | [c4-system-context.md](../../architecture/c4-system-context.md), [c4-container.md](../../architecture/c4-container.md) |
 | Executable process | [bike-leasing.bpmn](process/bike-leasing.bpmn) |
-| How it is built and deployed, element list, deviations from the reference | [executable-process.md](process/executable-process.md) |
+| How it is built and deployed, element list, deviations from the source model | [executable-process.md](process/executable-process.md) |
 | Original model, frozen credit decision and what changed | [original-bike-leasing.bpmn](original/original-bike-leasing.bpmn), [original-cancel-bike-order.bpmn](original/original-cancel-bike-order.bpmn), [checkCreditRating.dmn](original/checkCreditRating.dmn), [scope-comparison.md](original/scope-comparison.md) |
 | Architecture decisions (ADRs); why this core: ADR-0017 | [adr/](../../adr/), [0017](../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md) |
 | Live demo script | [demo-script.md](../../demo/demo-script.md) |

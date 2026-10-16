@@ -1,6 +1,6 @@
 # Scope comparison: original vs. core
 
-The executable process is a core: the reference model `03-bike-leasing-event-subprocess-simplified`
+The executable process is a core: the simplified event-subprocess model
 (see [executable-process.md](../process/executable-process.md)). This file records what the
 original model could do, what the core keeps, and where each missing capability went. The
 capability ids C1 to C19 are referenced from the GitHub issues, so keep them stable. Why the core
@@ -87,7 +87,7 @@ Totals: 4 kept (C1, C3, C16, C18), 8 simplified (C2, C4, C7, C8, C10, C12, C17, 
 |---|---|---|
 | Java/Maven variant removed | two equivalent services, `kotlin-gradle/` and `java-maven/`, kept identical by a CI parity check (Blueprint Checks) | one Kotlin service |
 | Single Gradle project | two modules, `service:app` and `service:common-architecture-tests` | one project at the repo root; the architecture rules live in `src/test/kotlin/io/miragon/common/architecture/` |
-| Executable model from the reference | the repo's own model | the reference model `03-bike-leasing-event-subprocess-simplified.bpmn` at a pinned commit, with the deviations listed in [executable-process.md](../process/executable-process.md) |
+| Executable model from a source model | the repo's own model | the simplified event-subprocess model, with the deviations listed in [executable-process.md](../process/executable-process.md) |
 | No sub-process, no escalation, no compensation | "Conclude contract" sub-process; escalation `contractNotSigned`; compensation boundaries on contract, policy and order | flat main flow; the reversal is a user task |
 | Terminate end gone | endEvent_contractCancelled terminated the instance, killing the insurance token waiting at gateway_join | no such path; an interrupting event sub-process ends the instance on withdrawal |
 | Execution listener removed | BikeOrderAuditListener on serviceTask_orderBike (end event, technical audit log) | removed |
@@ -108,8 +108,7 @@ Totals: 4 kept (C1, C3, C16, C18), 8 simplified (C2, C4, C7, C8, C10, C12, C17, 
    is labelled "No" but fires on `${cancellationPossible}`. The default flow `flow_cancellationPossible`,
    labelled "Yes", fires when cancellation is not possible. The form text matches the condition; the
    labels match the opposite reading. The simulated dealer always answered "possible", so only the
-   return-and-costs branch ever ran. The reference model `04-bike-storno.bpmn` has the same
-   contradiction. Decide which reading is right before the process comes back. Carried by [#4].
+   return-and-costs branch ever ran.  Decide which reading is right before the process comes back. Carried by [#4].
 3. Should a withdrawal before the signature revoke the sent contract (C12)? In the original, the
    contract became compensable only when "Conclude contract" completed, that is after the
    signature. Today the back office decides case by case in "Reverse application". Once the

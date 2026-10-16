@@ -41,8 +41,7 @@ issued and the bike is ordered from the dealer in parallel. When the dealer repo
 the leasing is active. Until then the customer can withdraw; the back office then reverses the
 application.
 
-The model is stage 3 of the [MiraVelo reference models](https://github.com/Miragon/miravelo-reference)
-(`03-bike-leasing-event-subprocess-simplified.bpmn`). It deliberately leaves out what the
+The model deliberately leaves out what the
 [original process](docs/use-cases/bike-leasing/original/scope-comparison.md) could do. That gap is
 the roadmap below.
 
@@ -102,7 +101,7 @@ Open sourcing decisions (make, buy or adapt; [sourcing decisions](docs/architect
 - [AGENTS.md](AGENTS.md): structure, rules, commands and how to implement a feature issue
 - [docs/README.md](docs/README.md): every design artifact, the demo order and the ADR list
 - [Executable process](docs/use-cases/bike-leasing/process/executable-process.md): element ids,
-  what differs from the reference model, how a model change reaches the code
+  what differs from its source model, how a model change reaches the code
 - [Demo script](docs/demo/demo-script.md): the live demo, step by step
 - [frontend/AGENTS.md](frontend/AGENTS.md): the frontend's structure and rules
 

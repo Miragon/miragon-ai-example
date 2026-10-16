@@ -44,7 +44,7 @@ Known deviations (ids stay stable):
 
 - In the code, "Send rejection" calls `RejectApplicationUseCase`, and the two user tasks are
   completed through `CompleteCreditCheckUseCase` and `CompleteReversalUseCase`.
-- The boundary event "Application invalid" is `event_applicationInvalid`; the reference model calls
+- The boundary event "Application invalid" is `event_applicationInvalid`; the source model calls
   it `boundary_applicationInvalid` (see executable-process.md).
 
 ## Say this, not that
@@ -183,7 +183,6 @@ in the engine; the services set it when the process reaches the step.
 | Frontend | The React app in `frontend/` (ADR-0018): application list, request form, detail page with the customer and dealer actions, and the inbox. Its API client is generated from `openapi/openapi.json`. | – | `frontend/src/app/routes/` (`/`, `/antraege/neu`, `/antraege/{id}`, `/aufgaben`) | core |
 | Simulated system | An external system the core only fakes, so the demo needs no partners: contract system (#8), notification channel (#9), dealer system (#10), insurer. | – | `LoggingContractAdapter`, `LoggingNotificationAdapter`, `BikeDealerAdapter`, `LoggingInsuranceAdapter` | core |
 | Bruno scenario | A scripted series of REST calls that plays customer, dealer and back office against the running service. `00-demo-data` prepares cases for a live demo. | – | `bruno/` (`00-demo-data` … `06-incident-demo`) | core |
-| Reference model | The MiraVelo models Miragon maintains in Miragon/miravelo-reference. The executable process is its stage `03-bike-leasing-event-subprocess-simplified.bpmn` (ADR-0017). | `bike-leasing.bpmn` | – | core |
 | t.BPM | Tangible BPM: modelling a process together at a table with a reduced BPMN palette (activity, event, gateway, document). The table-top model is the shared language. | `bike-leasing-tbpm.bpmn` (workshop mode) | – | core |
 | Feature map | The t.BPM model plus the planned features, in stages: Core (runs today), Stage 1 – Customer follow-up, Stage 2 – Automation and supply, Stage 3 – Withdrawal, Stage 4 – Portal. A group marks each feature that adds steps, and a note sticky names every feature. No feature loses its place in the process. | `bike-leasing-feature-map.bpmn`, `feature-map.md` | – | core |
 | C4 model | Architecture diagrams at two zoom levels: system context (who and what talks to the service) and container (what runs inside it). | `c4-system-context.md`, `c4-container.md` (Mermaid: drawn on GitHub, raw text in designIQ) | – | core |
