@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
+import { toast } from "@/shared/ui";
 import { server } from "./msw-server";
 
 // jsdom lacks the pointer/scroll APIs Radix primitives (Select, Dialog) probe; polyfill them so
@@ -17,7 +18,11 @@ if (typeof window !== "undefined") {
   }
 }
 
-// Start the MSW server for the whole test run; reset per test so `server.use(...)` overrides don't leak.
+// Start the MSW server for the whole test run; reset per test so `server.use(...)` overrides and
+// sonner's module-global toasts don't leak into the next test.
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  toast.dismiss();
+});
 afterAll(() => server.close());

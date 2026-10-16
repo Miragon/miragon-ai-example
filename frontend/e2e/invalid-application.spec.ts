@@ -17,6 +17,6 @@ test("invalid application: an under-age applicant is rejected without a credit c
   await expectStatus(page, "abgelehnt");
 
   await page.goto("/aufgaben");
-  await expect(page.getByRole("heading", { name: "aufgaben" })).toBeVisible();
+  await expect(page.getByRole("table").or(page.getByText("keine offenen aufgaben."))).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: name })).toHaveCount(0);
 });

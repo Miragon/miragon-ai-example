@@ -20,7 +20,7 @@ export async function submitApplication(page: Page, input: ApplicationInput): Pr
   await page.getByLabel(/^alter/i).fill(String(input.age));
   await page.getByLabel(/nettoeinkommen/i).fill(String(input.income));
 
-  await page.getByRole("combobox").click();
+  await page.getByLabel(/^fahrrad/i).click();
   await page.getByRole("option", { name: input.bikeModel }).click();
 
   await page.getByRole("button", { name: /antrag absenden/i }).click();
@@ -48,7 +48,7 @@ export async function openInboxTask(
 ): Promise<void> {
   await page.goto("/aufgaben");
   const row = page.getByRole("row").filter({ hasText: customerName }).filter({ hasText: taskType });
-  await row.getByRole("button", { name: "bearbeiten" }).click({ timeout: 20_000 });
+  await row.getByRole("button", { name: `bearbeiten: ${customerName}` }).click({ timeout: 20_000 });
   await expect(page.getByRole("dialog")).toBeVisible();
 }
 

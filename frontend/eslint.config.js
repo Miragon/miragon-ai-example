@@ -44,8 +44,7 @@ export default tseslint.config(
     },
   },
   {
-    // entities/api, features/api and shared may import the generated client.
-    files: ["src/entities/**", "src/features/**", "src/shared/**"],
+    files: ["src/{entities,features}/*/api/**", "src/shared/**"],
     rules: {
       "no-restricted-imports": ["error", { patterns: [PROCESSES_BAN, DEEP_CROSS_SLICE] }],
     },

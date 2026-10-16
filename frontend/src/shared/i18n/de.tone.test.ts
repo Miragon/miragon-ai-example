@@ -7,7 +7,7 @@ import { de } from "./de";
  * (never ae/oe/ue/ss transliterations), and no em-dashes. Brand/technical tokens are allowlisted.
  */
 
-const ALLOWLIST = ["MiraVelo", "BPMN", "BIKE-"];
+const ALLOWLIST = ["MiraVelo"];
 
 function leaves(value: unknown, path = ""): Array<{ path: string; text: string }> {
   if (typeof value === "string") return [{ path, text: value }];

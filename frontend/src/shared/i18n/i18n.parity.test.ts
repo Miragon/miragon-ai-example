@@ -9,7 +9,7 @@ import { en } from "./en";
  *  - English brand voice: same lowercase, no-em-dash tone as German (see de.tone.test.ts).
  */
 
-const ALLOWLIST = ["MiraVelo", "BPMN", "BIKE-"];
+const ALLOWLIST = ["MiraVelo"];
 
 function paths(value: unknown, prefix = ""): string[] {
   if (value && typeof value === "object") {

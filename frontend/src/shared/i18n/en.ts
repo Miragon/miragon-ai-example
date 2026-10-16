@@ -14,10 +14,7 @@ export const en: Copy = {
   },
   common: {
     retry: "try again",
-    cancel: "cancel",
-    back: "back",
-    loading: "loading",
-    save: "save",
+    conflictToast: "the application has changed in the meantime.",
   },
   status: {
     RECEIVED: "received",
@@ -41,6 +38,10 @@ export const en: Copy = {
     empty: "no applications yet.",
     emptyAction: "submit the first application",
     error: "the applications could not be loaded.",
+    previousPage: "previous",
+    nextPage: "next",
+    page: "page",
+    pageOf: "of",
   },
   submit: {
     title: "new leasing application",
@@ -100,10 +101,10 @@ export const en: Copy = {
     withdrawSuccess: "the application was withdrawn.",
     creditCheckPendingNote: "the back office is checking the credit rating.",
     orderPendingNote:
-      "the insurance policy and the order are on their way, then the dealer reports the handover.",
+      "the insurance policy and the order are on their way, then the handover is reported.",
     reversalPendingTitle: "application withdrawn",
     reversalPendingNote:
-      "the back office reverses the application in the tasks, then the status changes to cancelled.",
+      "the back office confirms the reversal in the tasks, then the status changes to cancelled.",
     error: "the action could not be performed.",
     terminalActive: "the leasing is active. no further steps are needed.",
     terminalRejected: "the application was rejected. no actions are possible.",

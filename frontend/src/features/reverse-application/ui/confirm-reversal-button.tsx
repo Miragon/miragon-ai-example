@@ -4,13 +4,13 @@ import { useCompleteReversalAction } from "../api/use-complete-reversal";
 
 export function ConfirmReversalButton({
   applicationId,
-  onCompleted,
+  onDone,
 }: {
   applicationId: string;
-  onCompleted?: () => void;
+  onDone?: () => void;
 }) {
   const copy = useCopy();
-  const mutation = useCompleteReversalAction(applicationId, onCompleted);
+  const mutation = useCompleteReversalAction(applicationId, onDone);
   const busy = mutation.isPending || mutation.isSuccess;
   return (
     <Button variant="danger" onClick={() => mutation.mutate({ applicationId })} disabled={busy}>

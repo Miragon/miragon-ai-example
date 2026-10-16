@@ -4,11 +4,7 @@ import { X } from "lucide-react";
 import { cn } from "@/shared/lib/cn";
 
 export const Dialog = RadixDialog.Root;
-export const DialogTrigger = RadixDialog.Trigger;
-export const DialogClose = RadixDialog.Close;
-export const DialogPortal = RadixDialog.Portal;
-
-export const DialogOverlay = React.forwardRef<
+const DialogOverlay = React.forwardRef<
   React.ComponentRef<typeof RadixDialog.Overlay>,
   React.ComponentPropsWithoutRef<typeof RadixDialog.Overlay>
 >(({ className, ...props }, ref) => (
@@ -24,7 +20,7 @@ export const DialogContent = React.forwardRef<
   React.ComponentRef<typeof RadixDialog.Content>,
   React.ComponentPropsWithoutRef<typeof RadixDialog.Content>
 >(({ className, children, ...props }, ref) => (
-  <DialogPortal>
+  <RadixDialog.Portal>
     <DialogOverlay />
     <RadixDialog.Content
       ref={ref}
@@ -42,21 +38,12 @@ export const DialogContent = React.forwardRef<
         <X className="size-5" strokeWidth={1.75} />
       </RadixDialog.Close>
     </RadixDialog.Content>
-  </DialogPortal>
+  </RadixDialog.Portal>
 ));
 DialogContent.displayName = "DialogContent";
 
 export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("flex flex-col gap-1.5", className)} {...props} />;
-}
-
-export function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
-      {...props}
-    />
-  );
 }
 
 export const DialogTitle = React.forwardRef<

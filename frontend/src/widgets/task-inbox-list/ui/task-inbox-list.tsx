@@ -44,7 +44,7 @@ function CreditCheckDialogBody({ task, onDone }: { task: OpenTaskDto; onDone: ()
         <Fact label={copy.detail.income} value={formatEuro(application.monthlyNetIncome)} />
         <Fact label={copy.detail.bike} value={application.bikeModel ?? application.bikeId} />
       </dl>
-      <CreditRatingDecision applicationId={application.applicationId} onCompleted={onDone} />
+      <CreditRatingDecision applicationId={application.applicationId} onDone={onDone} />
     </>
   );
 }
@@ -58,19 +58,27 @@ function ReversalDialogBody({ task, onDone }: { task: OpenTaskDto; onDone: () =>
         <DialogDescription>{copy.reversal.subtitle}</DialogDescription>
       </DialogHeader>
       <div>
-        <ConfirmReversalButton
-          applicationId={task.application.applicationId}
-          onCompleted={onDone}
-        />
+        <ConfirmReversalButton applicationId={task.application.applicationId} onDone={onDone} />
       </div>
     </>
   );
 }
 
+type TaskSelection = Pick<OpenTaskDto, "type"> & { applicationId: string };
+
+function isSelected(task: OpenTaskDto, selection: TaskSelection | null): boolean {
+  return (
+    selection !== null &&
+    task.type === selection.type &&
+    task.application.applicationId === selection.applicationId
+  );
+}
+
 export function TaskInboxList({ tasks }: { tasks: OpenTaskDto[] }) {
   const copy = useCopy();
-  const [openTask, setOpenTask] = useState<OpenTaskDto | null>(null);
-  const close = () => setOpenTask(null);
+  const [selection, setSelection] = useState<TaskSelection | null>(null);
+  const openTask = tasks.find((task) => isSelected(task, selection)) ?? null;
+  const close = () => setSelection(null);
 
   return (
     <>
@@ -96,7 +104,14 @@ export function TaskInboxList({ tasks }: { tasks: OpenTaskDto[] }) {
               <TD>{task.application.bikeModel ?? task.application.bikeId}</TD>
               <TD>{formatDateTime(task.waitingSince)}</TD>
               <TD>
-                <Button size="sm" variant="secondary" onClick={() => setOpenTask(task)}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  aria-label={`${copy.inbox.open}: ${task.application.customerName}`}
+                  onClick={() =>
+                    setSelection({ type: task.type, applicationId: task.application.applicationId })
+                  }
+                >
                   {copy.inbox.open}
                 </Button>
               </TD>

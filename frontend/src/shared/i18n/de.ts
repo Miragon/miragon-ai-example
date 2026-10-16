@@ -16,10 +16,7 @@ export const de = {
   },
   common: {
     retry: "erneut versuchen",
-    cancel: "abbrechen",
-    back: "zurück",
-    loading: "wird geladen",
-    save: "speichern",
+    conflictToast: "der antrag hat sich inzwischen geändert.",
   },
   status: {
     RECEIVED: "eingegangen",
@@ -43,6 +40,10 @@ export const de = {
     empty: "noch keine anträge vorhanden.",
     emptyAction: "ersten antrag stellen",
     error: "die anträge konnten nicht geladen werden.",
+    previousPage: "zurück",
+    nextPage: "weiter",
+    page: "seite",
+    pageOf: "von",
   },
   submit: {
     title: "neuer leasing-antrag",
@@ -101,10 +102,10 @@ export const de = {
     handoverSuccess: "übergabe wurde gemeldet.",
     withdrawSuccess: "antrag wurde zurückgezogen.",
     creditCheckPendingNote: "das back office prüft gerade die bonität.",
-    orderPendingNote: "versicherung und bestellung laufen, danach meldet der händler die übergabe.",
+    orderPendingNote: "versicherung und bestellung laufen, danach wird die übergabe gemeldet.",
     reversalPendingTitle: "antrag zurückgezogen",
     reversalPendingNote:
-      "das back office wickelt den antrag in den aufgaben rück, dann wechselt der status auf storniert.",
+      "das back office bestätigt die rückabwicklung in den aufgaben, dann wechselt der status auf storniert.",
     error: "die aktion konnte nicht ausgeführt werden.",
     terminalActive: "das leasing ist aktiv. es sind keine weiteren schritte nötig.",
     terminalRejected: "der antrag wurde abgelehnt. es sind keine aktionen möglich.",

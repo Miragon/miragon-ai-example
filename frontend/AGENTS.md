@@ -43,8 +43,11 @@ utilities (`text-h1` … `text-klein`) and the palette (`blau`, `gruen`, semanti
 ## State, forms, copy
 
 - **Polling is the point.** Every action except the submit (200) returns 202 and the engine advances asynchronously, so the
-  detail page polls every 2 s until `isTerminal` (`ACTIVE | REJECTED | CANCELLED`) and the inbox polls
-  every 2 s. Don't "fix" this away.
+  detail page polls every 2 s until `isTerminal` (`ACTIVE | REJECTED | CANCELLED`) or an error, and the
+  list and the inbox poll every 2 s. Don't "fix" this away.
+- **A 409 means the case moved on.** The action features check `isConflict` (`shared/api`), show
+  `common.conflictToast` and re-read the detail, the list and the inbox, never the raw problem
+  `detail`.
 - **Query keys** come from orval; `entities/leasing-application/api/keys.ts` adds the `all`
   invalidation prefix (unit-tested).
 - **Forms must not duplicate process rules.** The submit form reuses the generated

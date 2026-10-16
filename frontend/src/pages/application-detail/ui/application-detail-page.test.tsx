@@ -76,4 +76,41 @@ describe("ApplicationDetailPage polling", () => {
     await vi.advanceTimersByTimeAsync(4500);
     expect(count).toBeGreaterThan(1);
   });
+
+  it("gives up at once on an unknown id: no retries, no polling of the 404", async () => {
+    vi.useFakeTimers();
+    let count = 0;
+    server.use(
+      http.get("*/api/bike-leasing/:id", () => {
+        count += 1;
+        return HttpResponse.json({ status: 404 }, { status: 404 });
+      }),
+    );
+
+    renderWithProviders(<ApplicationDetailPage applicationId="unknown" />);
+
+    await vi.advanceTimersByTimeAsync(50);
+    expect(screen.getByText("der antrag konnte nicht geladen werden.")).toBeInTheDocument();
+    await vi.advanceTimersByTimeAsync(15000);
+    expect(count).toBe(1);
+  });
+
+  it("retries a server error three times, then stops polling until the user retries", async () => {
+    vi.useFakeTimers();
+    let count = 0;
+    server.use(
+      http.get("*/api/bike-leasing/:id", () => {
+        count += 1;
+        return HttpResponse.json({ status: 500 }, { status: 500 });
+      }),
+    );
+
+    renderWithProviders(<ApplicationDetailPage applicationId="app-1" />);
+
+    await vi.advanceTimersByTimeAsync(15000);
+    expect(count).toBe(4);
+    expect(screen.getByText("der antrag konnte nicht geladen werden.")).toBeInTheDocument();
+    await vi.advanceTimersByTimeAsync(15000);
+    expect(count).toBe(4);
+  });
 });

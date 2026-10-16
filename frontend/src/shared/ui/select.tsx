@@ -4,7 +4,6 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/shared/lib/cn";
 
 export const Select = RadixSelect.Root;
-export const SelectGroup = RadixSelect.Group;
 export const SelectValue = RadixSelect.Value;
 
 export const SelectTrigger = React.forwardRef<
@@ -66,18 +65,6 @@ export const SelectContent = React.forwardRef<
   </RadixSelect.Portal>
 ));
 SelectContent.displayName = "SelectContent";
-
-export const SelectLabel = React.forwardRef<
-  React.ComponentRef<typeof RadixSelect.Label>,
-  React.ComponentPropsWithoutRef<typeof RadixSelect.Label>
->(({ className, ...props }, ref) => (
-  <RadixSelect.Label
-    ref={ref}
-    className={cn("px-2 py-1.5 text-klein font-medium text-schwarz/60", className)}
-    {...props}
-  />
-));
-SelectLabel.displayName = "SelectLabel";
 
 export const SelectItem = React.forwardRef<
   React.ComponentRef<typeof RadixSelect.Item>,

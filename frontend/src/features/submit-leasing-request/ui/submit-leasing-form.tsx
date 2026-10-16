@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Field,
@@ -11,17 +10,45 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  toast,
 } from "@/shared/ui";
 import { useCopy } from "@/shared/i18n";
-import { useSubmitLeasingRequest } from "@/shared/api/generated/endpoints";
-import { leasingApplicationKeys } from "@/entities/leasing-application";
 import { useListBikes } from "@/entities/bike";
+import { useSubmitLeasingRequestAction } from "../api/use-submit-leasing-request";
 import { makeSubmitFormSchema, type SubmitFormValues } from "../model/submit-form-schema";
+
+function BikeSelect({
+  bikes,
+  value,
+  onValueChange,
+  placeholder,
+  ...fieldControlProps
+}: {
+  bikes: { bikeId: string; model: string }[];
+  value: string;
+  onValueChange: (bikeId: string) => void;
+  placeholder: string;
+  id?: string;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
+}) {
+  return (
+    <Select value={value || undefined} onValueChange={onValueChange}>
+      <SelectTrigger {...fieldControlProps}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {bikes.map((bike) => (
+          <SelectItem key={bike.bikeId} value={bike.bikeId}>
+            {bike.model}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 export function SubmitLeasingForm({ onCreated }: { onCreated: (applicationId: string) => void }) {
   const copy = useCopy();
-  const queryClient = useQueryClient();
   const bikes = useListBikes();
 
   const schema = useMemo(() => makeSubmitFormSchema(copy), [copy]);
@@ -36,16 +63,7 @@ export function SubmitLeasingForm({ onCreated }: { onCreated: (applicationId: st
     defaultValues: { customerName: "", email: "", bikeId: "" },
   });
 
-  const submit = useSubmitLeasingRequest({
-    mutation: {
-      onSuccess: async (created) => {
-        await queryClient.invalidateQueries({ queryKey: leasingApplicationKeys.all });
-        toast.success(copy.submit.successToast);
-        onCreated(created.applicationId);
-      },
-      onError: () => toast.error(copy.submit.errorToast),
-    },
-  });
+  const submit = useSubmitLeasingRequestAction(onCreated);
 
   const onSubmit = handleSubmit((values) => submit.mutate({ data: values }));
 
@@ -83,18 +101,12 @@ export function SubmitLeasingForm({ onCreated }: { onCreated: (applicationId: st
         name="bikeId"
         render={({ field }) => (
           <Field label={copy.submit.bike} required error={errors.bikeId?.message}>
-            <Select value={field.value || undefined} onValueChange={field.onChange}>
-              <SelectTrigger aria-invalid={errors.bikeId ? true : undefined}>
-                <SelectValue placeholder={copy.submit.bikePlaceholder} />
-              </SelectTrigger>
-              <SelectContent>
-                {bikeList.map((bike) => (
-                  <SelectItem key={bike.bikeId} value={bike.bikeId}>
-                    {bike.model}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <BikeSelect
+              bikes={bikeList}
+              value={field.value}
+              onValueChange={field.onChange}
+              placeholder={copy.submit.bikePlaceholder}
+            />
           </Field>
         )}
       />

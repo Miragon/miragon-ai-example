@@ -16,7 +16,7 @@ export interface FieldProps {
   required?: boolean;
   className?: string;
   /**
-   * Exactly one form control (Input, Select, Textarea, ...). The Field clones
+   * Exactly one form control (Input, or a component forwarding these props to its control). The Field clones
    * it to wire `id`, `aria-invalid`, and `aria-describedby` automatically.
    */
   children: React.ReactElement<{

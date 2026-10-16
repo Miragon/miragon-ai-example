@@ -29,7 +29,8 @@ describe("SubmitApplicationPage", () => {
     await user.type(screen.getByLabelText(/alter/i), "17");
     await user.type(screen.getByLabelText(/einkommen/i), "3500");
 
-    const picker = screen.getByRole("combobox");
+    const picker = screen.getByLabelText(/fahrrad/i);
+    expect(picker).toHaveRole("combobox");
     await user.click(picker);
     await user.click(await screen.findByRole("option", { name: "Gravel Explorer 900" }));
 

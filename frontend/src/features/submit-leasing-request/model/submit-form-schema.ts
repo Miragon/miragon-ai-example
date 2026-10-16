@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SubmitLeasingRequestBody } from "@/shared/api/generated/zod";
+import { SubmitLeasingRequestBody } from "../api/request-body-schema";
 import type { Copy } from "@/shared/i18n";
 
 /**

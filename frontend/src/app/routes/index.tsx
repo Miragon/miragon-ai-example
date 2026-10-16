@@ -3,9 +3,10 @@ import { z } from "zod";
 import { LEASING_STATUSES } from "@/entities/leasing-application";
 import { ApplicationListPage } from "@/pages/application-list";
 
-// The status filter lives in the URL, so it survives reload and is shareable.
+// The status filter and the page live in the URL, so they survive reload and are shareable.
 const searchSchema = z.object({
   status: z.enum(LEASING_STATUSES).optional(),
+  page: z.number().int().min(1).optional(),
 });
 
 export const Route = createFileRoute("/")({
@@ -15,12 +16,14 @@ export const Route = createFileRoute("/")({
 
 function ApplicationListRoute() {
   const navigate = useNavigate();
-  const { status } = Route.useSearch();
+  const { status, page } = Route.useSearch();
 
   return (
     <ApplicationListPage
       status={status ?? null}
       onStatusChange={(next) => void navigate({ to: "/", search: next ? { status: next } : {} })}
+      pageNumber={page ?? 1}
+      onPageChange={(next) => void navigate({ to: "/", search: { status, page: next } })}
       onSelect={(applicationId) =>
         void navigate({ to: "/antraege/$applicationId", params: { applicationId } })
       }

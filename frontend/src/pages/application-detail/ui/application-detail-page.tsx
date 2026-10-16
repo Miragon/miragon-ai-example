@@ -1,10 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle, QueryBoundary, Skeleton } from "@/shared/ui";
 import { useCopy } from "@/shared/i18n";
 import { POLL_INTERVAL_MS } from "@/shared/config";
+import { isNotFound } from "@/shared/api";
 import { isTerminal, useGetLeasingApplication } from "@/entities/leasing-application";
 import { ApplicationSummary } from "@/widgets/application-summary";
 import { LeasingProgress } from "@/widgets/leasing-progress";
 import { ApplicationActions } from "@/widgets/application-actions";
+
+const MAX_RETRIES = 3;
 
 function DetailSkeleton() {
   return (
@@ -20,7 +23,9 @@ export function ApplicationDetailPage({ applicationId }: { applicationId: string
   const copy = useCopy();
   const query = useGetLeasingApplication(applicationId, {
     query: {
-      refetchInterval: (q) => (isTerminal(q.state.data?.status) ? false : POLL_INTERVAL_MS),
+      retry: (failureCount, error) => !isNotFound(error) && failureCount < MAX_RETRIES,
+      refetchInterval: (q) =>
+        q.state.status === "error" || isTerminal(q.state.data?.status) ? false : POLL_INTERVAL_MS,
     },
   });
   const application = query.data;

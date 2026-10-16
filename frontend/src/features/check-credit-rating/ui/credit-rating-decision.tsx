@@ -4,13 +4,13 @@ import { useCompleteCreditCheckAction } from "../api/use-complete-credit-check";
 
 export function CreditRatingDecision({
   applicationId,
-  onCompleted,
+  onDone,
 }: {
   applicationId: string;
-  onCompleted?: () => void;
+  onDone?: () => void;
 }) {
   const copy = useCopy();
-  const mutation = useCompleteCreditCheckAction(applicationId, onCompleted);
+  const mutation = useCompleteCreditCheckAction(applicationId, onDone);
   const busy = mutation.isPending || mutation.isSuccess;
   const decide = (solvent: boolean) => mutation.mutate({ applicationId, data: { solvent } });
   return (

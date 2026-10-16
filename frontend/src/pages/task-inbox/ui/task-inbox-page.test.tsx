@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { renderWithProviders, screen, server, waitFor, within } from "@/shared/testing";
+import { Toaster } from "@/shared/ui";
 import { TaskInboxPage } from "./task-inbox-page";
 
 function application(applicationId: string, customerName: string, status: string) {
@@ -69,7 +70,7 @@ describe("TaskInboxPage", () => {
     renderWithProviders(<TaskInboxPage />);
 
     await screen.findByText("Alice Rider");
-    await user.click(within(rowOf("Alice Rider")).getByRole("button", { name: "bearbeiten" }));
+    await user.click(screen.getByRole("button", { name: "bearbeiten: Alice Rider" }));
     const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByText("35 jahre")).toBeInTheDocument();
     expect(within(dialog).getByText("Gravel Explorer 900")).toBeInTheDocument();
@@ -94,10 +95,57 @@ describe("TaskInboxPage", () => {
     renderWithProviders(<TaskInboxPage />);
 
     await screen.findByText("Wanda Withdraw");
-    await user.click(within(rowOf("Wanda Withdraw")).getByRole("button", { name: "bearbeiten" }));
+    await user.click(screen.getByRole("button", { name: "bearbeiten: Wanda Withdraw" }));
     const dialog = await screen.findByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: "rückabwicklung bestätigen" }));
 
     await waitFor(() => expect(reversedFor).toBe("app-reversal"));
+  });
+
+  it("closes the dialog and says the application changed when the task is already gone (409)", async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    server.use(
+      http.get("*/api/tasks", () => HttpResponse.json(openTasks)),
+      http.post("*/api/bike-leasing/:id/credit-check", () =>
+        HttpResponse.json({ status: 409, detail: "raw engine detail" }, { status: 409 }),
+      ),
+    );
+    renderWithProviders(
+      <>
+        <TaskInboxPage />
+        <Toaster />
+      </>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "bearbeiten: Alice Rider" }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "solvent" }));
+
+    expect(await screen.findByText("der antrag hat sich inzwischen geändert.")).toBeInTheDocument();
+    expect(screen.queryByText("raw engine detail")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  });
+
+  it("closes the reversal dialog on a 409 as well", async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    server.use(
+      http.get("*/api/tasks", () => HttpResponse.json(openTasks)),
+      http.post("*/api/bike-leasing/:id/reversal", () =>
+        HttpResponse.json({ status: 409 }, { status: 409 }),
+      ),
+    );
+    renderWithProviders(
+      <>
+        <TaskInboxPage />
+        <Toaster />
+      </>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "bearbeiten: Wanda Withdraw" }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: "rückabwicklung bestätigen" }));
+
+    expect(await screen.findByText("der antrag hat sich inzwischen geändert.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });
 });
