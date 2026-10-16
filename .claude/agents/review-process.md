@@ -1,6 +1,6 @@
 ---
 name: review-process
-description: "CIB seven (Camunda 7) process review specialist. Audits the executable BPMN model against its glue code: every service task bound to a delegate bean by #{expression}, message and error names matching the generated ProcessApi, user tasks completed through the process adapter, delegates and paths covered by tests, and the modelling conventions. Use when asked to review or audit a process, or before and after automate-process. Reports; does not fix."
+description: "Audits the executable BPMN model against its glue code: delegate expressions, message and error names, user-task completion, test coverage, conventions. Use to review a process or around automate-process. Reports only."
 tools: Read, Glob, Grep
 model: inherit
 ---

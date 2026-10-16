@@ -1,6 +1,6 @@
 ---
 name: create-adr
-description: "Write a new Architecture Decision Record under docs/adr/ in this repo's format (Status, Date, Context, Decision, Consequences). Use when the user asks to write an ADR, record an architecture decision, take a sourcing decision (issues 8 to 10), or document why something was done. Numbers it after the highest existing record, copies docs/adr/0000-adr-template.md, marks a superseded ADR, and shows the full draft before writing."
+description: "Write a new ADR under docs/adr/ from the template, numbered after the latest, marking any superseded one. Use when recording an architecture or sourcing decision (issues 8 to 10)."
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 

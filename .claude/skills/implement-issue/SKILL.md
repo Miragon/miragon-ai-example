@@ -1,7 +1,7 @@
 ---
 name: implement-issue
 argument-hint: "<issue number or URL>"
-description: "Take one GitHub issue of this repo from its acceptance criteria to a verified change: read the issue, mark assumptions, plan along the feature chain (model, process API, backend, contract, client, UI, Bruno, Playwright, design artifacts), stop for the user's approval of the plan, implement test-first, verify and report each acceptance criterion with its evidence. Use when the user says implement, build or work on issue #n, or picks up a roadmap feature. Never commits, pushes, opens a PR or changes the issue unless asked."
+description: "Take a GitHub issue from its acceptance criteria to a verified change along the feature chain, with a plan-approval stop. Use when asked to implement or work on issue #n. Never commits, pushes or opens a PR unless asked."
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Skill, Agent
 ---
 
@@ -39,7 +39,7 @@ Write the plan as a checklist along the chain, skipping hops the issue does not 
 
 1. Model change in `docs/use-cases/bike-leasing/process/bike-leasing.bpmn` (skill `automate-process`)
 2. Domain and application: ports, services, domain rules
-3. Delegates and their tests (skills `create-delegate`, `test-delegate`)
+3. Delegates and their tests (skill `create-delegate`)
 4. REST and persistence (skills `create-rest-controller`, `create-persistence-adapter`), including
    the regenerated contract and client
 5. Frontend (skill `create-feature-slice`)

@@ -1,7 +1,7 @@
 ---
 name: create-rest-controller
 argument-hint: "[<path-to-UseCase-or-Query-port-file>] [http-verb] [path]"
-description: "Create or update one Spring @RestController (inbound adapter) for one inbound port, with nested request types, an @Operation(operationId) and its @WebMvcTest, then carry the change through openapi.json to the regenerated frontend client. Use when the user asks to create a REST controller, add an endpoint, or expose a use case over REST."
+description: "Create or update a Spring REST controller for one inbound port with its @WebMvcTest, carried through openapi.json to the frontend client. Use when adding an endpoint or exposing a use case over REST."
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(./gradlew *), Bash(git diff *), Bash(npm --prefix frontend run *)
 ---
 

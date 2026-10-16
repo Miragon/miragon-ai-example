@@ -1,7 +1,7 @@
 ---
 name: create-feature-slice
 argument-hint: "[<layer>/<slice-name>]  e.g. features/sign-contract or entities/bike"
-description: "Create a Feature-Sliced Design slice under frontend/src with its Vitest test: a public index.ts, purpose-named segments, downward-only imports, the generated client used only from entities/features api segments, and a component test against the generated MSW handlers. Use when the user asks to add a feature, an FSD slice, an entity, widget or page, or a frontend action for an endpoint."
+description: "Create a Feature-Sliced Design slice under frontend/src with its Vitest test against the generated MSW handlers. Use when adding a frontend feature, entity, widget, page or an action for an endpoint."
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(npm --prefix frontend run *)
 ---
 
