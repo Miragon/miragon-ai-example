@@ -110,7 +110,6 @@ CI runs the build, bpmnlint, both drift checks (contract, process API), the diff
 | `implement-issue` | take a GitHub issue from plan (with approval) to a verified change |
 | `automate-process` | change the executable model and its glue code, validate it |
 | `create-rest-controller`, `create-persistence-adapter`, `create-feature-slice`, `create-delegate` | one building block of a layer, each with its production and test pattern |
-| `test-delegate` | the unit test for an existing delegate |
 | `review-change` | review a diff or PR, findings by severity |
 | `test-in-browser` | check a flow in the running app with Playwright MCP, with screenshots |
 | `create-adr` | record a decision in `docs/adr/` |

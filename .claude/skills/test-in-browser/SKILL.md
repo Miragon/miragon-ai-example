@@ -1,7 +1,7 @@
 ---
 name: test-in-browser
 argument-hint: "[issue number or flow, e.g. #18 or 'withdraw while the contract waits']"
-description: "Check a user flow in the locally running app with the Playwright MCP browser and record evidence: verify the stack is up, seed demo data with Bruno, act as customer or back office, take a screenshot per step into .context/, watch the console, and give a PASS/FAIL/BLOCKED verdict per acceptance criterion. Use when the user asks to test or check something in the browser, to verify a UI change, or as the browser step of implement-issue. Exploratory evidence only; lasting coverage belongs in a Playwright spec under frontend/e2e."
+description: "Check a user flow in the running app with the Playwright MCP browser: seed data, screenshot each step, verdict per acceptance criterion. Use to verify a UI change or as the browser step of implement-issue."
 allowed-tools: Read, Write, Glob, Bash(docker compose *), Bash(podman compose *), Bash(curl *), Bash(mkdir *), Bash(npx --yes @usebruno/cli@4.0.0 *), Bash(npx operate inspect *), Bash(npx operate status), mcp__playwright
 ---
 

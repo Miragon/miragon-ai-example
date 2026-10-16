@@ -1,7 +1,7 @@
 ---
 name: create-delegate
 argument-hint: "[<path-to-ProcessApi-or-BPMN-file>] [element-id-or-task-name]"
-description: "Create or update a CIB seven (Camunda 7) JavaDelegate, or an execution/task listener, for a BPMN service task or listener hook, wired as a Spring @Component and invoked by expression (#{beanName}). Use when the user asks to create a delegate, wire a service task to code, add a JavaDelegate, or add an execution/task listener. The delegate extends BaseDelegate, calls exactly one inbound port, and reads process variables via the typed ProcessApi."
+description: "Create, update or test a CIB seven JavaDelegate or listener for a BPMN element, with its MockK unit test. Use when wiring a service task to code, testing a delegate, or fixing a surviving mutant in one."
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(./gradlew *), Skill
 ---
 
@@ -39,29 +39,57 @@ class ValidateApplicationDelegate(
 
 ## Test pattern
 
-```kotlin
-class SendContractDelegateTest {
+One test class per delegate in `service/app/src/test/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/`.
+The happy path comes first; each mapped `BpmnError` adds one test.
 
-    private val useCase = mockk<SendContractUseCase>()
+```kotlin
+class ValidateApplicationDelegateTest {
+
+    private val useCase = mockk<ValidateApplicationUseCase>()
     private val execution = mockk<DelegateExecution>()
-    private val underTest = SendContractDelegate(useCase)
+    private val underTest = ValidateApplicationDelegate(useCase)
+
+    private val applicationId = ApplicationId.new()
+
+    @BeforeEach
+    fun givenTheApplicationIsTheBusinessKey() {
+        every { execution.processBusinessKey } returns applicationId.value.toString()
+    }
 
     @Test
-    fun `sends the contract for the application of the business key`() {
-        val applicationId = ApplicationId.new()
-        every { execution.processBusinessKey } returns applicationId.value.toString()
-        every { useCase.sendContract(applicationId) } just Runs
+    fun `validates the application of the business key`() {
+        every { useCase.validate(applicationId) } just Runs
 
         underTest.execute(execution)
 
-        verify { useCase.sendContract(applicationId) }
+        verify { useCase.validate(applicationId) }
         confirmVerified(useCase)
+    }
+
+    @Test
+    fun `turns an invalid application into the applicationInvalid BPMN error`() {
+        every { useCase.validate(applicationId) } throws
+            ApplicationInvalidException(applicationId, listOf("customer is underage"))
+
+        assertThatThrownBy { underTest.execute(execution) }
+            .isInstanceOf(BpmnError::class.java)
+            .extracting("errorCode")
+            .isEqualTo(Errors.APPLICATION_INVALID.code)
     }
 }
 ```
 
-The full test rules (one test per `BpmnError`, the rethrow case, the mutation check) are in skill
-[`test-delegate`](../test-delegate/SKILL.md), which also covers delegates that already exist.
+- **Call `execute`, not `executeTask`.** That runs `BaseDelegate` too, as the engine does.
+- **Strict mocks.** Stub the port with `every { … } just Runs` (or `returns` for a result), then
+  `verify` the call with the exact `ApplicationId` and `confirmVerified(useCase)`. A relaxed mock lets
+  a removed call survive the mutation gate.
+- **One test per outcome:** always the happy path; then each `BpmnError` the delegate throws (assert
+  the code from the generated `Errors`, never a string literal), and for an unmapped exception that it
+  is rethrown unchanged (stub `execution.currentActivityId`, `BaseDelegate` logs it).
+- **Variables** other than the business key are stubbed with the names from
+  `BikeLeasingProcessProcessApi.FlowNodes.<Node>.Variables`, never raw strings.
+- **No Spring, no engine.** Plain JUnit 5 + MockK + AssertJ; backtick names, `underTest`, no
+  given/when/then comments.
 
 ## IMPORTANT — the rules the build enforces
 
@@ -84,9 +112,13 @@ The full test rules (one test per `BpmnError`, the rethrow case, the mutation ch
 2. **Identify the element** by the id/name in `$ARGUMENTS`, else list the service tasks and ask.
 3. **Find the inbound port** (`Glob service/app/src/main/kotlin/**/application/port/inbound/*{UseCase,Query}.kt`).
    If missing, offer to generate it or run [`automate-process`](../automate-process/SKILL.md).
-4. **Generate or update** the delegate; for an existing file add only what is missing.
-5. **Test it twice:** the unit test with skill [`test-delegate`](../test-delegate/SKILL.md) (delegates
-   are in the mutation gate), and the path through the engine with a process test in
+4. **Generate or update** the delegate; for an existing file add only what is missing. To only test an
+   existing delegate, skip to step 5.
+5. **Test it twice:** the unit test after the test pattern above, one test per outcome, then
+   `./gradlew test --tests "*<DelegateName>Test"` and the mutation check
+   `./gradlew pitest -PmutationTargetClasses=io.miragon.blueprint.adapter.inbound.cibseven.<DelegateName>`
+   (a surviving mutant means a missing assertion: add it, do not weaken the gate); and the path
+   through the engine with a process test in
    `service/app/src/test/kotlin/io/miragon/blueprint/adapter/process/`:
    `./gradlew test --tests "io.miragon.blueprint.adapter.process.*"`.
 6. **Report:** confirm the expression matches the bean name (the agent

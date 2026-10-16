@@ -15,8 +15,7 @@ Workflows, loaded when a task matches their description.
 | `create-rest-controller` | one endpoint with its `@WebMvcTest`, carried through `openapi.json` to the client |
 | `create-persistence-adapter` | entity, repository, mapper, adapter, migration and `@DataJpaTest` |
 | `create-feature-slice` | one FSD slice with its Vitest test |
-| `create-delegate` | one JavaDelegate for a service task, with its unit test |
-| `test-delegate` | the MockK unit test for an existing delegate |
+| `create-delegate` | one JavaDelegate for a service task, or the unit test for an existing one |
 | `review-change` | review a PR or diff, findings by severity with a failure scenario |
 | `test-in-browser` | check a flow in the running app with Playwright MCP, screenshots as evidence |
 | `create-adr` | record a decision in `docs/adr/` |

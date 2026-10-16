@@ -1,7 +1,7 @@
 ---
 name: review-change
 argument-hint: "[PR number | branch | empty for the working tree against origin/main]"
-description: "Review a change in this repo for business correctness, architecture, security and tests, and report findings ranked by severity, each with file:line and a concrete failure scenario. Checks the repo-specific counterparts a change needs (migration, contract, client, regenerated process API, delegate and process tests, Bruno/Playwright, feature map) and delegates model and end-to-end checks to the review agents. Use when the user asks to review a PR, a branch or the current diff. Read-only; posts nothing unless asked."
+description: "Review a PR, branch or diff for business correctness, architecture, security and missing counterparts; findings by severity with file:line and a failure scenario. Use when asked for a review. Read-only."
 allowed-tools: Read, Glob, Grep, Bash(git *), Bash(gh pr view *), Bash(gh pr diff *), Bash(gh pr checks *), Bash(gh issue view *), Bash(gh api repos/*/pulls/*/comments), Agent
 ---
 
@@ -35,7 +35,7 @@ change: is it what the issue asks for, and nothing else? Does it hold for the pr
 | a controller or DTO | `@Operation(operationId)`, the re-exported `openapi.json`, the regenerated client |
 | a domain field shown to users | DTO, mapper, `openapi.json`, client, FSD entity, Bruno assertion |
 | `bike-leasing.bpmn` | regenerated `adapter/process`, complete BPMNDI, a row in `executable-process.md`, feature map and glossary for changed ids; run the agent `review-process` |
-| a delegate | its unit test (`test-delegate`) and a process test for the path |
+| a delegate | its unit test (`create-delegate`) and a process test for the path |
 | a service throwing what a delegate maps to `BpmnError` | `noRollbackFor` on `@Transactional` |
 | a user-visible flow | copy in `de.ts` and `en.ts`, a Playwright spec, the Bruno scenario |
 | a whole feature | run the agent `review-vertical-slice` |

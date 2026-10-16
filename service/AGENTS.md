@@ -67,7 +67,7 @@ Match the test style to the layer:
 | domain | plain unit tests |
 | application service | unit tests with mocked ports (MockK) |
 | `adapter.inbound.rest` | `@WebMvcTest` with the use case mocked |
-| `adapter.inbound.cibseven` | MockK unit test per delegate (skill `test-delegate`) |
+| `adapter.inbound.cibseven` | MockK unit test per delegate (skill `create-delegate`) |
 | `adapter.outbound.db` | `@DataJpaTest` |
 | process end to end | CIB seven process tests in `adapter/process/`, paths asserted via `ProcessPath` (`adapter/process/ProcessPathAssertions.kt`) |
 

@@ -1,7 +1,7 @@
 ---
 name: create-persistence-adapter
 argument-hint: "[<path-to-Repository-port-file-or-domain-aggregate>]"
-description: "Create or update the JPA persistence adapter for one domain aggregate: entity, Spring Data repository, mapper, the @Component implementing the outbound Repository port, its Flyway migration and its @DataJpaTest. Use when the user asks to create a persistence adapter, persist an aggregate, add a column or query, or add an outbound db adapter."
+description: "Create or update the JPA persistence adapter of an aggregate: entity, repository, mapper, adapter, Flyway migration and @DataJpaTest. Use when persisting an aggregate or adding a column or query."
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(./gradlew *)
 ---
 

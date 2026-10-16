@@ -285,7 +285,7 @@ Do not run an agent live unless you rehearsed it; show the files and tell the pa
 2. `.claude/`: workflow skills (`implement-issue` with its plan-approval stop, `automate-process`,
    `review-change`, `test-in-browser`, `create-adr`), layer skills with a production and a test
    pattern each (`create-rest-controller`, `create-persistence-adapter`, `create-feature-slice`,
-   `create-delegate`, `test-delegate`) and two review agents (`review-process`,
+   `create-delegate`) and two review agents (`review-process`,
    `review-vertical-slice`).
 3. The gates that refuse a wrong change: the typed process API, ArchUnit and Konsist, mutation
    testing at 80, the drift-gated `openapi.json` and generated client, bpmnlint, Bruno and

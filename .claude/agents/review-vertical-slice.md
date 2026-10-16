@@ -1,6 +1,6 @@
 ---
 name: review-vertical-slice
-description: "Walk one feature end to end across the service, the frontend and the design artifacts and report gaps at every hop: BPMN element, outbound port, service, inbound port, REST controller or delegate (with its tests), openapi.json, generated client, FSD slice, Bruno scenario, Playwright spec, feature map and glossary. Use when asked to review a vertical slice, check a feature is wired end to end, or find where a flow drops. Reports; does not fix."
+description: "Walks one feature end to end (BPMN, ports, controller or delegate, contract, client, UI, Bruno, Playwright, feature map) and reports gaps per hop. Use to check a feature is wired through. Reports only."
 tools: Read, Glob, Grep, Bash
 model: inherit
 ---

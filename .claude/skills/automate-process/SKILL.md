@@ -1,7 +1,7 @@
 ---
 name: automate-process
 argument-hint: "[what should change in the process]"
-description: "Change the executable CIB seven BPMN model (docs/use-cases/bike-leasing/process/bike-leasing.bpmn) and wire its glue code across the hexagon: regenerate the typed process API, add ports, services, delegates and process-adapter methods, cover the new paths with process tests and validate the model with bpmnlint, the designIQ validator and a visual check. Use when the user asks to automate a process step, add or change a task, event or gateway, or review the diagram after an edit. Business decisions are asked, never assumed."
+description: "Change the executable BPMN model and wire its glue code: process API, ports, delegates, process tests, validation. Use when adding or changing a task, event or gateway, or automating a process step. Asks business decisions, never assumes them."
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Skill, Agent
 ---
 
@@ -48,7 +48,7 @@ The model is the business's artifact; this skill changes it technically. Source 
    | Domain | `domain.{leasing,bike}` | a value object per new variable (`ApplicationId`, `BikeId`) |
    | Inbound port | `application.port.inbound` | one `*UseCase`/`*Query` per delegate or endpoint |
    | Service | `application.service` | one `*Service` per inbound port |
-   | Delegate | `adapter.inbound.cibseven` | skills `create-delegate` and `test-delegate` |
+   | Delegate | `adapter.inbound.cibseven` | skill `create-delegate` |
    | Outbound port | `application.port.outbound` | `LeasingProcess`: one method per message or user-task completion |
    | Process adapter | `adapter.outbound.cibseven` | `LeasingProcessAdapter`, using `ProcessEngineExtensions.kt` |
 
