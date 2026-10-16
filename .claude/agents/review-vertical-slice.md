@@ -1,6 +1,6 @@
 ---
 name: review-vertical-slice
-description: Walk one feature end to end across the service, the frontend and the design artifacts and report gaps at every hop — BPMN element → outbound port → service → inbound port → REST controller → openapi.json → generated client → FSD slice → Bruno scenario → Playwright spec → feature map / glossary. Use when asked to review a vertical slice, check a feature is wired end to end, or find where a flow drops. Reports; does not fix.
+description: "Walk one feature end to end across the service, the frontend and the design artifacts and report gaps at every hop: BPMN element, outbound port, service, inbound port, REST controller or delegate (with its tests), openapi.json, generated client, FSD slice, Bruno scenario, Playwright spec, feature map and glossary. Use when asked to review a vertical slice, check a feature is wired end to end, or find where a flow drops. Reports; does not fix."
 tools: Read, Glob, Grep, Bash
 model: inherit
 ---
@@ -25,8 +25,9 @@ Backend paths are relative to `service/app/src/main/kotlin/io/miragon/blueprint/
    port and orchestrating the outbound ports.
 4. **Inbound port** — `application/port/inbound/`: the `*UseCase`/`*Query` the service implements.
 5. **REST controller** — `adapter/inbound/rest/`: a one-endpoint `@RestController` injecting that
-   port, with `@Operation(operationId = …)`. Engine-driven hops have a **delegate** in
-   `adapter/inbound/cibseven/` instead — note which.
+   port, with `@Operation(operationId = …)` and a `@WebMvcTest`. Engine-driven hops have a
+   **delegate** in `adapter/inbound/cibseven/` instead, with its unit test under
+   `service/app/src/test/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/`. Note which.
 6. **openapi.json** — `openapi/openapi.json`: the operationId / path present and matching the
    controller? (If absent, the export test was not rerun: a drift-gate failure.)
 7. **Generated client** — `frontend/src/shared/api/generated/`: the hook/model/zod schema for that

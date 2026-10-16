@@ -3,17 +3,21 @@
 The executable process is a core: the simplified event-subprocess model
 (see [executable-process.md](../process/executable-process.md)). This file records what the
 original model could do, what the core keeps, and where each missing capability went. The
-capability ids C1 to C19 are referenced from the GitHub issues, so keep them stable. Why the core
-looks like this: [ADR-0017](../../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)
-(it supersedes the first reduction, [ADR-0015](../../../adr/0015-reduce-the-executable-process-to-a-core.md)).
+capability ids C1 to C19 are referenced from the GitHub issues, so keep them stable.
+
+The original is the target picture for the roadmap. Every capability the core lacks or has in a
+smaller form points to a GitHub issue in the table below. A feature issue's body says what the
+original did, and its anchor block pins it to the core element it would extend (or to the process as
+a whole). The feature map orders the issues into stages.
 
 This file is maintained. Only the copies of the original models and of the decision in this folder
 are frozen.
 
 ## Reference: the original
 
-- Tag `original-process-v1` → commit `40da36ef7cc20423a7312ca29d5a1c493043ca9c` (main on 2026-10-13,
-  before the first core reduction): https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1
+- Tag `original-process-v1` → commit `40da36ef7cc20423a7312ca29d5a1c493043ca9c` (main on 2026-10-13):
+  https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1. The tag is never
+  moved; a later baseline gets a new tag.
 - Permalinks at that commit. The kotlin-gradle copies are linked; the java-maven copies were
   byte-identical.
   - `bike-leasing.bpmn`: process `bikeLeasingProcess`, blob `6c221a5`

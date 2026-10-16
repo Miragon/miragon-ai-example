@@ -6,9 +6,16 @@ view is in [bike-leasing-use-case.md](../bike-leasing-use-case.md).
 
 ## Provenance
 
-Why this model: [ADR-0017](../../../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md).
-The flow-node ids of the source model are kept, except the error boundary. The copy here differs only
-where the engine or this repo's gates require it (see "Deviations from the source model").
+The executable model is a copy of the simplified event-subprocess variant of the MiraVelo process
+that Miragon maintains (the source model): 20 flow nodes, two user tasks (`Check credit rating`,
+`Reverse application`), an interrupting event sub-process for the withdrawal, and no DMN, timer,
+compensation or called process. The flow-node ids of the source model are kept, except the error
+boundary. The copy here differs only where the engine or this repo's gates require it, and every
+difference is listed in "Deviations from the source model"; add a row when you add one.
+
+The original model of this repo is not the source model. It is frozen in `../original/` as the
+target picture for the roadmap; [scope-comparison.md](../original/scope-comparison.md) maps each of
+its capabilities to the core or to a feature issue.
 
 ## What is deployed
 
@@ -41,7 +48,7 @@ model lives under `docs/`: [ADR-0016](../../../adr/0016-docs-is-the-designiq-wor
    end-to-end tests against the running service. A designIQ release opens a pull request, so a model
    change made in designIQ passes the same gates before it reaches main.
 
-The process tests (`service/app/src/test/kotlin/io/miragon/blueprint/process/`) cover every path:
+The process tests (`service/app/src/test/kotlin/io/miragon/blueprint/adapter/process/`) cover every path:
 happy path, invalid application, not solvent, withdrawal during the credit check, while the
 signature is awaited and after the order, and the dealer-outage incident. `InvalidApplicationTransactionTest`
 shows that an under-age applicant is rejected, not stuck in an incident.
@@ -95,7 +102,7 @@ the engine.
 | Sequence flow ids | generated (`Flow_0cq39pq`, `E01`, …) | descriptive `flow_*` (list above) | the same bpmnlint rule; readable ids in tests and anchors |
 | History time to live | `180` | `P180D` | the same 180 days, as an ISO 8601 duration |
 | Rejection merge | `gateway_rejectionJoin` unnamed | named "Rejection reason" | the merge rule of the glossary; the name the issues use |
-| Validation rule | not defined | age ≥ 18 and bike in the dealer catalogue | **Assumption** (ADR-0017); the source model names the step only |
+| Validation rule | not defined | age ≥ 18 and bike in the dealer catalogue | **Assumption**; the source model names the step only |
 
 Everything else (flow-node ids and names, messages, the error, the variables) is as in the source model.
 
@@ -174,7 +181,7 @@ AGENTS.md.
    `.bpmn`. CI regenerates the API before compiling, so the tests see the new model, but the
    regenerated files must still be committed: check out the release branch, regenerate and push to
    the same pull request.
-4. Verify: `npm run lint:bpmn`, then `./gradlew test --tests "io.miragon.blueprint.process.*"`, then
+4. Verify: `npm run lint:bpmn`, then `./gradlew test --tests "io.miragon.blueprint.adapter.process.*"`, then
    `./gradlew build`. Run the Bruno scenarios and the Playwright tests against a running service.
    The designIQ validator must still report 0 errors.
 5. When behaviour changes, update the process test paths (`ProcessPath`), the Bruno scenarios, the

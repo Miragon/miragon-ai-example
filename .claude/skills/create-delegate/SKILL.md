@@ -1,18 +1,18 @@
 ---
 name: create-delegate
 argument-hint: "[<path-to-ProcessApi-or-BPMN-file>] [element-id-or-task-name]"
-description: Create or update a CIB seven (Camunda 7) JavaDelegate — or an execution/task listener — for a BPMN service task or listener hook, wired as a Spring @Component and invoked by expression (#{beanName}). Use when the user asks to "create a delegate", "wire a service task to code", "add a JavaDelegate", or "add an execution/task listener". The delegate extends BaseDelegate, calls exactly one inbound port, and reads process variables via the typed ProcessApi.
-allowed-tools: Read, Write, Glob
+description: "Create or update a CIB seven (Camunda 7) JavaDelegate, or an execution/task listener, for a BPMN service task or listener hook, wired as a Spring @Component and invoked by expression (#{beanName}). Use when the user asks to create a delegate, wire a service task to code, add a JavaDelegate, or add an execution/task listener. The delegate extends BaseDelegate, calls exactly one inbound port, and reads process variables via the typed ProcessApi."
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(./gradlew *), Skill
 ---
 
 # Skill: create-delegate
 
 Generate one `@Component` **JavaDelegate** (or listener) in
 `service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/` for a BPMN element. CIB seven runs
-**embedded**; service tasks call **JavaDelegates by expression**, not Zeebe job workers. See
-[ADR-0002](../../../docs/adr/0002-hexagonal-architecture-for-the-backend.md).
+**embedded**; service tasks call **JavaDelegates by expression**, not external task workers. The
+backend rules are in `service/AGENTS.md`.
 
-## Pattern (this repo)
+## Production pattern
 
 ```kotlin
 @Component
@@ -37,6 +37,32 @@ class ValidateApplicationDelegate(
 - A **listener** is a plain `@Component` implementing `ExecutionListener` or `TaskListener`, without
   `BaseDelegate`. The model has none today.
 
+## Test pattern
+
+```kotlin
+class SendContractDelegateTest {
+
+    private val useCase = mockk<SendContractUseCase>()
+    private val execution = mockk<DelegateExecution>()
+    private val underTest = SendContractDelegate(useCase)
+
+    @Test
+    fun `sends the contract for the application of the business key`() {
+        val applicationId = ApplicationId.new()
+        every { execution.processBusinessKey } returns applicationId.value.toString()
+        every { useCase.sendContract(applicationId) } just Runs
+
+        underTest.execute(execution)
+
+        verify { useCase.sendContract(applicationId) }
+        confirmVerified(useCase)
+    }
+}
+```
+
+The full test rules (one test per `BpmnError`, the rethrow case, the mutation check) are in skill
+[`test-delegate`](../test-delegate/SKILL.md), which also covers delegates that already exist.
+
 ## IMPORTANT — the rules the build enforces
 
 - The delegate injects **exactly one** inbound port (`*UseCase`/`*Query`).
@@ -59,8 +85,9 @@ class ValidateApplicationDelegate(
 3. **Find the inbound port** (`Glob service/app/src/main/kotlin/**/application/port/inbound/*{UseCase,Query}.kt`).
    If missing, offer to generate it or run [`automate-process`](../automate-process/SKILL.md).
 4. **Generate or update** the delegate; for an existing file add only what is missing.
-5. **Report and hand off:** confirm the expression matches the bean name (the
-   [`review-process`](../../agents/review-process.md) subagent audits this), add a process test in
-   `service/app/src/test/kotlin/io/miragon/blueprint/process/` (the `cibseven` package is excluded from pitest on
-   purpose: thin glue, covered by the process tests), and run
-   `./gradlew test --tests "io.miragon.blueprint.process.*"`.
+5. **Test it twice:** the unit test with skill [`test-delegate`](../test-delegate/SKILL.md) (delegates
+   are in the mutation gate), and the path through the engine with a process test in
+   `service/app/src/test/kotlin/io/miragon/blueprint/adapter/process/`:
+   `./gradlew test --tests "io.miragon.blueprint.adapter.process.*"`.
+6. **Report:** confirm the expression matches the bean name (the agent
+   [`review-process`](../../agents/review-process.md) audits this) and list the files written.

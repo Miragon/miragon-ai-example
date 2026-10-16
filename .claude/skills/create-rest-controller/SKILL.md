@@ -1,18 +1,17 @@
 ---
 name: create-rest-controller
 argument-hint: "[<path-to-UseCase-or-Query-port-file>] [http-verb] [path]"
-description: Scaffold or update a Spring @RestController (inbound adapter) for one inbound port, with nested request/response types and a toCommand() mapping. Use when the user asks to "create a REST controller", "add an endpoint", "expose a use-case over REST", or "scaffold an inbound adapter". The controller obeys the hexagonal + naming architecture rules and carries an @Operation(operationId) so the generated frontend client stays stable.
-allowed-tools: Read, Write, Glob
+description: "Create or update one Spring @RestController (inbound adapter) for one inbound port, with nested request types, an @Operation(operationId) and its @WebMvcTest, then carry the change through openapi.json to the regenerated frontend client. Use when the user asks to create a REST controller, add an endpoint, or expose a use case over REST."
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(./gradlew *), Bash(git diff *), Bash(npm --prefix frontend run *)
 ---
 
 # Skill: create-rest-controller
 
-Generate or update **one** `@RestController` for one inbound port in
-`service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/`. One endpoint per class. See
-[ADR-0002](../../../docs/adr/0002-hexagonal-architecture-for-the-backend.md) and
-[ADR-0003](../../../docs/adr/0003-openapi-as-the-checked-in-contract.md).
+One endpoint per class in `service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/`,
+its test in `service/app/src/test/kotlin/io/miragon/blueprint/adapter/inbound/rest/`. The backend
+rules are in `service/AGENTS.md`.
 
-## Pattern (this repo)
+## Production pattern
 
 ```kotlin
 @RestController
@@ -36,34 +35,79 @@ class CompleteCreditCheckController(
 }
 ```
 
-A **read** controller injects a `*Query` and maps to a `*Dto` (see `ListBikesController`,
-`LeasingApplicationDto`).
-
-## IMPORTANT — the rules the build enforces
-
-- **One endpoint per controller**, and the port is the **only** inbound-port constructor parameter
-  (`in adapters should only offer one use-case or query`). A read and a completion are two controllers.
-- Suffixes in `adapter.inbound.rest`: `Controller`, `Dto`, `Input`, `Mapper`, `Configuration`.
-- **Wrap every request field in its domain value object** before calling the port. Scan
-  `domain/{leasing,bike}/` first; ask before creating a missing one.
-- Request → `*Input`, response → `*Dto`, nested in the controller unless shared.
-- Return `ResponseEntity<T>`; a command that continues asynchronously answers **202**.
-- Errors are RFC 9457 problem details from `GlobalExceptionConfiguration`: `IllegalArgumentException`
-  → 400, `ApplicationNotFoundException` → 404, `ActionNotAvailableException`,
-  `MismatchingMessageCorrelationException` and `OptimisticLockingException` → 409. Look the
-  application up first (404), then let the domain guard the state (409). Document them in
-  `@Operation(responses = …)`.
+- **One inbound port** as the only constructor parameter; a read and a command are two controllers.
+- Commands are `POST /api/bike-leasing/{applicationId}/<action>` and answer **202** when the engine
+  continues asynchronously. Reads are `GET` with a `*Query` and a `*Dto` (see `ListBikesController`,
+  `LeasingApplicationDto`).
+- Wrap every request field in its domain value object before calling the port.
 - **Always set `@Operation(operationId = "…")`** (camelCase): orval derives the hook name from it.
-- No new top-level `config` package; cross-cutting `@Configuration` goes in `adapter.inbound.rest`.
+- Errors are problem details from `GlobalExceptionConfiguration`: `IllegalArgumentException` → 400,
+  `ApplicationNotFoundException` → 404, `ActionNotAvailableException`,
+  `MismatchingMessageCorrelationException`, `OptimisticLockingException` → 409. Document them in
+  `@Operation(responses = …)`.
+
+## Test pattern
+
+```kotlin
+@WebMvcTest(CompleteCreditCheckController::class)
+class CompleteCreditCheckControllerTest {
+
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
+    @MockkBean
+    private lateinit var useCase: CompleteCreditCheckUseCase
+
+    private val pathVar = "123e4567-e89b-12d3-a456-426614174000"
+
+    private fun creditCheck(body: String) =
+        post("/api/bike-leasing/{applicationId}/credit-check", pathVar)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(body)
+
+    @Test
+    fun `back office records a solvent applicant`() {
+        every { useCase.completeCreditCheck(any(), any()) } just Runs
+
+        val response = mockMvc.perform(creditCheck("""{"solvent":true}""")).andReturn()
+
+        assertThat(response.response.status).isEqualTo(202)
+        verify { useCase.completeCreditCheck(ApplicationId.of(pathVar), true) }
+        confirmVerified(useCase)
+    }
+
+    @Test
+    fun `refuses a decision without the solvent flag`() {
+        val response = mockMvc.perform(creditCheck("{}")).andReturn()
+
+        assertThat(response.response.status).isEqualTo(400)
+        confirmVerified(useCase)
+    }
+}
+```
+
+- One test per outcome: the success status with the exact port call, each invalid input (400), and
+  the not-found case where the port can throw it (404, see `GetLeasingApplicationControllerTest`).
+  The exception-to-status mapping itself is tested once in `GlobalExceptionConfigurationTest`.
+- Verify the port call with the domain value objects, then `confirmVerified`; a rejected request
+  proves the port was **not** called.
+- A read controller asserts every DTO field in the body, including the date format (see
+  `GetLeasingApplicationControllerTest`).
 
 ## Instructions
 
-1. **Resolve the port** from `$ARGUMENTS`, else `Glob service/app/src/main/kotlin/**/application/port/inbound/*`,
-   list and ask.
-2. **Verb and path:** commands are `POST /api/bike-leasing/{applicationId}/<action>`, reads are `GET`
-   (`/api/bike-leasing`, `/api/tasks`, `/api/bikes`). Confirm with the user.
-3. **Generate or update** per the pattern; for an existing file add only what is missing.
-4. **Report and hand off:** add a `@WebMvcTest` with the port mocked
-   (`./gradlew test --tests "*<Name>ControllerTest"`), then run
-   [`sync-api-client`](../sync-api-client/SKILL.md): the spec is **drift-gated in CI**. Add or update
-   the Bruno scenario in `bruno/`.
+1. **Resolve the port** from `$ARGUMENTS`, else list `application/port/inbound/*` and ask.
+2. **Agree verb, path and status codes** with the user.
+3. **Write the test first**, then the controller; for an existing file add only what is missing.
+   `./gradlew test --tests "*<Name>ControllerTest"`
+4. **Carry the contract through** (both sides are drift-gated in CI; never hand-edit the outputs):
+   ```bash
+   ./gradlew test --tests "io.miragon.blueprint.adapter.inbound.rest.OpenApiSpecExportTest"
+   git diff --stat -- openapi/openapi.json
+   npm --prefix frontend run api:generate
+   npm --prefix frontend run typecheck
+   npm --prefix frontend run api:check
+   ```
+   An endpoint missing from the spec lacks its `@Operation(operationId)`.
+5. **Report** the files, the test results and the spec diff. Add the request to the matching Bruno
+   folder in `bruno/`; the UI follows with skill `create-feature-slice`.

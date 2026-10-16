@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew *)",
+      "Bash(npm run lint:bpmn)",
+      "Bash(npm --prefix frontend run *)",
+      "Bash(npx --yes @miragon/design-iq-validator@5.3.0 *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr checks *)"
+    ],
+    "deny": [
+      "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/BikeLeasingProcessProcessApi.kt)",
+      "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/ServiceTasks.kt)",
+      "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/Messages.kt)",
+      "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/ProcessVariables.kt)",
+      "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/Errors.kt)",
+      "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/Escalations.kt)",
+      "Edit(/openapi/openapi.json)",
+      "Edit(/frontend/src/shared/api/generated/**)",
+      "Edit(/docs/use-cases/bike-leasing/original/*.bpmn)",
+      "Edit(/docs/use-cases/bike-leasing/original/*.dmn)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Write|Grep|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-env-files.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/lint-bpmn.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

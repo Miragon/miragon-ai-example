@@ -3,39 +3,41 @@
 - **Status:** Accepted
 - **Date:** 2026-10-16
 - **Deciders:** Marco (@emaarco)
+- **Origin:** Consolidated baseline; earlier history in git.
 
 ## Context
 
-The example was headless: customers and the back office were played by Bruno and the CIB seven
-Tasklist. That hides the most visible part of a process application, and it leaves the
-OpenAPI contract ([ADR-0003](0003-openapi-as-the-checked-in-contract.md)) without a real consumer.
+A process application has customers and a back office who need a UI. Without one, they are played by
+Bruno and the CIB seven Tasklist, which hides the most visible part of the application.
 [miragon-blueprints/fullstack-example](https://github.com/miragon-blueprints/fullstack-example)
-already has a frontend built for the same MiraVelo domain, with a toolchain and guardrails we use in
-projects.
+has a frontend for the same MiraVelo domain, with a toolchain and guardrails we use in projects.
 
 ## Decision
 
-We add a **React frontend in `frontend/`**, ported from the fullstack example and cut to this
-process. It is a separate npm project; Gradle does not build it, so the Kotlin build under `service/`
-stays as it is.
+We have a **React frontend in `frontend/`**, ported from the fullstack example and cut to this
+process. It is a separate npm project; Gradle does not build it.
 
 - **Stack:** React, Vite, TypeScript, TanStack Router and Query, Tailwind with the Miragon theme,
   radix-based `shared/ui`, react-hook-form and zod, German and English copy.
-- **Contract:** orval generates the API client, MSW mocks and zod schemas from
-  `openapi/openapi.json`. `npm run api:check` fails when the generated client drifts from the
-  contract.
+- **API client:** generated from the checked-in contract
+  ([ADR-0003](0003-openapi-as-the-checked-in-contract.md)).
 - **Structure:** Feature-Sliced Design, checked by steiger and ESLint import rules; knip finds dead
   code.
-- **Tests:** Vitest with MSW for units and pages, Playwright end to end against the running stack.
-- **Dev serving:** Vite on port **5173** proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda`
-  and `/webapp` to the service on 8081, so the browser sees one origin and the service needs no CORS.
+- **Tests:** Vitest and Testing Library with MSW for units, widgets and pages; Playwright end to end
+  against the running stack.
+- **Dev serving:** the Vite dev server proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda`
+  and `/webapp` to the service, so the browser sees one origin and the service needs no CORS.
+- **Gates:** `npm --prefix frontend run verify` (format, ESLint, steiger, knip, typecheck, Vitest)
+  and the build run in CI on every PR, Playwright runs against the started stack.
+
+The frontend's own rules are in [`frontend/AGENTS.md`](../../frontend/AGENTS.md).
 
 ## Consequences
 
 - **Positive:** the demo shows the customer's and the back office's view of the same process. A
   contract change reaches the UI through a regenerated client, and the gates catch drift.
-- **Negative / trade-offs:** a second toolchain (Node 24, npm) and two more CI jobs (`frontend`,
-  `e2e`). Dependabot watches one more ecosystem.
-- **Neutral:** a JS dev server now exists, so portless could wrap it. The backend and Postgres ports
-  still collide across worktrees, so [ADR-0006](0006-fixed-ports-for-v1-portless-as-the-upgrade.md)
-  holds: fixed ports, `nonconcurrent`.
+- **Negative / trade-offs:** a second toolchain (Node, npm) and more CI jobs (frontend verify,
+  Playwright). Dependabot watches more ecosystems.
+- **Not covered:** no authentication or roles: anyone who opens the frontend can act as customer,
+  dealer or back office. The frontend is not served by the service; in containers it is its own
+  nginx image ([ADR-0011](0011-build-and-deployment-approach.md)).

@@ -196,7 +196,7 @@ Not drawn above; each issue describes its change.
 [compose]: ../../stack/docker-compose.yml
 [migrations]: ../../service/app/src/main/resources/db/migration/
 [openapi]: ../../openapi/openapi.json
-[arch]: ../../service/app/src/test/kotlin/io/miragon/blueprint/architecture/ArchitectureTest.kt
+[arch]: ../../service/app/src/test/kotlin/io/miragon/blueprint/ArchitectureTest.kt
 [pkg-rest]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/
 [pkg-delegates]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/cibseven/
 [pkg-in]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/inbound/

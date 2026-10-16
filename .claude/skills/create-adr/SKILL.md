@@ -1,7 +1,7 @@
 ---
 name: create-adr
-description: Write a new Architecture Decision Record (ADR) under docs/adr/ in this repo's format (Status, Date, Context, Decision, Consequences). Use when the user asks to "write an ADR", "record an architecture decision", "take decision #n", or "document why we did X". Auto-numbers from the existing records, derives the filename slug from the title, copies docs/adr/0000-adr-template.md, and shows a full draft before writing.
-allowed-tools: Read, Write, Glob
+description: "Write a new Architecture Decision Record under docs/adr/ in this repo's format (Status, Date, Context, Decision, Consequences). Use when the user asks to write an ADR, record an architecture decision, take a sourcing decision (issues 8 to 10), or document why something was done. Numbers it after the highest existing record, copies docs/adr/0000-adr-template.md, marks a superseded ADR, and shows the full draft before writing."
+allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
 # Skill: create-adr
@@ -12,9 +12,12 @@ designIQ model, so the file stem must be unique under `docs/`.
 
 ## Rules
 
-- **An accepted ADR is not rewritten.** A reversal is a new ADR that supersedes the old one (flip its
-  Status to "Superseded by …"). A later change that only makes a detail untrue adds a dated
-  "Amended by" bullet under the old one's Status (see ADR-0002 for the form); its body stays.
+- **An accepted ADR is not rewritten.** A changed decision is a new ADR that supersedes the old one:
+  flip the old one's Status to "Superseded by [NNNN](…)" and leave its body as it is. A small factual
+  correction (a renamed path) may add one dated note under the Status.
+- **Record what is decided, not what is planned.** Code proves an implementation, not the motive:
+  a reason the user did not state is marked "(⚠ reconstructed, to be confirmed)".
+- Numbers have gaps (removed records live in git); never reuse a number.
 - One decision per record, roughly one screenful, present tense.
 - Plain-text Markdown: designIQ shows it unrendered, so keep it readable raw.
 

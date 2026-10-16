@@ -5,8 +5,18 @@ against a **running** service. Domain endpoints trigger the business actions (in
 back-office tasks); the CIB seven `/engine-rest` API reads process instances, history, jobs and
 incidents, and resets the retries of the failed job in the incident demo. The tasks, events and
 the order step are asynchronous continuations, so each step polls for the wait state it needs
-(`pollApp`, `pollEngine`, `pollActivity` in `collection.bru`, see ADR-0012) instead of sleeping. CI
-runs the collection on every pull request. Run the commands from this folder.
+(`pollApp`, `pollEngine`, `pollActivity` in `collection.bru`) instead of sleeping. CI runs the
+collection on every pull request. Run the commands from this folder.
+
+**Polling, not sleeping.** A helper returns the moment its predicate holds and waits the full budget
+only when something is really wrong; the request's own assertions then report the actual state instead
+of a bare timeout. Budgets come from the environment (`pollTimeoutMs`, `pollIntervalMs` in
+`environments/local.bru`); a scenario that needs longer, like the incident demo waiting out the
+`R3/PT10S` retry cycle, passes `{ timeoutMs }`. Command steps poll for the precondition that makes the
+command valid (for example a `contractId` before `sign-contract`). Bruno asserts the HTTP contract and
+the eventually consistent read model; deterministic engine-level checks stay in the JVM process tests.
+The CLI is pinned (`@usebruno/cli@4.0.0`) because the script sandbox the helpers rely on can change
+between majors.
 
 ```bash
 npx --yes @usebruno/cli@4.0.0 run . --env local -r
