@@ -64,10 +64,10 @@ class StatusMatchesWaitStateTest {
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
 
         Assertions.assertThat(statusOf(id)).isEqualTo(LeasingStatus.CONTRACT_SENT)
-        assertThat(instance).isWaitingAt(FlowNodes.EventContractSigned.ELEMENT_ID)
+        assertThat(instance).isWaitingAt(FlowNodes.ReceiveTaskContractSigned.ELEMENT_ID)
 
         signContract.signContract(id)
-        processEngine.executeJobFor(FlowNodes.EventContractSigned)
+        processEngine.executeJobFor(FlowNodes.ReceiveTaskContractSigned)
         Assertions.assertThat(statusOf(id)).isEqualTo(LeasingStatus.CONTRACT_SIGNED)
         processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
 

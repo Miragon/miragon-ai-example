@@ -75,7 +75,7 @@ class BikeLeasingProcessTest {
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
 
         process.correlateContractSigned(id)
-        processEngine.executeJobFor(FlowNodes.EventContractSigned)
+        processEngine.executeJobFor(FlowNodes.ReceiveTaskContractSigned)
         processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
 
         process.correlateHandoverReported(id)
@@ -185,7 +185,7 @@ class BikeLeasingProcessTest {
         val instance = runtimeService.findProcessInstance(id)
         process.completeCreditCheck(id, solvent = true)
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
-        assertThat(instance).isWaitingAt(FlowNodes.EventContractSigned.ELEMENT_ID)
+        assertThat(instance).isWaitingAt(FlowNodes.ReceiveTaskContractSigned.ELEMENT_ID)
 
         process.correlateApplicationWithdrawn(id)
         processEngine.executeJobFor(FlowNodes.StartEventApplicationWithdrawn)
@@ -210,7 +210,7 @@ class BikeLeasingProcessTest {
         process.completeCreditCheck(id, solvent = true)
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
         process.correlateContractSigned(id)
-        processEngine.executeJobFor(FlowNodes.EventContractSigned)
+        processEngine.executeJobFor(FlowNodes.ReceiveTaskContractSigned)
         processEngine.executeJobFor(FlowNodes.ServiceTaskOrderBike)
         assertThat(instance).isWaitingAt(FlowNodes.EventHandoverReported.ELEMENT_ID)
 
@@ -244,7 +244,7 @@ class BikeLeasingProcessTest {
     private fun pathUntilContractSigned() =
         pathUntilCreditChecked()
             .then { it.serviceTaskSendContract }
-            .then { it.eventContractSigned }
+            .then { it.receiveTaskContractSigned }
 
     private fun pathOfTheReversal() =
         ProcessPath.from(FlowNodes.StartEventApplicationWithdrawn)

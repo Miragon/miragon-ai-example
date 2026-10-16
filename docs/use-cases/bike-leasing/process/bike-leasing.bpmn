@@ -37,11 +37,10 @@
       <bpmn:incoming>flow_solvent</bpmn:incoming>
       <bpmn:outgoing>flow_contractSentToSigned</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:intermediateCatchEvent id="event_contractSigned" name="Contract signed" camunda:asyncAfter="true">
+    <bpmn:receiveTask id="receiveTask_contractSigned" name="Contract signed" camunda:asyncAfter="true" messageRef="Message_ContractSigned">
       <bpmn:incoming>flow_contractSentToSigned</bpmn:incoming>
       <bpmn:outgoing>flow_signedToFork</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1bpl8b7" messageRef="Message_ContractSigned" />
-    </bpmn:intermediateCatchEvent>
+    </bpmn:receiveTask>
     <bpmn:parallelGateway id="gateway_fork">
       <bpmn:incoming>flow_signedToFork</bpmn:incoming>
       <bpmn:outgoing>flow_forkToInsurance</bpmn:outgoing>
@@ -109,8 +108,8 @@
     <bpmn:sequenceFlow id="flow_notSolvent" name="No" sourceRef="gateway_isSolvent" targetRef="gateway_rejectionJoin">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!solvent}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="flow_contractSentToSigned" sourceRef="serviceTask_sendContract" targetRef="event_contractSigned" />
-    <bpmn:sequenceFlow id="flow_signedToFork" sourceRef="event_contractSigned" targetRef="gateway_fork" />
+    <bpmn:sequenceFlow id="flow_contractSentToSigned" sourceRef="serviceTask_sendContract" targetRef="receiveTask_contractSigned" />
+    <bpmn:sequenceFlow id="flow_signedToFork" sourceRef="receiveTask_contractSigned" targetRef="gateway_fork" />
     <bpmn:sequenceFlow id="flow_forkToInsurance" sourceRef="gateway_fork" targetRef="serviceTask_issueInsurancePolicy" />
     <bpmn:sequenceFlow id="flow_forkToOrder" sourceRef="gateway_fork" targetRef="serviceTask_orderBike" />
     <bpmn:sequenceFlow id="flow_insuranceToJoin" sourceRef="serviceTask_issueInsurancePolicy" targetRef="gateway_join" />
@@ -144,43 +143,40 @@
       <bpmndi:BPMNShape id="BPMNShape_1378qnz" bpmnElement="serviceTask_sendContract">
         <dc:Bounds x="520" y="630" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0cxthdg" bpmnElement="event_contractSigned">
-        <dc:Bounds x="672" y="652" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="651" y="695" width="78" height="14" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNShape id="BPMNShape_0cxthdg" bpmnElement="receiveTask_contractSigned">
+        <dc:Bounds x="670" y="630" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0337vs7" bpmnElement="gateway_fork">
-        <dc:Bounds x="755" y="645" width="50" height="50" />
+        <dc:Bounds x="819" y="645" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_16r8g9s" bpmnElement="serviceTask_issueInsurancePolicy">
-        <dc:Bounds x="850" y="550" width="100" height="80" />
+        <dc:Bounds x="914" y="630" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1qlh2qb" bpmnElement="serviceTask_orderBike">
-        <dc:Bounds x="850" y="710" width="100" height="80" />
+        <dc:Bounds x="914" y="770" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_05h5jhe" bpmnElement="gateway_join">
-        <dc:Bounds x="995" y="645" width="50" height="50" />
+        <dc:Bounds x="1059" y="645" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1aghg5v" bpmnElement="event_handoverReported">
-        <dc:Bounds x="1092" y="652" width="36" height="36" />
+        <dc:Bounds x="1156" y="652" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1087" y="695" width="48" height="27" />
+          <dc:Bounds x="1151" y="695" width="48" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1jvldo9" bpmnElement="endEvent_leasingActive">
-        <dc:Bounds x="1192" y="652" width="36" height="36" />
+        <dc:Bounds x="1256" y="652" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1175" y="695" width="71" height="14" />
+          <dc:Bounds x="1239" y="695" width="71" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1os5qx3" bpmnElement="serviceTask_sendRejection">
         <dc:Bounds x="520" y="760" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_03fwv9j" bpmnElement="endEvent_applicationRejected">
-        <dc:Bounds x="662" y="782" width="36" height="36" />
+        <dc:Bounds x="726" y="782" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="654" y="825" width="54" height="27" />
+          <dc:Bounds x="718" y="825" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1ot89uz" bpmnElement="gateway_rejectionJoin" isMarkerVisible="true">
@@ -243,39 +239,37 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0gq7e6v" bpmnElement="flow_contractSentToSigned">
         <di:waypoint x="620" y="670" />
-        <di:waypoint x="672" y="670" />
+        <di:waypoint x="670" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0kd5tho" bpmnElement="flow_signedToFork">
-        <di:waypoint x="708" y="670" />
-        <di:waypoint x="755" y="670" />
+        <di:waypoint x="770" y="670" />
+        <di:waypoint x="819" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_1ihbgdo" bpmnElement="flow_forkToInsurance">
-        <di:waypoint x="780" y="645" />
-        <di:waypoint x="780" y="590" />
-        <di:waypoint x="850" y="590" />
+        <di:waypoint x="869" y="670" />
+        <di:waypoint x="914" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0b0j140" bpmnElement="flow_forkToOrder">
-        <di:waypoint x="780" y="695" />
-        <di:waypoint x="780" y="750" />
-        <di:waypoint x="850" y="750" />
+        <di:waypoint x="844" y="695" />
+        <di:waypoint x="844" y="810" />
+        <di:waypoint x="914" y="810" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_16rf9gu" bpmnElement="flow_insuranceToJoin">
-        <di:waypoint x="950" y="590" />
-        <di:waypoint x="1020" y="590" />
-        <di:waypoint x="1020" y="645" />
+        <di:waypoint x="1014" y="670" />
+        <di:waypoint x="1059" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0h1lzng" bpmnElement="flow_orderToJoin">
-        <di:waypoint x="950" y="750" />
-        <di:waypoint x="1020" y="750" />
-        <di:waypoint x="1020" y="695" />
+        <di:waypoint x="1014" y="810" />
+        <di:waypoint x="1084" y="810" />
+        <di:waypoint x="1084" y="695" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_19kjk2n" bpmnElement="flow_joinToHandover">
-        <di:waypoint x="1045" y="670" />
-        <di:waypoint x="1092" y="670" />
+        <di:waypoint x="1109" y="670" />
+        <di:waypoint x="1156" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_1vj1ors" bpmnElement="flow_handoverToActive">
-        <di:waypoint x="1128" y="670" />
         <di:waypoint x="1192" y="670" />
+        <di:waypoint x="1256" y="670" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_13xrzsh" bpmnElement="flow_rejectionJoined">
         <di:waypoint x="468" y="810" />
@@ -283,7 +277,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_1vw6y69" bpmnElement="flow_rejectionSent">
         <di:waypoint x="620" y="800" />
-        <di:waypoint x="662" y="800" />
+        <di:waypoint x="726" y="800" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0ynek7f" bpmnElement="flow_applicationInvalid">
         <di:waypoint x="190" y="728" />

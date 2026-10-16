@@ -32,7 +32,7 @@ Where things live:
 | Merging gateway | unnamed, or named after what it collects | Rejection reason |
 | Parallel gateway | unnamed | `gateway_fork`, `gateway_join` |
 | Timer | the duration | 14 days (planned #18, #21) |
-| BPMN element id | `<type>_<camelCase>`, never changed once released | `serviceTask_orderBike` · `event_contractSigned` · `gateway_isSolvent` |
+| BPMN element id | `<type>_<camelCase>`, never changed once released | `serviceTask_orderBike` · `receiveTask_contractSigned` · `gateway_isSolvent` |
 | Sequence flow id | `flow_<camelCase>` describing the step, as bpmnlint requires | `flow_requestToValidation` · `flow_notSolvent` |
 | Message | id `Message_<PascalCase>`, name `miravelo.<camelCase>` | `Message_ContractSigned` / `miravelo.contractSigned` |
 | Decision (DMN) | file name = decision id, so designIQ links the rule task | `checkCreditRating.dmn` → `checkCreditRating` |
@@ -83,7 +83,7 @@ Do not mix up:
 | Term | Definition | In the models | In the code | Status |
 |---|---|---|---|---|
 | MiraVelo | The fictional bike brand that leases bikes to customers and runs this process. | process `bikeLeasingProcess` "MiraVelo Bike Leasing"; message names `miravelo.*` | `Messages.MIRAVELO_*` | core |
-| Customer | The person who applies for a lease, signs the contract, may withdraw and receives the bike. | "Leasing request received" (`startEvent_leasingRequestReceived`); "Contract signed" (`event_contractSigned`); "Application withdrawn" (`startEvent_applicationWithdrawn`) | `CustomerName`, `Email`, `LeasingApplication.customerName`; frontend `/antraege/neu`, `/antraege/{id}` | core |
+| Customer | The person who applies for a lease, signs the contract, may withdraw and receives the bike. | "Leasing request received" (`startEvent_leasingRequestReceived`); "Contract signed" (`receiveTask_contractSigned`); "Application withdrawn" (`startEvent_applicationWithdrawn`) | `CustomerName`, `Email`, `LeasingApplication.customerName`; frontend `/antraege/neu`, `/antraege/{id}` | core |
 | Back office | MiraVelo staff who check the credit rating and reverse withdrawn applications. They work in the inbox of the frontend. | `userTask_checkCreditRating`, `userTask_reverseApplication` | `GET /api/tasks`, `POST /api/bike-leasing/{id}/credit-check`, `POST /api/bike-leasing/{id}/reversal`; frontend `/aufgaben` | core |
 | Operations | Whoever watches running cases and resolves incidents. | incidents on `serviceTask_orderBike` | – (works in the CIB seven Cockpit) | core |
 | Dealer | The bike dealer: offers the catalogue, takes the order, reports the handover. Simulated in the core (decision #10). | "Order bike from dealer" (`serviceTask_orderBike`); "Handover reported" (`event_handoverReported`) | `BikeDealerPort` → `BikeDealerAdapter`; `POST /api/bike-leasing/{id}/report-handover` | core |
@@ -110,7 +110,7 @@ Do not mix up:
 |---|---|---|---|---|
 | Leasing contract | The contract between MiraVelo and the customer. The contract system issues it when it is sent; its reference is stored on the application. Simulated in the core (decision #8). | "Send contract" (`serviceTask_sendContract`) | `ContractPort.issueContract` → `ContractId` (`CONTRACT-<uuid>`); `LoggingContractAdapter` | core |
 | Send contract | Issue the contract and ask the customer to sign it ("Please review and sign your leasing contract"). | `serviceTask_sendContract` (`#{sendContractDelegate}`) | `SendContractDelegate`, `SendContractUseCase`, `LeasingApplication.sendContract` | core |
-| Contract signed | The customer has signed, so policy and order can start. The process waits without a time limit. Signing when no signature is awaited is refused (409). | `event_contractSigned`; `Message_ContractSigned` / `miravelo.contractSigned` | `POST /api/bike-leasing/{id}/sign-contract`, `SignContractUseCase`, `LeasingApplication.signContract`; frontend feature `sign-contract` | core |
+| Contract signed | The customer has signed, so policy and order can start. The process waits without a time limit. Signing when no signature is awaited is refused (409). | `receiveTask_contractSigned`; `Message_ContractSigned` / `miravelo.contractSigned` | `POST /api/bike-leasing/{id}/sign-contract`, `SignContractUseCase`, `LeasingApplication.signContract`; frontend feature `sign-contract` | core |
 | Customer notification | A message to the customer, sent by "Send contract" and "Send rejection". The channel is simulated (decision #9). | `serviceTask_sendContract`, `serviceTask_sendRejection` | `NotificationPort.send` → `LoggingNotificationAdapter` | core |
 | Signature deadline | 14 days to sign after the contract was sent; without a signature the application is rejected. | map: event-based gateway `gateway_awaitSignature`, timer "14 days" (`event_signatureDeadline`, P14D), `flow_deadlineToRejection` | – | planned #18 |
 | Signature reminder | One reminder if the contract is still unsigned after 7 days; the deadline (#18) stays as it is. | map and original: timer "7 days" (`event_signatureReminder`, P7D) → `serviceTask_sendReminderMail` → `endEvent_prospectReminded` | – | planned #1 |
@@ -158,7 +158,7 @@ in the engine; the services set it when the process reaches the step.
 |---|---|---|---|---|
 | RECEIVED | Submitted. Stays so through the validation and the credit check. | set before `startEvent_leasingRequestReceived` | `LeasingStatus.RECEIVED` (`LeasingApplication.receive`) | core |
 | CONTRACT_SENT | The contract is out; the customer's signature is awaited. | `serviceTask_sendContract` | `LeasingStatus.CONTRACT_SENT` (`sendContract`) | core |
-| CONTRACT_SIGNED | The customer signed; the policy is issued and the bike ordered. | `event_contractSigned` | `LeasingStatus.CONTRACT_SIGNED` (`signContract`) | core |
+| CONTRACT_SIGNED | The customer signed; the policy is issued and the bike ordered. | `receiveTask_contractSigned` | `LeasingStatus.CONTRACT_SIGNED` (`signContract`) | core |
 | ORDERED | The dealer accepted the bike order; the handover is awaited. | `serviceTask_orderBike` | `LeasingStatus.ORDERED` (`documentOrder`) | core |
 | ACTIVE | Final: the lease is live. | `event_handoverReported` → `endEvent_leasingActive` | `LeasingStatus.ACTIVE` (`activate`) | core |
 | REJECTED | Final: invalid, or not solvent. | `serviceTask_sendRejection` → `endEvent_applicationRejected` | `LeasingStatus.REJECTED` (`reject`) | core |

@@ -74,7 +74,7 @@ class DealerOutageIncidentTest {
         process.completeCreditCheck(application.id, solvent = true)
         processEngine.executeJobFor(FlowNodes.UserTaskCheckCreditRating)
         process.correlateContractSigned(application.id)
-        processEngine.executeJobFor(FlowNodes.EventContractSigned)
+        processEngine.executeJobFor(FlowNodes.ReceiveTaskContractSigned)
 
         val failures = processEngine.failJobUntilRetriesAreExhausted(FlowNodes.ServiceTaskOrderBike)
 
@@ -100,7 +100,7 @@ class DealerOutageIncidentTest {
                     .then { it.userTaskCheckCreditRating }
                     .then { it.gatewayIsSolvent }
                     .then { it.serviceTaskSendContract }
-                    .then { it.eventContractSigned }
+                    .then { it.receiveTaskContractSigned }
                     .then { it.gatewayFork },
             )
             .hasNotPassed(FlowNodes.ServiceTaskOrderBike.ELEMENT_ID)
