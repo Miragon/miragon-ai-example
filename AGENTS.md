@@ -5,27 +5,34 @@ imports it (see [ADR-0005](docs/adr/0005-agents-md-as-the-single-source.md)).
 
 ## Project Overview
 
-The **designIQ demo** repository for the **MiraVelo bike-leasing** process. An executable BPMN model
-runs on an embedded CIB seven engine behind an enforced hexagonal architecture. The process is
-deliberately reduced to a core. The design artifacts that explain it (use case, glossary, t.BPM
-model, feature map, C4, Wardley Map, ADRs) are versioned under `docs/`, the one folder designIQ reads.
-The capabilities that were removed from the original process are GitHub issues. No other Miragon AI
-component is integrated.
+An example of Miragon's way of automating a process with AI agents: the **MiraVelo bike-leasing**
+process as an executable BPMN model on an embedded CIB seven engine, behind an enforced hexagonal
+architecture, with a React frontend for customers and the back office. The process is the reference
+model `03-bike-leasing-event-subprocess-simplified` from
+[Miragon/miravelo-reference](https://github.com/Miragon/miravelo-reference)
+([ADR-0017](docs/adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)). The design
+artifacts that explain it (use case, glossary, t.BPM model, feature map, C4, Wardley Map, ADRs) are
+versioned under `docs/`, the one folder designIQ reads. What the original process could do and this
+one cannot yet is GitHub issues.
 
 - **Backend**: a single Kotlin project built with Gradle at the repo root. It uses Spring Boot 4, a
   hexagonal structure and the embedded CIB seven 2.2 engine. Service tasks call Spring-bean
-  `JavaDelegate`s by expression (the engine's interface, implemented in Kotlin), **not** Zeebe
-  workers. Package root `io.miragon.blueprint`. There is **no frontend**: the service is driven over
-  REST, and the CIB seven webapps (Cockpit / Tasklist) handle the one human step.
-- **The contract** is `openapi/openapi.json`. springdoc generates it from the controllers, and it is
-  **committed and drift-gated** in CI. It is the published contract for any REST consumer: a REST
-  change that isn't re-exported fails the drift gate. See
-  [ADR-0003](docs/adr/0003-openapi-as-the-checked-in-contract.md).
-- **The design artifacts** live in `docs/` (`designiq.yml`: `models: docs`). The executable models
-  live there too, next to the use case, and Gradle packages them onto the classpath. See
-  [ADR-0014](docs/adr/0014-one-kotlin-gradle-stack-at-the-repo-root.md) (one Kotlin/Gradle project),
-  [ADR-0015](docs/adr/0015-reduce-the-executable-process-to-a-core.md) (the core process) and
-  [ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md) (`docs/` as the designIQ workspace).
+  `JavaDelegate`s by expression (the engine's interface, implemented in Kotlin), **not** external
+  task workers. Package root `io.miragon.blueprint`.
+- **Frontend**: `frontend/`, a separate npm project (React, Vite, TanStack Router/Query, Tailwind,
+  Feature-Sliced Design), ported from
+  [miragon-blueprints/fullstack-example](https://github.com/miragon-blueprints/fullstack-example)
+  ([ADR-0018](docs/adr/0018-react-frontend-next-to-the-service.md)). Its rules are in
+  [frontend/AGENTS.md](frontend/AGENTS.md). The back office works both user tasks in the frontend
+  inbox, not in the Tasklist ([ADR-0019](docs/adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
+- **The contract** is `openapi/openapi.json`. springdoc generates it from the controllers, it is
+  **committed and drift-gated** in CI, and orval generates the frontend client from it
+  ([ADR-0003](docs/adr/0003-openapi-as-the-checked-in-contract.md)). A REST change means: re-export
+  the spec, then `npm run api:generate` in `frontend/`.
+- **The design artifacts** live in `docs/` (`designiq.yml`: `models: docs`). The executable model
+  lives there too, next to the use case, and Gradle packages it onto the classpath. See
+  [ADR-0014](docs/adr/0014-one-kotlin-gradle-stack-at-the-repo-root.md) (one Kotlin/Gradle project)
+  and [ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md) (`docs/` as the designIQ workspace).
 
 ## Repository Map
 
@@ -35,17 +42,28 @@ The service, a single Gradle project at the repo root (`build.gradle.kts`, `sett
 ```
 src/main/kotlin/io/miragon/blueprint/   the bike-leasing service (hexagonal)
   adapter/inbound/rest        REST controllers + OpenAPI / problem-details config
-  adapter/inbound/cibseven    JavaDelegates + the task listener for the BPMN tasks
-  adapter/outbound/cibseven   drives the engine (RuntimeService / TaskService)
+  adapter/inbound/cibseven    JavaDelegates for the service tasks
+  adapter/outbound/cibseven   drives the engine: start, correlate, complete and list user tasks
   adapter/outbound/db         JPA persistence (leasing applications)
-  adapter/outbound/…          simulated contract / notification / dealer adapters
+  adapter/outbound/…          simulated contract / insurance / notification / dealer adapters
   adapter/process             generated *ProcessApi (bpmn-to-code) + engine config
   application/{port,service}  use-case ports and their services
   domain/{leasing,bike}       pure domain model
-src/main/resources/forms      the Camunda Form of the user task
 src/main/resources/db/migration   Flyway versioned schema migrations
 src/test/kotlin/io/miragon/blueprint/          tests (architecture, domain, services, adapters, process)
 src/test/kotlin/io/miragon/common/architecture/   reusable ArchUnit + Konsist rule suite
+```
+
+The frontend (`frontend/`, npm, see [frontend/AGENTS.md](frontend/AGENTS.md)):
+
+```
+frontend/src/app        router, routes, styles
+frontend/src/pages      application-list, application-detail, submit-application, task-inbox
+frontend/src/widgets    app-shell, application table/summary/actions, leasing-progress, task-inbox-list
+frontend/src/features   one write each: submit, sign, handover, withdraw, credit check, reversal
+frontend/src/entities   reads: leasing-application, bike, user-task
+frontend/src/shared     generated API client (orval), ui kit, i18n (de/en)
+frontend/e2e            Playwright scenarios against the running stack
 ```
 
 The designIQ folder:
@@ -60,9 +78,9 @@ docs/
     bike-leasing-use-case.md  the use case: problem, actors, core scope vs. features
     tbpm/                     bike-leasing-tbpm.bpmn: t.BPM table-top model of the core
     feature-map/              bike-leasing-feature-map.bpmn + feature-map.md: features on the process
-    process/                  EXECUTABLE: bike-leasing.bpmn, checkCreditRating.dmn,
+    process/                  EXECUTABLE: bike-leasing.bpmn,
                               executable-process.md (how it is built, element ids)
-    original/                 FROZEN copies of the original models + scope-comparison.md
+    original/                 FROZEN original models + checkCreditRating.dmn + scope-comparison.md
   architecture/               c4-system-context.md, c4-container.md (Mermaid),
                               sourcing-map.owm (Wardley Map), sourcing-decisions.md
   adr/                        Architecture Decision Records
@@ -77,13 +95,14 @@ bruno/                        REST scenarios + 00-demo-data (demo cases for a li
 openapi/                      the checked-in, drift-gated OpenAPI contract (openapi.json)
 stack/                        Postgres dev stack (docker compose)
 .github/                      pre-merge + nightly pipelines + Dependabot
-.githooks/                    pre-commit hook (bpmnlint on staged .bpmn)
+.githooks/                    pre-commit hook (bpmnlint on staged .bpmn, lint-staged in frontend/)
+.claude/                      Claude Code skills and review agents (see .claude/README.md)
 package.json / .bpmnlintrc    bpmnlint config + git-hook installer (npm run lint:bpmn)
 ```
 
 ## Development Setup
 
-Two commands to a running service: Postgres, then the backend + engine on :8081.
+Three commands to a running stack: Postgres, the backend + engine on :8081, the frontend on :5173.
 
 ```bash
 docker compose -f stack/docker-compose.yml up -d
@@ -93,10 +112,15 @@ docker compose -f stack/docker-compose.yml up -d
 ./gradlew bootRun
 ```
 
+```bash
+npm --prefix frontend ci && npm --prefix frontend run dev
+```
+
 ### Ports (one source of truth: keep README, CONTRIBUTING, this file and `.conductor/settings.toml` in sync)
 
 | What | Port |
 |---|---|
+| Frontend (Vite dev server, proxies `/api`, `/engine-rest`, `/camunda` to 8081) | 5173 |
 | Postgres | 5432 |
 | Backend (REST + `/engine-rest`) | 8081 |
 | CIB seven Cockpit / Tasklist / Admin | 8081/camunda (admin/admin) |
@@ -105,7 +129,8 @@ docker compose -f stack/docker-compose.yml up -d
 | Actuator (health/liveness/readiness · prometheus) | 8081/actuator |
 
 Under Conductor the ports are fixed and the workspace runs `nonconcurrent`
-(see [ADR-0006](docs/adr/0006-fixed-ports-for-v1-portless-as-the-upgrade.md)).
+(see [ADR-0006](docs/adr/0006-fixed-ports-for-v1-portless-as-the-upgrade.md)). Keep this table,
+`frontend/vite.config.ts` and `frontend/playwright.config.ts` in sync.
 
 ## Build Commands
 
@@ -119,10 +144,14 @@ All from the repo root:
 | Regenerate the OpenAPI contract | `./gradlew test --tests "io.miragon.blueprint.openapi.OpenApiSpecExportTest"` |
 | Verify the OpenAPI contract after regenerating it | `git diff --exit-code openapi/openapi.json` |
 | Backend OCI image (`miravelo/cibseven-embedded-example`) | `./gradlew bootBuildImage` |
+| Frontend gates (format, lint, FSD, dead code, types, unit tests) | `npm --prefix frontend run verify` |
+| Regenerate the frontend API client after a contract change | `npm --prefix frontend run api:generate` |
+| Check the generated client against the contract | `npm --prefix frontend run api:check` |
+| Frontend end-to-end (running stack + dev server) | `npm --prefix frontend run e2e` |
 | BPMN lint (executable models) | `npm run lint:bpmn` |
 | designIQ validation (all models under `docs/`) | `npx --yes @miragon/design-iq-validator@5.3.0 --root .` |
 | designIQ validation (one model, id = file stem) | `npx --yes @miragon/design-iq-validator@5.3.0 --root . <model-id>` |
-| Demo data and Tasklist filter (running stack) | `cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local` |
+| Demo data (running stack) | `cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local` |
 | API scenarios (running stack) | `cd bruno && npx --yes @usebruno/cli@4.0.0 run . --env local -r` |
 
 The OCI image decision is [ADR-0011](docs/adr/0011-build-and-deployment-approach.md); the how-to is
@@ -130,18 +159,21 @@ CONTRIBUTING "Run it in containers".
 
 ## Process Models
 
-- **Executable models live in `docs/use-cases/bike-leasing/process/`** (`bike-leasing.bpmn`,
-  `checkCreditRating.dmn`). Gradle packages them onto the classpath as `bpmn/*.bpmn` and `dmn/*.dmn`.
+- **Executable models live in `docs/use-cases/bike-leasing/process/`** (today only
+  `bike-leasing.bpmn`). Gradle packages them onto the classpath as `bpmn/*.bpmn` and `dmn/*.dmn`.
   Edit them there and nowhere else; `src/main/resources` holds no `.bpmn` or `.dmn` files.
+- **The executable model derives from the reference model** `03-bike-leasing-event-subprocess-simplified`.
+  Every difference is listed in `executable-process.md`; add a row when you add one.
 - **After editing a `.bpmn`**, run `./gradlew generateBpmnModels` and commit the regenerated
   `adapter/process` files. Then run `npm run lint:bpmn` and the `process.*` tests.
 - **Keep element ids stable.** The issues' anchor blocks, the feature map, `executable-process.md` and
   the glossary refer to them. If you rename or remove an element, update every reference in the same
   change.
-- **The DMN file stem is its decision id** (`checkCreditRating`). That is how designIQ links
-  *Check credit rating* to the decision, so never rename one without the other.
+- **A DMN's file stem is its decision id** (`checkCreditRating`). That is how designIQ links a
+  business rule task to the decision, so never rename one without the other. The DMN is not
+  deployed today; it waits in `original/` for its feature issue.
 - **`docs/use-cases/bike-leasing/original/` is frozen.** It holds reference copies of the tag
-  `original-process-v1`, is not deployed and is never edited.
+  `original-process-v1` (the target picture for the roadmap), is not deployed and is never edited.
 - **The t.BPM model and the feature map are documentation**, not deployed: Gradle packages only
   `process/`.
 
@@ -162,10 +194,9 @@ CONTRIBUTING "Run it in containers".
 - **Plain-text Markdown.** designIQ shows Markdown and Mermaid as raw text. Keep docs readable without
   rendering, and refresh the PNG in `docs/assets/` when a model's picture changes.
 - **Validate** every changed model with the validator (see Build Commands), or with the dry-run
-  `validate_model` MCP tool. Known false positive: the compensation handler `serviceTask_cancelContract`
-  and its boundary event `event_compensateContract` are reported as unreachable / dead end
-  ([ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md)).
-  A change must add no other error.
+  `validate_model` MCP tool. The executable model validates without errors or warnings; keep it
+  that way. The frozen original shows known errors (compensation false positives, too many
+  activities); a change must add no other error.
 - **Todos are GitHub issues** labelled `todo` and `process:bike-leasing`, with this anchor block at the
   very top of the body (one `element:` line per element; none for a process-level todo):
 
@@ -187,23 +218,27 @@ CONTRIBUTING "Run it in containers".
 
 | # | Feature or decision | Stage |
 |---|---|---|
-| [#1](https://github.com/miragon-blueprints/miragon-ai-example/issues/1) | Signature reminder | Stage 1 – Customer follow-up |
-| [#2](https://github.com/miragon-blueprints/miragon-ai-example/issues/2) | Insurance policy | Stage 2 – Insurance |
-| [#3](https://github.com/miragon-blueprints/miragon-ai-example/issues/3) | Withdrawal | Stage 3 – Withdrawal |
+| [#18](https://github.com/miragon-blueprints/miragon-ai-example/issues/18) | Signature deadline (14 days) | Stage 1 – Customer follow-up |
+| [#1](https://github.com/miragon-blueprints/miragon-ai-example/issues/1) | Signature reminder (depends on #18) | Stage 1 – Customer follow-up |
+| [#19](https://github.com/miragon-blueprints/miragon-ai-example/issues/19) | Credit check via DMN | Stage 2 – Automation and supply |
+| [#20](https://github.com/miragon-blueprints/miragon-ai-example/issues/20) | Alternative bike when unavailable | Stage 2 – Automation and supply |
+| [#21](https://github.com/miragon-blueprints/miragon-ai-example/issues/21) | Withdrawal period before activation | Stage 3 – Withdrawal |
+| [#3](https://github.com/miragon-blueprints/miragon-ai-example/issues/3) | Automatic reversal (compensation) | Stage 3 – Withdrawal |
 | [#4](https://github.com/miragon-blueprints/miragon-ai-example/issues/4) | Bike order cancellation (depends on #3) | Stage 3 – Withdrawal |
-| [#5](https://github.com/miragon-blueprints/miragon-ai-example/issues/5) | Back-office inbox | Stage 4 – Portal and back-office views |
-| [#6](https://github.com/miragon-blueprints/miragon-ai-example/issues/6) | Application list | Stage 4 – Portal and back-office views |
-| [#7](https://github.com/miragon-blueprints/miragon-ai-example/issues/7) | Bike catalogue | Stage 4 – Portal and back-office views |
+| [#7](https://github.com/miragon-blueprints/miragon-ai-example/issues/7) | Live dealer availability | Stage 4 – Portal |
 | [#8](https://github.com/miragon-blueprints/miragon-ai-example/issues/8) | Decision: contract & e-signature | – |
 | [#9](https://github.com/miragon-blueprints/miragon-ai-example/issues/9) | Decision: customer notification | – |
 | [#10](https://github.com/miragon-blueprints/miragon-ai-example/issues/10) | Decision: dealer integration | – |
-| [#11](https://github.com/miragon-blueprints/miragon-ai-example/issues/11) | Decision: back-office task UI | – |
 
-- **Implementing a feature (#1–#7)** means following its acceptance criteria through every layer:
-  model, regenerated process API, code, tests, `openapi.json` and Bruno. In the same PR, update the
-  feature map (`bike-leasing-feature-map.bpmn` and `feature-map.md`), the glossary and, if elements
-  change, `executable-process.md`. Close the issue from the PR (`Closes #n`).
-- **Taking a decision (#8–#11)** means writing a new ADR in `docs/adr/` (copy the template), updating
+Delivered by the rebase and closed: #2 (insurance policy), #5 (back-office inbox), #6 (application
+list) and the decision #11 (task UI, [ADR-0019](docs/adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
+
+- **Implementing a feature** means following its acceptance criteria through every layer: model,
+  regenerated process API, code, tests, `openapi.json`, the regenerated frontend client and the UI
+  where the feature is visible, Bruno and Playwright. In the same PR, update the feature map
+  (`bike-leasing-feature-map.bpmn` and `feature-map.md`), the glossary and, if elements change,
+  `executable-process.md`. Close the issue from the PR (`Closes #n`).
+- **Taking a decision (#8–#10)** means writing a new ADR in `docs/adr/` (copy the template), updating
   `sourcing-map.owm` and `sourcing-decisions.md`, and closing the issue.
 - **Derive, never invent.** A feature's details come from its issue and the original model in
   `original/`. Mark anything else as an assumption.
@@ -254,6 +289,8 @@ TDD. Match the test style to the layer:
 | `adapter.inbound.rest` | `@WebMvcTest` with the use case mocked |
 | `adapter.outbound.db` | `@DataJpaTest` |
 | process end-to-end | CIB seven process tests, paths asserted via `ProcessPath` |
+| frontend units, widgets, pages | Vitest + Testing Library, API mocked with the generated MSW handlers |
+| whole stack | Bruno (REST) and Playwright (UI) against the running service |
 
 **Mutation testing gates PRs at 80**: a test that executes without asserting will fail CI. Coverage
 says a line ran; mutation says a test would have noticed. The PR gate runs **diff-scoped** (only the
@@ -270,6 +307,16 @@ From the repo root:
 - Process changed: `./gradlew generateBpmnModels`, `npm run lint:bpmn`, then
   `./gradlew test --tests "io.miragon.blueprint.process.*"`
 - Design artifact changed: `npx --yes @miragon/design-iq-validator@5.3.0 --root . <model-id>`
+- Frontend changed: `npm --prefix frontend run verify`; after a contract change also
+  `npm --prefix frontend run api:generate` and `npm --prefix frontend run build`
+
+## Skills and Review Agents
+
+`.claude/` holds Claude Code skills for recurring work (automate a process step, add a delegate, a
+REST controller, a persistence adapter or a frontend feature slice, sync the API client, write an
+ADR, check a model visually) and two review agents (`review-process`, `review-vertical-slice`).
+[.claude/README.md](.claude/README.md) lists them. Use a review agent before you open a PR that
+changes the model or a vertical slice.
 
 ## Working with GitHub
 

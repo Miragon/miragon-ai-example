@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in the MiraVelo bike-leasing designIQ demo. Bug reports, feature ideas,
+Thanks for your interest in the MiraVelo bike-leasing example. Bug reports, feature ideas,
 docs, models and code are all welcome. The [README](README.md) explains what the repo is for. This
 file covers how to work on it.
 
@@ -10,16 +10,17 @@ file covers how to work on it.
 git clone git@github.com:miragon-blueprints/miragon-ai-example.git
 cd miragon-ai-example
 npm ci && npm run hooks:install   # bpmnlint + the pre-commit hook
+npm --prefix frontend ci          # the frontend
 ```
 
 You need:
 
 - **JDK 21**. The Gradle wrapper is included, so nothing else needs installing for the build.
 - **Docker** (or Podman) with Compose, for Postgres.
-- **Node.js 22+**, for bpmnlint, the Bruno scenarios and the designIQ validator. The service itself
-  has no Node dependency.
+- **Node.js 24** (`frontend/.nvmrc`), for the frontend, bpmnlint, the Bruno scenarios and the
+  designIQ validator. The service itself has no Node dependency.
 
-Start Postgres, then the backend and engine on :8081:
+Start Postgres, the backend and engine on :8081, and the frontend on :5173:
 
 ```bash
 docker compose -f stack/docker-compose.yml up -d
@@ -29,10 +30,15 @@ docker compose -f stack/docker-compose.yml up -d
 ./gradlew bootRun
 ```
 
+```bash
+npm --prefix frontend run dev
+```
+
 ### Ports
 
 | What | Port |
 |---|---|
+| Frontend (Vite dev server) | 5173 |
 | Postgres | 5432 |
 | Backend (REST + `/engine-rest`) | 8081 |
 | CIB seven Cockpit / Tasklist / Admin | 8081/camunda (admin/admin) |
@@ -40,7 +46,7 @@ docker compose -f stack/docker-compose.yml up -d
 | OpenAPI spec · Swagger UI | 8081/v3/api-docs · 8081/swagger-ui.html |
 | Actuator (health · liveness/readiness · prometheus) | 8081/actuator |
 
-So: <http://localhost:8081/camunda>, <http://localhost:8081/webapp>,
+So: <http://localhost:5173> (the frontend), <http://localhost:8081/camunda>, <http://localhost:8081/webapp>,
 <http://localhost:8081/swagger-ui.html> and <http://localhost:8081/actuator/health> (status `UP`).
 
 Under Conductor the ports are fixed and the workspace runs `nonconcurrent` (see
@@ -56,6 +62,9 @@ From the repo root:
 | Mutation testing (gate 80) | `./gradlew pitest` |
 | Regenerate the typed process API after editing a `.bpmn` | `./gradlew generateBpmnModels` |
 | Regenerate the OpenAPI contract | `./gradlew test --tests "io.miragon.blueprint.openapi.OpenApiSpecExportTest"` |
+| Frontend gates (format, lint, FSD, dead code, types, unit tests) | `npm --prefix frontend run verify` |
+| Regenerate the frontend API client after a contract change | `npm --prefix frontend run api:generate` |
+| Frontend end-to-end tests (running stack and dev server) | `npm --prefix frontend run e2e` |
 | Lint the executable BPMN models | `npm run lint:bpmn` |
 | Validate the designIQ models under `docs/` | `npx --yes @miragon/design-iq-validator@5.3.0 --root .` |
 | Build the OCI image | `./gradlew bootBuildImage` |
@@ -74,11 +83,11 @@ cd bruno && npx --yes @usebruno/cli@4.0.0 run 00-demo-data --env local && cd ..
 cd bruno && npx --yes @usebruno/cli@4.0.0 run . --env local -r && cd ..
 ```
 
-`00-demo-data` leaves four cases in demo-friendly states and creates the Tasklist filter "All tasks"
-if it is missing. The numbered folders cover the happy path,
-the signature deadline, a rejected credit check, an unavailable bike, a declined alternative, the
-alternative chosen via the Tasklist, invalid requests and the incident demo. The full list is in
-[bruno/README.md](bruno/README.md). CI runs the whole collection on every pull request.
+`00-demo-data` leaves cases in demo-friendly states, so the list and the inbox are not empty. The
+numbered folders cover the happy path, an invalid application, a rejected credit check, the
+withdrawal, invalid requests and the incident demo. The full list is in
+[bruno/README.md](bruno/README.md). CI runs the whole collection and the Playwright scenarios on
+every pull request.
 
 To start from an empty engine: stop the service, run `docker compose -f stack/docker-compose.yml down -v`,
 start Postgres and the service again, and load `00-demo-data` again.
@@ -108,6 +117,14 @@ docker run --rm -p 8081:8081 \
   miravelo/cibseven-embedded-example:1.0-SNAPSHOT
 ```
 
+To run the frontend in a container too (nginx on :8090, proxying to the service), use the full
+stack instead. It brings its own Postgres, so stop the dev stack first:
+
+```bash
+./gradlew bootBuildImage
+docker compose -f stack/docker-compose.full.yml up --build
+```
+
 **Podman:** the image build needs a Docker-API socket. Expose Podman's, then build the image as above:
 
 ```bash
@@ -131,8 +148,8 @@ the environment and win over the defaults:
 
 - **Start from an issue.** Every change traces back to one. Open an issue, or pick an existing one,
   and agree on the approach *before* you write code. Then reference it in the PR (`Closes #123`).
-  The planned features are #1–#7 and the open decisions #8–#11. [AGENTS.md](AGENTS.md) explains what
-  implementing one involves.
+  The planned features and open decisions are listed in [AGENTS.md](AGENTS.md#features-and-decisions),
+  which also explains what implementing one involves.
 - **Read [AGENTS.md](AGENTS.md) first.** It is the single source of guidance for humans and AI agents
   alike (see [ADR-0005](docs/adr/0005-agents-md-as-the-single-source.md)).
 - **Conventional Commits.** Commit messages and PR titles follow
@@ -151,15 +168,15 @@ the environment and win over the defaults:
 - **Never edit `docs/use-cases/bike-leasing/original/`.** It is the frozen original process
   (tag `original-process-v1`).
 - **Changing the API?** Re-export the spec with the `OpenApiSpecExportTest` (every full build runs
-  it), so that the committed `openapi/openapi.json` stays in sync. It is **drift-gated in CI**.
+  it), so that the committed `openapi/openapi.json` stays in sync, then regenerate the frontend
+  client with `npm --prefix frontend run api:generate`. Both are **drift-gated in CI**.
 - **Changing the database schema?** Flyway owns it. Add a new forward-only migration
   `V{n}__description.sql` under `src/main/resources/db/migration/` in the same change as the entity
   edit, and never edit an applied migration. Hibernate runs `validate`, so a mismatch fails startup.
   See [ADR-0010](docs/adr/0010-flyway-for-database-migrations.md).
 - **Changing a design artifact?** Everything under `docs/` is a designIQ model and must pass the
-  designIQ validator. The only accepted errors are the known compensation false positives on the
-  executable and the original process
-  ([ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md)). Keep file stems unique under
+  designIQ validator. The executable process validates clean; the only accepted errors are the known
+  ones on the frozen original ([ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md)). Keep file stems unique under
   `docs/`, keep BPMN diagrams complete (BPMNDI), and write Markdown that reads well as plain text.
 
 ## Before opening a PR
@@ -170,13 +187,16 @@ From the repo root:
 ./gradlew build pitest                                     # all tests, mutation score >= 80
 git diff --exit-code openapi/openapi.json                  # the API contract must not drift
 npm run lint:bpmn                                          # the executable models
+npm --prefix frontend run verify                           # the frontend gates
+npm --prefix frontend run api:check                        # the client matches the contract
 npx --yes @miragon/design-iq-validator@5.3.0 --root .      # the designIQ models: no new errors
 ```
 
-CI runs the build, bpmnlint, the contract-drift check, the mutation gate and the Bruno scenarios on
-every pull request (JDK 21, Node 22). Before you open a PR, check that a feature is wired end to end:
-BPMN element → outbound port → service → inbound port → REST controller → `openapi.json` → Bruno
-scenario → feature map and glossary.
+CI runs the build, bpmnlint, the contract-drift check, the mutation gate, the frontend gates, the
+Bruno scenarios and the Playwright scenarios on every pull request (JDK 21, Node 24). Before you open
+a PR, check that a feature is wired end to end: BPMN element → outbound port → service → inbound port
+→ REST controller → `openapi.json` → frontend client and UI → Bruno and Playwright scenario →
+feature map and glossary.
 
 ## Reporting bugs / requesting features
 
