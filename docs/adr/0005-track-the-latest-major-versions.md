@@ -1,4 +1,4 @@
-# 0008 — Track the latest stable major versions
+# 0005 — Track the latest stable major versions
 
 - **Status:** Accepted
 - **Date:** 2026-10-16

@@ -30,7 +30,7 @@ The service is a **hexagon (ports and adapters)** under `io.miragon.blueprint`:
 - `adapter/inbound/{rest,cibseven}`: driving adapters (REST controllers, JavaDelegates).
 - `adapter/outbound/{db,cibseven,contract,dealer,insurance,notification}`: driven adapters.
 - `adapter/process`: the generated process API (bpmn-to-code, see
-  [ADR-0020](0020-embedded-cib-seven-with-delegates-and-a-generated-process-api.md)) and engine
+  [ADR-0011](0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md)) and engine
   configuration. A technical seam that fits neither side.
 - There is no top-level `config` package. Spring configuration sits beside what it configures
   (`OpenApiConfiguration` and `GlobalExceptionConfiguration` in `adapter/inbound/rest`,

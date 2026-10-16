@@ -1,4 +1,4 @@
-# 0018 — React frontend next to the service
+# 0009 — React frontend next to the service
 
 - **Status:** Accepted
 - **Date:** 2026-10-16
@@ -40,4 +40,4 @@ The frontend's own rules are in [`frontend/AGENTS.md`](../../frontend/AGENTS.md)
   Playwright). Dependabot watches more ecosystems.
 - **Not covered:** no authentication or roles: anyone who opens the frontend can act as customer,
   dealer or back office. The frontend is not served by the service; in containers it is its own
-  nginx image ([ADR-0011](0011-build-and-deployment-approach.md)).
+  nginx image ([ADR-0007](0007-build-and-deployment-approach.md)).

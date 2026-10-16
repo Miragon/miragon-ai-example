@@ -19,7 +19,7 @@ Adapt is an option of its own, not a compromise.
 - Decorators: `build` = Make, `buy` = Buy a product, `outsource` = Buy as a service,
   `market` = Partner. No decorator plus a numbered "Open" annotation = open decision.
 - Adapt has no decorator of its own. It is `buy` plus an "Adapt" annotation (talk convention). No
-  component is adapted today. Until [ADR-0019][adr19] the CIB seven Tasklist with our own form was
+  component is adapted today. Until [ADR-0010][adr10] the CIB seven Tasklist with our own form was
   the Adapt option for the back-office task UI; the own inbox won.
 - Open source counts as Buy: we take a finished product as it is. The cost is upgrades and operation,
   not a licence.
@@ -53,20 +53,20 @@ Map position = evolution value on the map and its stage.
 | Component | Map position (evolution stage) | Decision | Rationale | Where in the process (BPMN element ids) | Where in the code | Issue / ADR |
 |---|---|---|---|---|---|---|
 | Bike leasing | 0.55, product (Assumption) | – (the user need) | What the customer wants: a bike, not an application form. | the whole process `bikeLeasingProcess` | – | [use case][usecase] |
-| Customer frontend | 0.26, custom-built | **Make** | The customer's view of the case: apply, follow the status, sign, withdraw. Built from known parts (React, Vite, TanStack) and a client generated from our contract, so not genesis. | `startEvent_leasingRequestReceived`, `event_contractSigned`, `startEvent_applicationWithdrawn` (and `event_handoverReported`, which the dealer would report) | [frontend/][fe]: pages `application-list`, `submit-application`, `application-detail` | [ADR-0018][adr18] |
-| Back-office task UI | 0.36, custom-built | **Make**: own inbox in the frontend (decided) | Task data goes through the domain and its validation, and the inbox shows business data (customer, income, bike) instead of process variables. Rejected: adapting the CIB seven Tasklist with a Camunda Form, which writes variables past the domain. Trade-off: no assignment, claiming or permissions yet. | `userTask_checkCreditRating`, `userTask_reverseApplication` | page `task-inbox`; `GET /api/tasks` (`ListOpenTasksController`), `CompleteCreditCheckController`, `CompleteReversalController` | [ADR-0019][adr19], decides [#11][i11] |
-| Process monitoring | 0.66, product | **Buy**: CIB seven Cockpit | Ships with the engine. Operations sees running cases and incidents without any code of ours. | incidents on `serviceTask_orderBike` (dealer outage); every running case | `cibseven-bpm-spring-boot-starter-webapp-4`, served at `/camunda` | [ADR-0011][adr11] (technical metrics) |
+| Customer frontend | 0.26, custom-built | **Make** | The customer's view of the case: apply, follow the status, sign, withdraw. Built from known parts (React, Vite, TanStack) and a client generated from our contract, so not genesis. | `startEvent_leasingRequestReceived`, `event_contractSigned`, `startEvent_applicationWithdrawn` (and `event_handoverReported`, which the dealer would report) | [frontend/][fe]: pages `application-list`, `submit-application`, `application-detail` | [ADR-0009][adr9] |
+| Back-office task UI | 0.36, custom-built | **Make**: own inbox in the frontend (decided) | Task data goes through the domain and its validation, and the inbox shows business data (customer, income, bike) instead of process variables. Rejected: adapting the CIB seven Tasklist with a Camunda Form, which writes variables past the domain. Trade-off: no assignment, claiming or permissions yet. | `userTask_checkCreditRating`, `userTask_reverseApplication` | page `task-inbox`; `GET /api/tasks` (`ListOpenTasksController`), `CompleteCreditCheckController`, `CompleteReversalController` | [ADR-0010][adr10], decides [#11][i11] |
+| Process monitoring | 0.66, product | **Buy**: CIB seven Cockpit | Ships with the engine. Operations sees running cases and incidents without any code of ours. | incidents on `serviceTask_orderBike` (dealer outage); every running case | `cibseven-bpm-spring-boot-starter-webapp-4`, served at `/camunda` | [ADR-0007][adr7] (technical metrics) |
 | Leasing application | 0.30, custom-built | **Make** | MiraVelo's own domain and use cases; nobody sells them. Built from known patterns (hexagon, Spring Boot), so not genesis. | every service task (via `#{...Delegate}`); the message events and both user tasks (via REST) | `domain/`, `application/`, `adapter/inbound/` under [io/miragon/blueprint][code] | [ADR-0002][adr2], [ADR-0003][adr3] |
 | Insurance policy | 0.77, commodity (Assumption) | **Partner** (the insurer) (Assumption); no decision issue yet | Insuring a leased bike is a standard product that an insurer sells; we never build it. How to connect the insurer has no issue of its own yet. | `serviceTask_issueInsurancePolicy` | `InsurancePort`, `LoggingInsuranceAdapter` (simulated) | [#2][i2] (delivered) |
 | Customer notification | 0.86, commodity (Assumption) | **Open** (#9) | The delivery sets nobody apart (the content may). Transactional messaging is a utility. | `serviceTask_sendContract`, `serviceTask_sendRejection` | `NotificationPort`, `LoggingNotificationAdapter` (simulated) | [#9][i9] |
 | Contract & e-signature | 0.68, product (Assumption) | **Open** (#8) | Does not set us apart, but no signature means no lease. E-signature is regulated and sold as a product or service. | `serviceTask_sendContract`, `event_contractSigned` | `ContractPort`, `LoggingContractAdapter` (simulated) | [#8][i8] |
 | Dealer integration | 0.38, custom-built (Assumption) | **Partner** (the dealer); how to connect is **open** (#10) | The dealer is an independent business: we never build its system. Dealer interfaces are probably uneven (APIs, portals). | `serviceTask_orderBike`, `event_handoverReported` | `BikeDealerPort`, `BikeDealerAdapter` (simulated); `ReportHandoverController` | [#10][i10] |
 | Credit check | 0.30, custom-built | **Make**; manual today, automation is [#19][i19] | MiraVelo's own risk policy. Today a person decides it in the inbox, with no rule behind the decision. #19 brings back the original decision table `checkCreditRating` (age 18 to 99, monthly net income at least 1,500), which waits frozen in `original/`. | `userTask_checkCreditRating`, read by `gateway_isSolvent` | `CompleteCreditCheckService`; [checkCreditRating.dmn][dmn] (not deployed) | [#19][i19] |
-| Process engine | 0.64, product | **Buy**: CIB seven (open source, embedded) | Running BPMN with messages, an event subprocess, async jobs and retries is a mature product. Building it would set us apart in nothing. | the waiting and the technical behaviour: `event_contractSigned`, `event_handoverReported`, `subProcess_applicationWithdrawn`, retries on `serviceTask_orderBike` | `cibseven-bpm-spring-boot-starter-rest-4` and `-webapp-4` ([versions][libs]); port `LeasingProcess`, adapter `LeasingProcessAdapter` | [ADR-0020][adr20], [ADR-0008][adr8] |
-| Leasing process model | 0.27, custom-built | **Make** | How MiraVelo runs a lease. It grows with every feature. BPMN itself is a standard, and the model follows a known template, so not genesis. | all of `bikeLeasingProcess` ([bike-leasing.bpmn][bpmn]) | generated `adapter/process/BikeLeasingProcessProcessApi.kt`; packaged by [build.gradle.kts][gradle] | [ADR-0016][adr16]; source model and deviations in [executable-process.md][exec] |
-| UI framework | 0.76, commodity | **Buy**: React, Vite and their ecosystem (open source) | The standard way to build a web frontend. We use it as it is. | none; it hosts the pages that start and complete the steps | [frontend/package.json][fe-package] | [ADR-0018][adr18] |
-| Application framework | 0.82, commodity | **Buy**: Spring Boot 4 (open source) | The standard way to run a JVM service. We use it as it is. | none; it hosts the delegate beans the service tasks call | [versions][libs], [build.gradle.kts][gradle] | [ADR-0008][adr8] |
-| Database | 0.90, commodity | **Buy as a service** (outsource): PostgreSQL (Assumption) | A standard database sets nothing apart. The service reads its datasource from `SPRING_DATASOURCE_*`, so a managed PostgreSQL needs no code change. | none; it holds the engine state of every case and the `leasing_application` table | [docker-compose.yml][compose] (local only); [Flyway migrations][migrations]; `LeasingApplicationPersistenceAdapter` | [ADR-0010][adr10], [ADR-0011][adr11] |
+| Process engine | 0.64, product | **Buy**: CIB seven (open source, embedded) | Running BPMN with messages, an event subprocess, async jobs and retries is a mature product. Building it would set us apart in nothing. | the waiting and the technical behaviour: `event_contractSigned`, `event_handoverReported`, `subProcess_applicationWithdrawn`, retries on `serviceTask_orderBike` | `cibseven-bpm-spring-boot-starter-rest-4` and `-webapp-4` ([versions][libs]); port `LeasingProcess`, adapter `LeasingProcessAdapter` | [ADR-0011][adr11], [ADR-0005][adr5] |
+| Leasing process model | 0.27, custom-built | **Make** | How MiraVelo runs a lease. It grows with every feature. BPMN itself is a standard, and the model follows a known template, so not genesis. | all of `bikeLeasingProcess` ([bike-leasing.bpmn][bpmn]) | generated `adapter/process/BikeLeasingProcessProcessApi.kt`; packaged by [build.gradle.kts][gradle] | [ADR-0008][adr8]; source model and deviations in [executable-process.md][exec] |
+| UI framework | 0.76, commodity | **Buy**: React, Vite and their ecosystem (open source) | The standard way to build a web frontend. We use it as it is. | none; it hosts the pages that start and complete the steps | [frontend/package.json][fe-package] | [ADR-0009][adr9] |
+| Application framework | 0.82, commodity | **Buy**: Spring Boot 4 (open source) | The standard way to run a JVM service. We use it as it is. | none; it hosts the delegate beans the service tasks call | [versions][libs], [build.gradle.kts][gradle] | [ADR-0005][adr5] |
+| Database | 0.90, commodity | **Buy as a service** (outsource): PostgreSQL (Assumption) | A standard database sets nothing apart. The service reads its datasource from `SPRING_DATASOURCE_*`, so a managed PostgreSQL needs no code change. | none; it holds the engine state of every case and the `leasing_application` table | [docker-compose.yml][compose] (local only); [Flyway migrations][migrations]; `LeasingApplicationPersistenceAdapter` | [ADR-0006][adr6], [ADR-0007][adr7] |
 
 
 ## Open decisions
@@ -88,7 +88,7 @@ designIQ pins it on the elements of `bike-leasing.bpmn`.
 | 2 | [#9][i9] | Customer notification | Which channel, and how is it sourced? | `serviceTask_sendContract`, `serviceTask_sendRejection` | simulated: `LoggingNotificationAdapter` | #1, #3, #8 |
 | 3 | [#10][i10] | Dealer integration | How do we connect the dealer? | `serviceTask_orderBike`, `event_handoverReported` | simulated: `BikeDealerAdapter`; the handover is reported with a button in the frontend | #4, #7, #20 |
 
-Decided: [#11][i11] Back-office task UI, build the own inbox ([ADR-0019][adr19]). The issue closes
+Decided: [#11][i11] Back-office task UI, build the own inbox ([ADR-0010][adr10]). The issue closes
 with the merge of the rebase; its pins then disappear from the model.
 
 
@@ -106,7 +106,7 @@ with the merge of the rebase; its pins then disappear from the model.
 6. Insurance policy sits at commodity, and the insurer is a partner. No issue asks how to connect
    the insurer yet; open one, like #8 to #10, before the simulated adapter is replaced.
 7. Database as a service: production hosting offers a managed PostgreSQL. This repository decides
-   no hosting; [ADR-0011][adr11] covers the container image and the overridable datasource, not where
+   no hosting; [ADR-0007][adr7] covers the container image and the overridable datasource, not where
    the database runs. Locally, PostgreSQL runs in Docker.
 8. The credit check uses only what the customer states (age, monthly net income), today by a person
    and with #19 by the decision table. No credit bureau is asked. A bureau check would be a new
@@ -129,7 +129,7 @@ with the merge of the rebase; its pins then disappear from the model.
    BPMN elements in designIQ. For Buy or Adapt, open the follow-up implementation issue that the
    acceptance criteria of #8 to #10 ask for.
 
-#11 went this way: [ADR-0019][adr19], the component "Back-office task UI" got `build` and a link to
+#11 went this way: [ADR-0010][adr10], the component "Back-office task UI" got `build` and a link to
 the ADR, and the Tasklist variant left the map.
 
 Edit a model either in designIQ (it reaches Git through a release pull request) or in Git, not in
@@ -158,13 +158,13 @@ both at the same time. A file changed on both sides becomes a conflict in design
 [adr0]: ../adr/0000-adr-template.md
 [adr2]: ../adr/0002-hexagonal-architecture-for-the-backend.md
 [adr3]: ../adr/0003-openapi-as-the-checked-in-contract.md
-[adr8]: ../adr/0008-track-the-latest-major-versions.md
-[adr10]: ../adr/0010-flyway-for-database-migrations.md
-[adr11]: ../adr/0011-build-and-deployment-approach.md
-[adr16]: ../adr/0016-docs-is-the-designiq-workspace.md
-[adr18]: ../adr/0018-react-frontend-next-to-the-service.md
-[adr19]: ../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md
-[adr20]: ../adr/0020-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
+[adr5]: ../adr/0005-track-the-latest-major-versions.md
+[adr6]: ../adr/0006-flyway-for-database-migrations.md
+[adr7]: ../adr/0007-build-and-deployment-approach.md
+[adr8]: ../adr/0008-docs-is-the-designiq-workspace.md
+[adr9]: ../adr/0009-react-frontend-next-to-the-service.md
+[adr10]: ../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md
+[adr11]: ../adr/0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
 [exec]: ../use-cases/bike-leasing/process/executable-process.md
 [i2]: https://github.com/miragon-blueprints/miragon-ai-example/issues/2
 [i8]: https://github.com/miragon-blueprints/miragon-ai-example/issues/8

@@ -99,7 +99,7 @@ Notes on the ids:
 | Dealer integration? | [#10] | Handover reported | `serviceTask_orderBike`, `event_handoverReported` |
 
 [#11] (back-office task UI) is decided: the back office works in an own inbox in the frontend
-([ADR-0019](../../../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)). A note sticky
+([ADR-0010](../../../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md)). A note sticky
 above "Leasing request received" and "Validate application" records it.
 
 The options, criteria and the Wardley map are in

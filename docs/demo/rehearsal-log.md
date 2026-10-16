@@ -267,8 +267,8 @@ Checklist for Thomas:
 
 What changed: the executable process was rebased onto a simplified
 event-subprocess model ([ADR-0017](../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md)),
-a React frontend was added ([ADR-0018](../adr/0018-react-frontend-next-to-the-service.md)), and the
-back office works both user tasks in the frontend inbox ([ADR-0019](../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)).
+a React frontend was added ([ADR-0009](../adr/0009-react-frontend-next-to-the-service.md)), and the
+back office works both user tasks in the frontend inbox ([ADR-0010](../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md)).
 The [demo script](demo-script.md) was rewritten for it. A review then added the status
 `CONTRACT_SIGNED`, stricter state checks (404 for unknown ids, 409 for a forbidden state, a task
 that is not open or a concurrent update) and removed the Tasklist filter from `00-demo-data` and the

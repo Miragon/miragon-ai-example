@@ -9,7 +9,7 @@ then the components inside the service. It draws only what runs today.
 
 A C4 container is a unit you deploy and run on its own. The system has three:
 
-- the **Frontend**, a React single-page app ([ADR-0018][adr18]). In development the Vite dev server
+- the **Frontend**, a React single-page app ([ADR-0009][adr9]). In development the Vite dev server
   serves it on port 5173 and proxies `/api`, `/v3/api-docs`, `/engine-rest`, `/camunda` and `/webapp`
   to the service, so the browser sees one origin. In a container, nginx serves the built app and proxies the
   same paths ([Dockerfile][fe-docker], [nginx.conf][fe-nginx]; port 8090 in
@@ -75,7 +75,7 @@ The external systems are described in the [system context](c4-system-context.md#
 | Process element | Where it lives today |
 |---|---|
 | Start event Leasing request received | The frontend form, which calls the REST API of the service |
-| User tasks Check credit rating, Reverse application | The frontend inbox, which completes them through domain endpoints of the service ([ADR-0019][adr19]); no Camunda Form |
+| User tasks Check credit rating, Reverse application | The frontend inbox, which completes them through domain endpoints of the service ([ADR-0010][adr10]); no Camunda Form |
 | Service tasks, gateways, the event subprocess Application withdrawn | Delegates and application services in the service, run by the engine |
 | Wait states Contract signed, Handover reported | The process engine; their state is in PostgreSQL. The frontend buttons correlate the messages through the REST API. |
 | External parties: contract, notification, insurer, dealer | Outside the boundary, simulated ([#8][i8], [#9][i9], [#10][i10]) |
@@ -156,7 +156,7 @@ from.
 | `adapter.outbound.dealer` | `BikeDealerAdapter` simulates the dealer system: a fixed catalogue (`BIKE-900`, `BIKE-800`, `BIKE-600`, `BIKE-FAIL`); `BIKE-FAIL` is an outage, every other bike gets `ORDER-<uuid>`. | Order bike from dealer; the catalogue for Validate application | [adapter/outbound/dealer][pkg-dealer] |
 | `adapter.process` | Process API that bpmn-to-code generates from the BPMN before every compile: typed element ids, messages, variables, errors and delegate expressions. Never edited by hand. Delegates and `LeasingProcessAdapter` use it. The package also holds one hand-written engine plugin, `HistoryCleanupConfiguration`. | Every element id of `bikeLeasingProcess` | [adapter/process][pkg-process], [build.gradle.kts][build] |
 | CIB seven process engine (library) | Embedded engine from the CIB seven Spring Boot starter. Deploys every `*.bpmn` and `*.dmn` on the classpath (today only `bike-leasing.bpmn`) and runs messages, the event subprocess, async jobs and retries. | The whole process; the retry cycle `R3/PT10S` on Order bike from dealer | [libs.versions.toml][libs], [application.yaml][yaml] |
-| CIB seven webapps and engine REST (library) | Cockpit, Tasklist and Admin at `/camunda`, webclient at `/webapp`, engine REST API at `/engine-rest`; login admin/admin. For operations, not the back office's workplace ([ADR-0019][adr19]). | Incidents and running cases (Cockpit) | [libs.versions.toml][libs], [application.yaml][yaml] |
+| CIB seven webapps and engine REST (library) | Cockpit, Tasklist and Admin at `/camunda`, webclient at `/webapp`, engine REST API at `/engine-rest`; login admin/admin. For operations, not the back office's workplace ([ADR-0010][adr10]). | Incidents and running cases (Cockpit) | [libs.versions.toml][libs], [application.yaml][yaml] |
 
 ## What changes with the planned features
 
@@ -181,8 +181,8 @@ Not drawn above; each issue describes its change.
   adapt turns the dashed box into a real external system. With a bought e-signature service, for
   example, the signature would arrive from the contract system instead of the customer's button.
 
-[adr18]: ../adr/0018-react-frontend-next-to-the-service.md
-[adr19]: ../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md
+[adr9]: ../adr/0009-react-frontend-next-to-the-service.md
+[adr10]: ../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md
 [fe]: ../../frontend/AGENTS.md
 [fe-src]: ../../frontend/src/
 [fe-vite]: ../../frontend/vite.config.ts

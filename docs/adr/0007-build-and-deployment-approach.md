@@ -1,4 +1,4 @@
-# 0011 — Operability and delivery: OCI images, probes and metrics
+# 0007 — Operability and delivery: OCI images, probes and metrics
 
 - **Status:** Accepted
 - **Date:** 2026-10-16

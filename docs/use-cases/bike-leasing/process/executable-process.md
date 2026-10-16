@@ -27,8 +27,8 @@ Nothing else is deployed. The decision `checkCreditRating.dmn` lies in `../origi
 reference until [#19] brings it back. The original models, the t.BPM model and the feature map are
 documentation only. The user tasks carry no Camunda Form: the back office completes them through
 the domain API in the frontend inbox
-([ADR-0019](../../../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md)). Why the executable
-model lives under `docs/`: [ADR-0016](../../../adr/0016-docs-is-the-designiq-workspace.md).
+([ADR-0010](../../../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md)). Why the executable
+model lives under `docs/`: [ADR-0008](../../../adr/0008-docs-is-the-designiq-workspace.md).
 
 ## How it gets into the engine
 
@@ -175,7 +175,7 @@ AGENTS.md.
    `serviceTask_sendReminderMail`), gets complete diagram information (designIQ needs a shape for
    every element), and, for a service task, a delegate expression `#{beanName}` backed by a delegate
    in `adapter/inbound/cibseven`. The model validation test enforces the delegate expression. A new
-   user task also needs a domain endpoint and an inbox entry (ADR-0019), not a form.
+   user task also needs a domain endpoint and an inbox entry (ADR-0010), not a form.
 3. Regenerate the API with `./gradlew generateBpmnModels` and commit the changed files in
    `adapter/process`. Never edit them by hand. A designIQ release pull request contains only the
    `.bpmn`. CI regenerates the API before compiling, so the tests see the new model, but the

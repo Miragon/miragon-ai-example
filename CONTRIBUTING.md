@@ -116,7 +116,7 @@ start Postgres and the service again, and load `00-demo-data` again.
 
 The dev loop above runs the backend from source. To run it as a container instead, build the OCI
 image (Spring buildpacks, no Dockerfile) and run it against the Postgres compose stack. The rationale
-is in [ADR-0011](docs/adr/0011-build-and-deployment-approach.md).
+is in [ADR-0007](docs/adr/0007-build-and-deployment-approach.md).
 
 Build the image. It produces `miravelo/cibseven-embedded-example:1.0-SNAPSHOT`:
 
@@ -196,10 +196,10 @@ the environment and win over the defaults:
 - **Changing the database schema?** Flyway owns it. Add a new forward-only migration
   `V{n}__description.sql` under `service/app/src/main/resources/db/migration/` in the same change as the entity
   edit, and never edit an applied migration. Hibernate runs `validate`, so a mismatch fails startup.
-  See [ADR-0010](docs/adr/0010-flyway-for-database-migrations.md).
+  See [ADR-0006](docs/adr/0006-flyway-for-database-migrations.md).
 - **Changing a design artifact?** Everything under `docs/` is a designIQ model and must pass the
   designIQ validator. The executable process validates clean; the only accepted errors are the known
-  ones on the frozen original ([ADR-0016](docs/adr/0016-docs-is-the-designiq-workspace.md)). Keep file stems unique under
+  ones on the frozen original ([ADR-0008](docs/adr/0008-docs-is-the-designiq-workspace.md)). Keep file stems unique under
   `docs/`, keep BPMN diagrams complete (BPMNDI), and write Markdown that reads well as plain text.
 
 ## Before opening a PR
@@ -227,7 +227,7 @@ Dependabot proposes updates; patch and minor updates merge automatically once CI
 merged by hand. `.github/dependabot.yml` carries no `ignore` entries. When an update cannot be taken
 yet, comment `@dependabot ignore this major version` (or `minor version` / `dependency`) on its pull
 request and open an issue for the blocker, so the update comes back once it is fixable
-([ADR-0008](docs/adr/0008-track-the-latest-major-versions.md)).
+([ADR-0005](docs/adr/0005-track-the-latest-major-versions.md)).
 
 ## Reporting bugs / requesting features
 

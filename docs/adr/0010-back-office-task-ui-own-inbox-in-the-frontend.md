@@ -1,4 +1,4 @@
-# 0019 — Back-office task UI: own inbox in the frontend
+# 0010 — Back-office task UI: own inbox in the frontend
 
 - **Status:** Accepted
 - **Date:** 2026-10-16
@@ -17,7 +17,7 @@ trust them.
 
 ## Decision
 
-We **build our own inbox** in the frontend ([ADR-0018](0018-react-frontend-next-to-the-service.md)).
+We **build our own inbox** in the frontend ([ADR-0009](0009-react-frontend-next-to-the-service.md)).
 
 - `GET /api/tasks` lists the open tasks of both kinds with the application they belong to. It
   returns no engine task id.

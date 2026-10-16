@@ -1,6 +1,6 @@
 title Bike leasing: make, buy or adapt
-url Back-office task UI URL [https://github.com/miragon-blueprints/miragon-ai-example/blob/main/docs/adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md]
-url Customer frontend URL [https://github.com/miragon-blueprints/miragon-ai-example/blob/main/docs/adr/0018-react-frontend-next-to-the-service.md]
+url Back-office task UI URL [https://github.com/miragon-blueprints/miragon-ai-example/blob/main/docs/adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md]
+url Customer frontend URL [https://github.com/miragon-blueprints/miragon-ai-example/blob/main/docs/adr/0009-react-frontend-next-to-the-service.md]
 url Credit check URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/19]
 url Customer notification URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/9]
 url Contract & e-signature URL [https://github.com/miragon-blueprints/miragon-ai-example/issues/8]
@@ -29,7 +29,7 @@ annotation 2 [0.51, 0.84] Open: which channel? See #9
 annotation 3 [0.45, 0.43] Open: how to integrate? See #10
 annotation 4 [0.37, 0.3] Manual today: automate with the DMN, see #19
 note Doctrine: build what sets us apart\nbuy the standard, adapt on purpose [0.92, 0.12] (color #0B7A55)
-note Decided (ADR-0019): own inbox\nnot the CIB seven Tasklist [0.64, 0.37]
+note Decided (ADR-0010): own inbox\nnot the CIB seven Tasklist [0.64, 0.37]
 note Assumption: evolution positions are estimates\nno market research yet, see sourcing-decisions.md [0.14, 0.32]
 note Assumption: insurer as partner, no decision issue yet [0.61, 0.72]
 note Assumption: managed PostgreSQL [0.03, 0.88]
@@ -57,7 +57,7 @@ Process engine -> Database
 // Decorators: build = Make, buy = Buy a product, outsource = Buy as a service, market = Partner.
 // No decorator = open decision. Annotations 1 to 3 name the open decisions, GitHub issues #8 to #10.
 // Annotation 4: the credit check is a human decision in the inbox today; #19 automates it with the DMN.
-// Back-office task UI was decided as build (ADR-0019, issue #11): the own inbox in the frontend.
+// Back-office task UI was decided as build (ADR-0010, issue #11): the own inbox in the frontend.
 // Adapt has no decorator of its own: it is buy plus an "Adapt" annotation. No component is adapted today.
 // Insurance policy as a partner and Database outsource (managed PostgreSQL) are assumptions.
 // Products: Process engine = CIB seven, Process monitoring = CIB seven Cockpit,
