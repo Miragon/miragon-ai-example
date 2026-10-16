@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Glob
 # Skill: create-persistence-adapter
 
 Generate or update the persistence files for one aggregate in
-`src/main/kotlin/io/miragon/blueprint/adapter/outbound/db/`. See
+`service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/db/`. See
 [ADR-0002](../../../docs/adr/0002-hexagonal-architecture-for-the-backend.md) and
 [ADR-0010](../../../docs/adr/0010-flyway-for-database-migrations.md). The reference is the
 `LeasingApplication*` set.
@@ -19,7 +19,7 @@ Files per aggregate:
 - `*JpaRepository.kt` — Spring Data `JpaRepository` interface.
 - `*EntityMapper.kt` — entity ↔ domain conversion, a Kotlin **`object`**.
 - `*PersistenceAdapter.kt` — `@Component` implementing the outbound port.
-- `src/main/resources/db/migration/V<next>__<what>.sql` — the schema change.
+- `service/app/src/main/resources/db/migration/V<next>__<what>.sql` — the schema change.
 
 ## IMPORTANT — the rules the build enforces
 

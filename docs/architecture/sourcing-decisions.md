@@ -65,7 +65,7 @@ Map position = evolution value on the map and its stage.
 | Process engine | 0.64, product | **Buy**: CIB seven (open source, embedded) | Running BPMN with messages, an event subprocess, async jobs and retries is a mature product. Building it would set us apart in nothing. | the waiting and the technical behaviour: `event_contractSigned`, `event_handoverReported`, `subProcess_applicationWithdrawn`, retries on `serviceTask_orderBike` | `cibseven-bpm-spring-boot-starter-rest-4` and `-webapp-4` ([versions][libs]); port `LeasingProcess`, adapter `LeasingProcessAdapter` | no ADR yet; [ADR-0008][adr8] |
 | Leasing process model | 0.27, custom-built | **Make** | How MiraVelo runs a lease. It grows with every feature. BPMN itself is a standard, and the model follows a known template, so not genesis. | all of `bikeLeasingProcess` ([bike-leasing.bpmn][bpmn]) | generated `adapter/process/BikeLeasingProcessProcessApi.kt`; packaged by [build.gradle.kts][gradle] | [ADR-0017][adr17], [ADR-0016][adr16] |
 | UI framework | 0.76, commodity | **Buy**: React, Vite and their ecosystem (open source) | The standard way to build a web frontend. We use it as it is. | none; it hosts the pages that start and complete the steps | [frontend/package.json][fe-package] | [ADR-0018][adr18] |
-| Application framework | 0.82, commodity | **Buy**: Spring Boot 4 (open source) | The standard way to run a JVM service. We use it as it is. | none; it hosts the delegate beans the service tasks call | [versions][libs], [build.gradle.kts][gradle] | [ADR-0008][adr8], [ADR-0014][adr14] |
+| Application framework | 0.82, commodity | **Buy**: Spring Boot 4 (open source) | The standard way to run a JVM service. We use it as it is. | none; it hosts the delegate beans the service tasks call | [versions][libs], [build.gradle.kts][gradle] | [ADR-0008][adr8] |
 | Database | 0.90, commodity | **Buy as a service** (outsource): PostgreSQL (Assumption) | A standard database sets nothing apart. The service reads its datasource from `SPRING_DATASOURCE_*`, so a managed PostgreSQL needs no code change. | none; it holds the engine state of every case and the `leasing_application` table | [docker-compose.yml][compose] (local only); [Flyway migrations][migrations]; `LeasingApplicationPersistenceAdapter` | [ADR-0010][adr10], [ADR-0011][adr11] |
 
 
@@ -148,12 +148,12 @@ both at the same time. A file changed on both sides becomes a conflict in design
 [usecase]: ../use-cases/bike-leasing/bike-leasing-use-case.md
 [bpmn]: ../use-cases/bike-leasing/process/bike-leasing.bpmn
 [dmn]: ../use-cases/bike-leasing/original/checkCreditRating.dmn
-[code]: ../../src/main/kotlin/io/miragon/blueprint/
+[code]: ../../service/app/src/main/kotlin/io/miragon/blueprint/
 [fe]: ../../frontend/AGENTS.md
 [fe-package]: ../../frontend/package.json
-[migrations]: ../../src/main/resources/db/migration/
+[migrations]: ../../service/app/src/main/resources/db/migration/
 [compose]: ../../stack/docker-compose.yml
-[gradle]: ../../build.gradle.kts
+[gradle]: ../../service/app/build.gradle.kts
 [libs]: ../../gradle/libs.versions.toml
 [adr0]: ../adr/0000-adr-template.md
 [adr2]: ../adr/0002-hexagonal-architecture-for-the-backend.md
@@ -162,7 +162,6 @@ both at the same time. A file changed on both sides becomes a conflict in design
 [adr9]: ../adr/0009-actuator-probes-and-prometheus-metrics.md
 [adr10]: ../adr/0010-flyway-for-database-migrations.md
 [adr11]: ../adr/0011-build-and-deployment-approach.md
-[adr14]: ../adr/0014-one-kotlin-gradle-stack-at-the-repo-root.md
 [adr16]: ../adr/0016-docs-is-the-designiq-workspace.md
 [adr17]: ../adr/0017-rebase-onto-the-simplified-event-subprocess-process.md
 [adr18]: ../adr/0018-react-frontend-next-to-the-service.md

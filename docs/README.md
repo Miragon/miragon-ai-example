@@ -84,19 +84,17 @@ decisions, so they live in CONTRIBUTING.md and AGENTS.md.
 | ADR         | Decision                                              | Status                               |
 |-------------|-------------------------------------------------------|--------------------------------------|
 | [0001][a01] | Record architecture decisions                         | Accepted                             |
-| [0002][a02] | Hexagonal architecture for the backend                | Accepted, amended (0014, 0015, 0017) |
+| [0002][a02] | Hexagonal architecture for the backend                | Accepted, amended (0015, 0017)       |
 | [0003][a03] | OpenAPI as the checked-in, drift-gated contract       | Accepted, amended (0015, 0017, 0018) |
-| [0004][a04] | Mutation testing as a blocking PR gate                | Accepted, amended (0014, 0015, 0017) |
+| [0004][a04] | Mutation testing as a blocking PR gate                | Accepted, amended (0015, 0017)       |
 | [0005][a05] | AGENTS.md as the single source of agent instructions  | Accepted                             |
 | [0006][a06] | Fixed ports for v1, portless as the upgrade path      | Accepted, amended (0018)             |
-| [0007][a07] | Two architecture-test tools: ArchUnit and Konsist     | Accepted, amended (0014)             |
+| [0007][a07] | Two architecture-test tools: ArchUnit and Konsist     | Accepted                             |
 | [0008][a08] | Deliberately track the latest major versions          | Accepted                             |
 | [0009][a09] | Actuator probes and Prometheus metrics                | Accepted                             |
-| [0010][a10] | Flyway for database schema migrations                 | Accepted, amended (0014, 0015, 0017) |
-| [0011][a11] | Build and deployment: OCI image with `bootBuildImage` | Accepted, amended (0014)             |
-| [0012][a12] | Poll for eventual consistency in end-to-end tests     | Accepted, amended (0014, 0015, 0017) |
-| [0013][a13] | Two stack variants side by side on `main`             | Superseded by 0014                   |
-| [0014][a14] | One Kotlin/Gradle stack at the repo root              | Accepted, amended (0018)             |
+| [0010][a10] | Flyway for database schema migrations                 | Accepted, amended (0015, 0017)       |
+| [0011][a11] | Build and deployment: OCI image with `bootBuildImage` | Accepted                             |
+| [0012][a12] | Poll for eventual consistency in end-to-end tests     | Accepted, amended (0015, 0017)       |
 | [0015][a15] | Reduce the executable process to a core               | Superseded by 0017                   |
 | [0016][a16] | `docs/` is the designIQ workspace                     | Accepted, amended (0017)             |
 | [0017][a17] | Rebase onto the simplified event-subprocess process   | Accepted                             |
@@ -116,8 +114,6 @@ decisions, so they live in CONTRIBUTING.md and AGENTS.md.
 [a10]: adr/0010-flyway-for-database-migrations.md
 [a11]: adr/0011-build-and-deployment-approach.md
 [a12]: adr/0012-polling-for-eventual-consistency-in-e2e-tests.md
-[a13]: adr/0013-two-stack-variants-side-by-side-on-main.md
-[a14]: adr/0014-one-kotlin-gradle-stack-at-the-repo-root.md
 [a15]: adr/0015-reduce-the-executable-process-to-a-core.md
 [a16]: adr/0016-docs-is-the-designiq-workspace.md
 [a17]: adr/0017-rebase-onto-the-simplified-event-subprocess-process.md

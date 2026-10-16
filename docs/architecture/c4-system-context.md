@@ -63,7 +63,7 @@ brackets are the executable ones.
 | Customer | The person applying for a lease. Submits the application, signs the contract, may withdraw, receives the messages. | Leasing request received (`startEvent_leasingRequestReceived`), Contract signed (`event_contractSigned`), Application withdrawn (`startEvent_applicationWithdrawn`) | frontend pages [submit-application][fe-submit], [application-detail][fe-detail]; [SubmitLeasingRequestController][submit], [SignContractController][sign], [WithdrawApplicationController][withdraw] |
 | Back office | MiraVelo staff who decide the credit check and reverse a withdrawn application. | Check credit rating (`userTask_checkCreditRating`), Reverse application (`userTask_reverseApplication`) | frontend page [task-inbox][fe-inbox]; [ListOpenTasksController][tasks], [CompleteCreditCheckController][credit], [CompleteReversalController][reversal] |
 | Operations | Whoever watches running cases and incidents and retries failed jobs. | No step of its own. A dealer outage on Order bike from dealer (`serviceTask_orderBike`) retries three times (`R3/PT10S`), then raises an incident. | [application.yaml][yaml] (webapps), [DealerOutageIncidentTest][incident] |
-| Bike-leasing system | The system in scope: the frontend for customer and back office, and the service that runs the process and keeps the leasing applications. | The whole process `bikeLeasingProcess` | [bike-leasing.bpmn][bpmn], [src/main/kotlin][src], [frontend/][fe] |
+| Bike-leasing system | The system in scope: the frontend for customer and back office, and the service that runs the process and keeps the leasing applications. | The whole process `bikeLeasingProcess` | [bike-leasing.bpmn][bpmn], [service/app/src/main/kotlin][src], [frontend/][fe] |
 | Contract system (simulated) | Issues the leasing contract. Simulated: logs and returns `CONTRACT-<uuid>`. Nothing revokes a contract today. | Send contract (`serviceTask_sendContract`) | [ContractPort][contract-port], [LoggingContractAdapter][contract-adapter] |
 | Notification channel (simulated) | Sends messages to the customer. Simulated: logs `Notifying <email>: <subject>`. | Send contract, Send rejection (`serviceTask_sendRejection`) | [NotificationPort][notification-port], [LoggingNotificationAdapter][notification-adapter] |
 | Insurer (simulated) | Issues the insurance policy for the leased bike. Simulated: logs and returns `POLICY-<uuid>`. | Issue insurance policy (`serviceTask_issueInsurancePolicy`) | [InsurancePort][insurance-port], [LoggingInsuranceAdapter][insurance-adapter] |
@@ -73,28 +73,28 @@ brackets are the executable ones.
 [tbpm]: ../use-cases/bike-leasing/tbpm/bike-leasing-tbpm.bpmn
 [bruno]: ../../bruno/README.md
 [adr19]: ../adr/0019-back-office-task-ui-own-inbox-in-the-frontend.md
-[yaml]: ../../src/main/resources/application.yaml
-[src]: ../../src/main/kotlin/io/miragon/blueprint/
+[yaml]: ../../service/app/src/main/resources/application.yaml
+[src]: ../../service/app/src/main/kotlin/io/miragon/blueprint/
 [fe]: ../../frontend/AGENTS.md
 [fe-submit]: ../../frontend/src/pages/submit-application/
 [fe-detail]: ../../frontend/src/pages/application-detail/
 [fe-inbox]: ../../frontend/src/pages/task-inbox/
-[submit]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/SubmitLeasingRequestController.kt
-[sign]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/SignContractController.kt
-[withdraw]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/WithdrawApplicationController.kt
-[tasks]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/ListOpenTasksController.kt
-[credit]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/CompleteCreditCheckController.kt
-[reversal]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/CompleteReversalController.kt
-[handover]: ../../src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/ReportHandoverController.kt
-[contract-port]: ../../src/main/kotlin/io/miragon/blueprint/application/port/outbound/ContractPort.kt
-[contract-adapter]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/contract/LoggingContractAdapter.kt
-[notification-port]: ../../src/main/kotlin/io/miragon/blueprint/application/port/outbound/NotificationPort.kt
-[notification-adapter]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/notification/LoggingNotificationAdapter.kt
-[insurance-port]: ../../src/main/kotlin/io/miragon/blueprint/application/port/outbound/InsurancePort.kt
-[insurance-adapter]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/insurance/LoggingInsuranceAdapter.kt
-[dealer-port]: ../../src/main/kotlin/io/miragon/blueprint/application/port/outbound/BikeDealerPort.kt
-[dealer-adapter]: ../../src/main/kotlin/io/miragon/blueprint/adapter/outbound/dealer/BikeDealerAdapter.kt
-[incident]: ../../src/test/kotlin/io/miragon/blueprint/process/DealerOutageIncidentTest.kt
+[submit]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/SubmitLeasingRequestController.kt
+[sign]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/SignContractController.kt
+[withdraw]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/WithdrawApplicationController.kt
+[tasks]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/ListOpenTasksController.kt
+[credit]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/CompleteCreditCheckController.kt
+[reversal]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/CompleteReversalController.kt
+[handover]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/inbound/rest/ReportHandoverController.kt
+[contract-port]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/outbound/ContractPort.kt
+[contract-adapter]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/contract/LoggingContractAdapter.kt
+[notification-port]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/outbound/NotificationPort.kt
+[notification-adapter]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/notification/LoggingNotificationAdapter.kt
+[insurance-port]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/outbound/InsurancePort.kt
+[insurance-adapter]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/insurance/LoggingInsuranceAdapter.kt
+[dealer-port]: ../../service/app/src/main/kotlin/io/miragon/blueprint/application/port/outbound/BikeDealerPort.kt
+[dealer-adapter]: ../../service/app/src/main/kotlin/io/miragon/blueprint/adapter/outbound/dealer/BikeDealerAdapter.kt
+[incident]: ../../service/app/src/test/kotlin/io/miragon/blueprint/process/DealerOutageIncidentTest.kt
 [i8]: https://github.com/miragon-blueprints/miragon-ai-example/issues/8
 [i9]: https://github.com/miragon-blueprints/miragon-ai-example/issues/9
 [i10]: https://github.com/miragon-blueprints/miragon-ai-example/issues/10

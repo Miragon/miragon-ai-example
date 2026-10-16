@@ -86,7 +86,7 @@ Totals: 4 kept (C1, C3, C16, C18), 8 simplified (C2, C4, C7, C8, C10, C12, C17, 
 | Change | Original | Core |
 |---|---|---|
 | Java/Maven variant removed | two equivalent services, `kotlin-gradle/` and `java-maven/`, kept identical by a CI parity check (Blueprint Checks) | one Kotlin service |
-| Single Gradle project | two modules, `service:app` and `service:common-architecture-tests` | one project at the repo root; the architecture rules live in `src/test/kotlin/io/miragon/common/architecture/` |
+| Gradle build at the repo root | `kotlin-gradle/` holds the build with `service:app` and `service:common-architecture-tests` | the same two modules, without the `kotlin-gradle/` level |
 | Executable model from a source model | the repo's own model | the simplified event-subprocess model, with the deviations listed in [executable-process.md](../process/executable-process.md) |
 | No sub-process, no escalation, no compensation | "Conclude contract" sub-process; escalation `contractNotSigned`; compensation boundaries on contract, policy and order | flat main flow; the reversal is a user task |
 | Terminate end gone | endEvent_contractCancelled terminated the instance, killing the insurance token waiting at gateway_join | no such path; an interrupting event sub-process ends the instance on withdrawal |
