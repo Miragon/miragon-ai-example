@@ -8,7 +8,7 @@ one BPMN model that runs on an embedded [CIB seven](https://cibseven.org) engine
 and a React frontend around it, and the design artifacts that explain it, all in one repository.
 Guardrails decide what a change may do, and the open features are issues anchored to the model.
 
-![The frontend: the back-office inbox with an open credit check](docs/assets/frontend-inbox.png)
+![The frontend: an ordered application with its data, the next actions and the process timeline](docs/assets/frontend-application.png)
 
 ## Why
 
