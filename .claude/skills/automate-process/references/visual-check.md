@@ -18,7 +18,8 @@ Geometry and wiring, exact and fast. Missing bpmnlint → `npm ci` once.
 npx --yes @miragon/design-iq-validator@5.3.0 --root . <model-id>   # id = file stem, e.g. bike-leasing
 ```
 
-The executable model validates clean; the frozen original keeps its 9 known errors and 2 warnings.
+The executable model and the t.BPM model validate clean. Without a model id the run reports 0 errors
+and only the feature map's 2 workshop warnings (open stickies, the 7±2 rule).
 
 ## 3. The rendered image
 
@@ -32,8 +33,8 @@ bpmn-js, not identical: the PNG in `docs/assets/` keeps coming from
 finding. Read the PNG, not `<dc:Bounds>`, and check in order:
 
 - **Visibility:** every element drawn; a flow ending in empty space means a missing shape. Expected off
-  the main flow: the event subprocess *Application withdrawn* and the error boundary *Application
-  invalid*. Stickies and groups are expected in the workshop-mode models.
+  the main flow of the executable model: the event subprocess *Application withdrawn* and the error
+  boundary *Application invalid*. Stickies and groups are expected in the feature map (workshop mode).
 - **Reading direction by meaning:** the flow reads left to right. A flow pointing backwards claims
   "the process steps back"; that is right for a loop, wrong for a merge gateway parked left of what it
   feeds.

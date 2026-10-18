@@ -23,9 +23,7 @@
       "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/Errors.kt)",
       "Edit(/service/app/src/main/kotlin/io/miragon/blueprint/adapter/process/Escalations.kt)",
       "Edit(/openapi/openapi.json)",
-      "Edit(/frontend/src/shared/api/generated/**)",
-      "Edit(/docs/use-cases/bike-leasing/original/*.bpmn)",
-      "Edit(/docs/use-cases/bike-leasing/original/*.dmn)"
+      "Edit(/frontend/src/shared/api/generated/**)"
     ]
   },
   "hooks": {
@@ -36,16 +34,6 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-env-files.js",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-frozen-models.js",
             "timeout": 10
           }
         ]

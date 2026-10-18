@@ -9,9 +9,9 @@ There is no `CLAUDE.md`; Claude Code reads these files natively (ADR-0001).
 An example of Miragon's way of automating a process with AI agents: the **MiraVelo bike-leasing**
 process as an executable BPMN model on an embedded CIB seven engine, behind an enforced hexagonal
 architecture, with a React frontend for customers and the back office. What the process covers and
-what it leaves out is in [executable-process.md](docs/use-cases/bike-leasing/process/executable-process.md)
-and [scope-comparison.md](docs/use-cases/bike-leasing/original/scope-comparison.md); the missing
-features are GitHub issues (see the [README roadmap](README.md#roadmap)).
+what it leaves out is in the [use case](docs/use-cases/bike-leasing/bike-leasing-use-case.md) and the
+[feature map](docs/use-cases/bike-leasing/feature-map/feature-map.md); the missing features are
+GitHub issues (see the [README roadmap](README.md#roadmap)).
 
 - **Backend** (`service/`, Gradle, Kotlin, Spring Boot 4, CIB seven 2.2): `service/app` is the service,
   `service/common-architecture-tests` the reusable rule suite. Service tasks call Spring-bean
@@ -28,8 +28,8 @@ features are GitHub issues (see the [README roadmap](README.md#roadmap)).
 service/                      the backend (see service/AGENTS.md)
 frontend/                     the frontend (see frontend/AGENTS.md)
 openapi/openapi.json          the checked-in, drift-gated REST contract
-docs/                         designIQ workspace: README.md (index + ADR list), glossary.md, demo/,
-  use-cases/bike-leasing/     use case, tbpm/, feature-map/, process/ (EXECUTABLE), original/ (FROZEN)
+docs/                         designIQ workspace: README.md (index + ADR list), glossary.md
+  use-cases/bike-leasing/     use case, tbpm/, feature-map/, process/ (EXECUTABLE)
   architecture/               C4, Wardley Map, sourcing decisions
   adr/                        Architecture Decision Records
 bruno/                        REST scenarios + 00-demo-data
@@ -47,17 +47,14 @@ Setup, ports and the full command list are in [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Generated files are never hand-edited:** `service/app/.../adapter/process/*` (except
   `HistoryCleanupConfiguration.kt`), `openapi/openapi.json`, `frontend/src/shared/api/generated/`.
   Regenerate them (see Verify). `.claude/settings.json` denies edits to them.
-- **The models in `docs/use-cases/bike-leasing/original/` are frozen** (tag `original-process-v1`):
-  reference copies of the target picture, never deployed, never edited. Only `scope-comparison.md`
-  next to them is maintained.
 - **Executable models live only in `docs/use-cases/bike-leasing/process/`.** Gradle packages them onto
   the classpath; `service/app/src/main/resources` holds no `.bpmn` or `.dmn`.
-- **Keep element ids stable.** Issues, the feature map, `executable-process.md` and the glossary refer
-  to them; a rename updates every reference in the same change. Every difference from the source
-  model gets a row in `executable-process.md`.
+- **Keep element ids stable.** Issues, the feature map and the glossary refer to them; a rename
+  updates every reference in the same change.
 - **A DMN's file stem is its decision id** (`checkCreditRating`); never rename one without the other.
-- **Derive, never invent.** A feature's details come from its issue and the original model; mark
-  anything else as an assumption and ask.
+- **Derive, never invent.** A feature's details come from its issue and the original model (tag
+  [`original-process-v1`](https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources));
+  mark anything else as an assumption and ask.
 - **Ask before deciding business logic.** Gateways, deadlines, error paths and copy are business
   decisions; propose, don't pick.
 
@@ -70,8 +67,8 @@ Setup, ports and the full command list are in [CONTRIBUTING.md](CONTRIBUTING.md)
 - The t.BPM model and the feature map keep `bpmiq:mode="workshop"` and the `bpmiq` namespace.
 - Markdown and Mermaid must read well as plain text; refresh the PNG in `docs/assets/` when a model's
   picture changes.
-- The executable model validates without findings; the frozen original keeps its 9 known errors and
-  2 warnings. A change adds no other finding.
+- The executable model validates without findings; the only findings under `docs/` are the feature
+  map's 2 workshop warnings (open stickies, the 7±2 rule). A change adds no other finding.
 - designIQ save, release and todo tools write to the live workspace or GitHub: use them only when
   asked. Release pull requests from designIQ are reviewed like any other PR.
 - Todos are GitHub issues with the anchor block described in
@@ -81,8 +78,8 @@ Setup, ports and the full command list are in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 A feature follows its acceptance criteria through every layer: model → regenerated process API →
 code → tests → `openapi.json` → regenerated frontend client and UI → Bruno and Playwright → feature
-map (`bike-leasing-feature-map.bpmn`, `feature-map.md`), glossary and, if elements change,
-`executable-process.md`. The PR closes the issue (`Closes #n`). Skill `implement-issue` walks this.
+map (`bike-leasing-feature-map.bpmn`, `feature-map.md`) and glossary. The PR closes the issue
+(`Closes #n`). Skill `implement-issue` walks this.
 
 A sourcing decision (#8–#10) is a new ADR plus updates to `sourcing-map.owm` and
 `sourcing-decisions.md`.
@@ -96,7 +93,7 @@ A sourcing decision (#8–#10) is a new ADR plus updates to `sourcing-map.owm` a
 | REST contract | `./gradlew test --tests "io.miragon.blueprint.adapter.inbound.rest.OpenApiSpecExportTest"`, then `npm --prefix frontend run api:generate` and `npm --prefix frontend run api:check` |
 | Frontend | `npm --prefix frontend run verify` |
 | Design artifact | `npx --yes @miragon/design-iq-validator@5.3.0 --root . <model-id>` (id = file stem) |
-| Before a PR | `./gradlew build`, `./gradlew pitest -PmutationTargetClasses=<changed classes>` (as CI), `npm --prefix frontend run verify`, `npm run lint:bpmn`, the validator without a model id (expected: only the original's 9 errors and 2 warnings plus the known workshop-model warnings) |
+| Before a PR | `./gradlew build`, `./gradlew pitest -PmutationTargetClasses=<changed classes>` (as CI), `npm --prefix frontend run verify`, `npm run lint:bpmn`, the validator without a model id (expected: 0 errors, only the feature map's 2 workshop warnings) |
 
 CI runs the build, bpmnlint, both drift checks (contract, process API), the diff-scoped mutation gate
 (80), the frontend gates, Bruno and Playwright on every PR.
@@ -118,8 +115,8 @@ CI runs the build, bpmnlint, both drift checks (contract, process API), the diff
 Two CLIs come as Claude Code plugins (`.claude/settings.json`) and pinned in the root `package.json`:
 
 - **bpmn-cli** (`npx bpmn`, skill `bpmn-cli:bpmn`) for every change to a `.bpmn`: semantic edits, no
-  XML by hand. `BPMN_KEEP_FLOW_IDS=1` keeps flow ids stable; a hook blocks writes to `original/`.
-  The workshop models are not lint targets: their bpmnlint findings in its output are expected.
+  XML by hand. `BPMN_KEEP_FLOW_IDS=1` keeps flow ids stable. The workshop models are not lint
+  targets: their bpmnlint findings in its output are expected.
 - **operate** (`npx operate`, skill `operate:operate`, `/operate:status`) for the local engine. Run
   `npx operate guide` before using it. It reads and repairs (`inspect --business-key <applicationId>`,
   `status`, `incident`, history, `retry`). It never deploys (the service deploys the models from its

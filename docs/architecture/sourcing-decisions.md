@@ -61,9 +61,9 @@ Map position = evolution value on the map and its stage.
 | Customer notification | 0.86, commodity (Assumption) | **Open** (#9) | The delivery sets nobody apart (the content may). Transactional messaging is a utility. | `serviceTask_sendContract`, `serviceTask_sendRejection` | `NotificationPort`, `LoggingNotificationAdapter` (simulated) | [#9][i9] |
 | Contract & e-signature | 0.68, product (Assumption) | **Open** (#8) | Does not set us apart, but no signature means no lease. E-signature is regulated and sold as a product or service. | `serviceTask_sendContract`, `receiveTask_contractSigned` | `ContractPort`, `LoggingContractAdapter` (simulated) | [#8][i8] |
 | Dealer integration | 0.38, custom-built (Assumption) | **Partner** (the dealer); how to connect is **open** (#10) | The dealer is an independent business: we never build its system. Dealer interfaces are probably uneven (APIs, portals). | `serviceTask_orderBike`, `event_handoverReported` | `BikeDealerPort`, `BikeDealerAdapter` (simulated); `ReportHandoverController` | [#10][i10] |
-| Credit check | 0.30, custom-built | **Make**; manual today, automation is [#19][i19] | MiraVelo's own risk policy. Today a person decides it in the inbox, with no rule behind the decision. #19 brings back the original decision table `checkCreditRating` (age 18 to 99, monthly net income at least 1,500), which waits frozen in `original/`. | `userTask_checkCreditRating`, read by `gateway_isSolvent` | `CompleteCreditCheckService`; [checkCreditRating.dmn][dmn] (not deployed) | [#19][i19] |
+| Credit check | 0.30, custom-built | **Make**; manual today, automation is [#19][i19] | MiraVelo's own risk policy. Today a person decides it in the inbox, with no rule behind the decision. #19 brings back the decision table `checkCreditRating` of the original model (age 18 to 99, monthly net income at least 1,500). | `userTask_checkCreditRating`, read by `gateway_isSolvent` | `CompleteCreditCheckService`; [check-credit-rating.dmn][dmn] at tag `original-process-v1` (not deployed) | [#19][i19] |
 | Process engine | 0.64, product | **Buy**: CIB seven (open source, embedded) | Running BPMN with messages, an event subprocess, async jobs and retries is a mature product. Building it would set us apart in nothing. | the waiting and the technical behaviour: `receiveTask_contractSigned`, `event_handoverReported`, `subProcess_applicationWithdrawn`, retries on `serviceTask_orderBike` | `cibseven-bpm-spring-boot-starter-rest-4` and `-webapp-4` ([versions][libs]); port `LeasingProcess`, adapter `LeasingProcessAdapter` | [ADR-0011][adr11], [ADR-0005][adr5] |
-| Leasing process model | 0.27, custom-built | **Make** | How MiraVelo runs a lease. It grows with every feature. BPMN itself is a standard, and the model follows a known template, so not genesis. | all of `bikeLeasingProcess` ([bike-leasing.bpmn][bpmn]) | generated `adapter/process/BikeLeasingProcessProcessApi.kt`; packaged by [build.gradle.kts][gradle] | [ADR-0008][adr8]; source model and deviations in [executable-process.md][exec] |
+| Leasing process model | 0.27, custom-built | **Make** | How MiraVelo runs a lease. It grows with every feature. BPMN itself is a standard, and the model follows a known template, so not genesis. | all of `bikeLeasingProcess` ([bike-leasing.bpmn][bpmn]) | generated `adapter/process/BikeLeasingProcessProcessApi.kt`; packaged by [build.gradle.kts][gradle] | [ADR-0008][adr8] |
 | UI framework | 0.76, commodity | **Buy**: React, Vite and their ecosystem (open source) | The standard way to build a web frontend. We use it as it is. | none; it hosts the pages that start and complete the steps | [frontend/package.json][fe-package] | [ADR-0009][adr9] |
 | Application framework | 0.82, commodity | **Buy**: Spring Boot 4 (open source) | The standard way to run a JVM service. We use it as it is. | none; it hosts the delegate beans the service tasks call | [versions][libs], [build.gradle.kts][gradle] | [ADR-0005][adr5] |
 | Database | 0.90, commodity | **Buy as a service** (outsource): PostgreSQL (Assumption) | A standard database sets nothing apart. The service reads its datasource from `SPRING_DATASOURCE_*`, so a managed PostgreSQL needs no code change. | none; it holds the engine state of every case and the `leasing_application` table | [docker-compose.yml][compose] (local only); [Flyway migrations][migrations]; `LeasingApplicationPersistenceAdapter` | [ADR-0006][adr6], [ADR-0007][adr7] |
@@ -147,7 +147,7 @@ both at the same time. A file changed on both sides becomes a conflict in design
 
 [usecase]: ../use-cases/bike-leasing/bike-leasing-use-case.md
 [bpmn]: ../use-cases/bike-leasing/process/bike-leasing.bpmn
-[dmn]: ../use-cases/bike-leasing/original/checkCreditRating.dmn
+[dmn]: https://github.com/miragon-blueprints/miragon-ai-example/blob/original-process-v1/kotlin-gradle/service/app/src/main/resources/dmn/check-credit-rating.dmn
 [code]: ../../service/app/src/main/kotlin/io/miragon/blueprint/
 [fe]: ../../frontend/AGENTS.md
 [fe-package]: ../../frontend/package.json
@@ -165,7 +165,6 @@ both at the same time. A file changed on both sides becomes a conflict in design
 [adr9]: ../adr/0009-react-frontend-next-to-the-service.md
 [adr10]: ../adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md
 [adr11]: ../adr/0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
-[exec]: ../use-cases/bike-leasing/process/executable-process.md
 [i2]: https://github.com/miragon-blueprints/miragon-ai-example/issues/2
 [i8]: https://github.com/miragon-blueprints/miragon-ai-example/issues/8
 [i9]: https://github.com/miragon-blueprints/miragon-ai-example/issues/9

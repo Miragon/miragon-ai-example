@@ -5,11 +5,15 @@
 - **Deciders:** Marco (@emaarco)
 - **Decides:** [#11](https://github.com/miragon-blueprints/miragon-ai-example/issues/11)
 - **Origin:** Consolidated baseline; earlier history in git.
+- **Note (2026-10-18):** PR [#33](https://github.com/miragon-blueprints/miragon-ai-example/pull/33)
+  removed `executable-process.md` from `docs/`. The link under Context points to its last
+  version, which is no longer maintained. The two human tasks are in the executable model
+  [bike-leasing.bpmn](../use-cases/bike-leasing/process/bike-leasing.bpmn).
 
 ## Context
 
 The process has two human tasks, `Check credit rating` and `Reverse application`
-([executable-process.md](../use-cases/bike-leasing/process/executable-process.md)). Issue #11 asked
+([executable-process.md](https://github.com/miragon-blueprints/miragon-ai-example/blob/90e4f61475727b1d284e389ffc3a79d630b9e5c6/docs/use-cases/bike-leasing/process/executable-process.md)). Issue #11 asked
 where the back office works on them: adapt the CIB seven Tasklist (forms, filters, users and
 groups), build an own inbox on the domain API, or buy a task UI. A Tasklist form writes process
 variables straight into the engine, past the domain; the service then has to read them back and

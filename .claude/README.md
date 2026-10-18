@@ -35,9 +35,9 @@ Read-only reviewers with their own context.
 
 ## Settings and hooks
 
-- `settings.json` denies edits to generated files (`adapter/process`, `openapi.json`, the orval client)
-  and the frozen models in `original/`, allows the build, lint and read-only `gh` commands, and wires
-  two hooks. Personal additions go in `settings.local.json` (git-ignored).
+- `settings.json` denies edits to generated files (`adapter/process`, `openapi.json`, the orval client),
+  allows the build, lint and read-only `gh` commands, and wires two hooks. Personal additions go in
+  `settings.local.json` (git-ignored).
 - `hooks/block-env-files.js` (PreToolUse, Node) refuses any Read, Edit, Write, Grep or Bash call whose
   target (`file_path`, `path` or `command`) names a `.env` or `.env.*` file; `.env.example` stays
   readable, and text that only mentions `.env` (an edit to the docs) passes.
@@ -49,9 +49,6 @@ Read-only reviewers with their own context.
   `operate@miragon` (skill `operate:operate`, `/operate:status`), from marketplaces fixed to a release
   tag. Claude Code installs them once you trust the folder; cloud sessions do not load them. Its `env`
   sets `BPMN_KEEP_FLOW_IDS=1`, so bpmn-cli keeps flow ids stable.
-- `hooks/block-frozen-models.js` (PreToolUse, Node) refuses a bpmn-cli command that would change a
-  model in `docs/use-cases/bike-leasing/original/`: the `Edit` deny rule does not see shell commands.
-  Reading it (`show`, `find`, `metrics`, `render`, `validate`) passes.
 - `../.mcp.json` provides the Playwright MCP server (pinned) for `test-in-browser`.
 
 ## What goes where

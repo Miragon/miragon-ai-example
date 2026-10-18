@@ -2,8 +2,7 @@
 
 This folder is the designIQ workspace of the repository. The root `designiq.yml` says
 `models: docs` ([ADR-0008][a08]). It holds the business and architecture material for the MiraVelo
-bike-leasing use case, the decisions, the demo, and the executable process model that the service
-deploys.
+bike-leasing use case, the decisions, and the executable process model that the service deploys.
 
 Building and running the service is covered in [README.md][root], the dev loop in
 [CONTRIBUTING.md][contrib] and the rules for agents in [AGENTS.md][agents].
@@ -28,35 +27,24 @@ How to view, in the tables below:
 
 ## Use case: bike leasing
 
-| Artifact                                | File                                     | Notation / how to view            |
-|-----------------------------------------|------------------------------------------|-----------------------------------|
-| Use case: problem, actors, goal, scope  | [bike-leasing-use-case.md][uc]           | Markdown · designIQ text · GitHub |
-| t.BPM table-top model of the core       | [bike-leasing-tbpm.bpmn][tbpm]           | t.BPM (BPMN) · designIQ modeler   |
-| BPM feature map: core and stages 1 to 4 | [bike-leasing-feature-map.bpmn][fm]      | t.BPM (BPMN) · designIQ modeler   |
-| Feature table: issues, stages, elements | [feature-map.md][fmmd]                   | Markdown · designIQ text · GitHub |
-| Executable process (deployed)           | [bike-leasing.bpmn][bpmn]                | BPMN · designIQ modeler           |
-| Notes on the executable process         | [executable-process.md][exec]            | Markdown · designIQ text · GitHub |
-| Original process (frozen, not deployed) | [original-bike-leasing.bpmn][orig]       | BPMN · designIQ modeler           |
-| Original called process (frozen)        | [original-cancel-bike-order.bpmn][origc] | BPMN · designIQ modeler           |
-| Credit-rating decision (frozen, #19)    | [checkCreditRating.dmn][dmn]             | DMN · designIQ modeler            |
-| Scope: original vs. core vs. issues     | [scope-comparison.md][scope]             | Markdown · designIQ text · GitHub |
-| Open feature and decision issues        | [issues labelled todo][issues]           | GitHub · designIQ todos           |
+| Artifact                                | File                                | Notation / how to view            |
+|-----------------------------------------|-------------------------------------|-----------------------------------|
+| Use case: problem, actors, goal, scope  | [bike-leasing-use-case.md][uc]      | Markdown · designIQ text · GitHub |
+| t.BPM table-top model of the main path  | [bike-leasing-tbpm.bpmn][tbpm]      | t.BPM (BPMN) · designIQ modeler   |
+| BPM feature map: core and stages 1 to 4 | [bike-leasing-feature-map.bpmn][fm] | t.BPM (BPMN) · designIQ modeler   |
+| Feature table: issues, stages, elements | [feature-map.md][fmmd]              | Markdown · designIQ text · GitHub |
+| Executable process (deployed)           | [bike-leasing.bpmn][bpmn]           | BPMN · designIQ modeler           |
+| Open feature and decision issues        | [issues labelled todo][issues]      | GitHub · designIQ todos           |
 
-The executable model is the simplified core ([executable-process.md][exec]). It and the frozen original both show the title "MiraVelo Bike Leasing" (process
-id `bikeLeasingProcess`). Tell them apart by the model id, which is the file name: `bike-leasing` is
-the one that runs, `original-bike-leasing` is the 43-node reference. The decision table
-`checkCreditRating.dmn` is not deployed; it waits in `original/` for feature #19.
+The executable model is the simplified core. The original model (tag [`original-process-v1`][tag])
+did more; its decision table `checkCreditRating` is not deployed and comes with feature #19.
 
 [uc]: use-cases/bike-leasing/bike-leasing-use-case.md
 [tbpm]: use-cases/bike-leasing/tbpm/bike-leasing-tbpm.bpmn
 [fm]: use-cases/bike-leasing/feature-map/bike-leasing-feature-map.bpmn
 [fmmd]: use-cases/bike-leasing/feature-map/feature-map.md
 [bpmn]: use-cases/bike-leasing/process/bike-leasing.bpmn
-[dmn]: use-cases/bike-leasing/original/checkCreditRating.dmn
-[exec]: use-cases/bike-leasing/process/executable-process.md
-[orig]: use-cases/bike-leasing/original/original-bike-leasing.bpmn
-[origc]: use-cases/bike-leasing/original/original-cancel-bike-order.bpmn
-[scope]: use-cases/bike-leasing/original/scope-comparison.md
+[tag]: https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources
 [issues]: https://github.com/miragon-blueprints/miragon-ai-example/issues?q=is%3Aissue%20label%3Atodo
 
 ## Architecture
@@ -109,28 +97,17 @@ decisions, so they live in CONTRIBUTING.md and the AGENTS.md files.
 [a10]: adr/0010-back-office-task-ui-own-inbox-in-the-frontend.md
 [a11]: adr/0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md
 
-## Demo
-
-| Artifact                                 | File                    | Notation / how to view            |
-|------------------------------------------|-------------------------|-----------------------------------|
-| Demo script: the live walk-through       | [demo-script.md][demo]  | Markdown · designIQ text · GitHub |
-| Rehearsal log: what the rehearsal showed | [rehearsal-log.md][log] | Markdown · designIQ text · GitHub |
-
-[demo]: demo/demo-script.md
-[log]: demo/rehearsal-log.md
-
 ## Viewing in designIQ
 
-- **Visual in designIQ:** BPMN (including the t.BPM workshop mode with its stickies and groups),
-  the frozen DMN and the Wardley Map. Open them in the designIQ modeler.
+- **Visual in designIQ:** BPMN (including the t.BPM workshop mode, with the stickies and groups of
+  the feature map) and the Wardley Map. Open them in the designIQ modeler.
 - **Text only in designIQ:** Markdown, shown raw without a preview. The Mermaid diagrams of the C4
   views are raw text there too.
 - **Rendered by GitHub:** Markdown and Mermaid. GitHub does not render BPMN, DMN or OWM; it shows
   their source.
 - **PNG fallbacks** in `assets/` cover what one side cannot show, or a designIQ outage:
-  `bike-leasing-core.png` (executable process), `bike-leasing-original.png`,
-  `bike-leasing-tbpm.png`, `bike-leasing-feature-map.png`, `sourcing-map.png`,
-  `c4-system-context.png`, `c4-container.png`.
+  `bike-leasing-core.png` (executable process), `bike-leasing-tbpm.png`,
+  `bike-leasing-feature-map.png`, `sourcing-map.png`, `c4-system-context.png`, `c4-container.png`.
 - designIQ reads the default branch (`main`) only. A model changed in a pull request appears after
   the merge. A change made in designIQ reaches Git as a pull request when it is released, and CI
   tests it like any other.
@@ -156,5 +133,3 @@ Recommended demo order:
    for example #19 on "Check credit rating".
 8. **How an agent implements it**: [AGENTS.md][agents], the skills and review agents in `.claude/`,
    and the gates that refuse a wrong change.
-
-The step-by-step script is [demo/demo-script.md][demo].

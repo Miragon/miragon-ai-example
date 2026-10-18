@@ -41,9 +41,9 @@ issued and the bike is ordered from the dealer in parallel. When the dealer repo
 the leasing is active. Until then the customer can withdraw; the back office then reverses the
 application.
 
-The model deliberately leaves out what the
-[original process](docs/use-cases/bike-leasing/original/scope-comparison.md) could do. That gap is
-the roadmap below.
+The model deliberately leaves out what the original process (tag
+[`original-process-v1`](https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources))
+could do. That gap is the roadmap below.
 
 ## Quick start
 
@@ -100,9 +100,8 @@ Open sourcing decisions (make, buy or adapt; [sourcing decisions](docs/architect
 
 - [AGENTS.md](AGENTS.md): structure, rules, commands and how to implement a feature issue
 - [docs/README.md](docs/README.md): every design artifact, the demo order and the ADR list
-- [Executable process](docs/use-cases/bike-leasing/process/executable-process.md): element ids,
-  what differs from its source model, how a model change reaches the code
-- [Demo script](docs/demo/demo-script.md): the live demo, step by step
+- [ADR-0011](docs/adr/0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md): how the
+  executable model reaches the code (delegates, the generated process API)
 - [service/AGENTS.md](service/AGENTS.md) and [frontend/AGENTS.md](frontend/AGENTS.md): the rules of
   each area
 

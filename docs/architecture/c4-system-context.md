@@ -55,8 +55,8 @@ capability inside; a buy or adapt decision turns a dashed box into a real system
 
 ## Elements
 
-The step names are the same in the [t.BPM model][tbpm] and the [executable model][bpmn]; the ids in
-brackets are the executable ones.
+The step names are the same in the [t.BPM model][tbpm] and the [executable model][bpmn]; the t.BPM
+model shows only the main path, without the withdrawal. The ids in brackets are the executable ones.
 
 | Element | What it is | Origin in the process | Source in the repo |
 |---|---|---|---|
