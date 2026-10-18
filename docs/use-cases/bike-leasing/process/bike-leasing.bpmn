@@ -188,7 +188,7 @@
       <bpmndi:BPMNShape id="BPMNShape_02oc6bu" bpmnElement="startEvent_applicationWithdrawn">
         <dc:Bounds x="190" y="942" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="182" y="983" width="54" height="27" />
+          <dc:Bounds x="152" y="984" width="112" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1hnpf86" bpmnElement="userTask_reverseApplication">
@@ -197,7 +197,7 @@
       <bpmndi:BPMNShape id="BPMNShape_1yrmkma" bpmnElement="endEvent_applicationCancelled">
         <dc:Bounds x="422" y="942" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="414" y="983" width="54" height="27" />
+          <dc:Bounds x="384" y="984" width="112" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_13304qq" bpmnElement="flow_withdrawnToReversal">
