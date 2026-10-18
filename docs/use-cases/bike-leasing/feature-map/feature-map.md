@@ -5,11 +5,12 @@ that runs today, and every open feature issue where the process needs it, so no 
 process context.
 
 - Model: [bike-leasing-feature-map.bpmn](bike-leasing-feature-map.bpmn) (t.BPM workshop mode, not executable)
-- The core alone: [bike-leasing-tbpm.bpmn](../tbpm/bike-leasing-tbpm.bpmn). It has the same steps, names and ids.
-  One exception, see the notes on the ids: "Contract signed".
+- The main path of the core alone: [bike-leasing-tbpm.bpmn](../tbpm/bike-leasing-tbpm.bpmn). It has
+  the steps, names and ids of this map's main path. Against the executable model two ids differ, see
+  the notes on the ids: "Application valid?" and "Contract signed". The withdrawal is not in it; it
+  is on this map and in the executable model.
 - What runs: [bike-leasing.bpmn](../process/bike-leasing.bpmn), the executable model
-- Where the features come from: the issues, and the original via
-  [scope-comparison.md](../original/scope-comparison.md) (capabilities C1 to C19)
+- Where the features come from: the issues, and the original model (tag [`original-process-v1`][tag])
 - Picture, if designIQ is unavailable: [bike-leasing-feature-map.png](../../../assets/bike-leasing-feature-map.png)
 
 ## How to read the map
@@ -45,7 +46,7 @@ process context.
 
 | Stage | Features | Why in this order (derived from the issues) |
 |---|---|---|
-| Core (runs today) | apply, validate and check credit by hand; conclude the contract; reject; insure and order in parallel; hand over; withdraw and reverse by hand | The simplified event-subprocess model ([executable-process.md](../process/executable-process.md)), with a frontend and an inbox for both human tasks. |
+| Core (runs today) | apply, validate and check credit by hand; conclude the contract; reject; insure and order in parallel; hand over; withdraw and reverse by hand | The simplified event-subprocess model ([bike-leasing.bpmn](../process/bike-leasing.bpmn)), with a frontend and an inbox for both human tasks. |
 | Stage 1 – Customer follow-up | [#18], [#1] | A sent contract no longer waits forever. #18 needs only the core; #1 depends on #18, whose modelling choice decides where the reminder attaches. |
 | Stage 2 – Automation and supply | [#19], [#20] | #19 needs only the core and takes the routine credit checks out of the inbox. #20 brings back the business outcome "out of stock"; its "no alternative" path reuses the compensation handlers of #3, so it lands after #3 or brings them itself. |
 | Stage 3 – Withdrawal | [#21], [#3], [#4] | #21 needs only the core; a withdrawal during the period works with today's manual reversal. #3 makes the reversal automatic. #4 needs #3: only the automatic reversal compensates a placed order. |
@@ -56,22 +57,22 @@ process context.
 The anchors are the designIQ todo anchors in the executable model
 ([bike-leasing.bpmn](../process/bike-leasing.bpmn)), copied from the `element:` lines of each issue.
 
-| Stage | Issue | Title | Steps on the map (element ids) | Anchored elements in the executable model | Original capability | Depends on |
-|---|---|---|---|---|---|---|
-| Core | — | Apply, validate and check credit | `startEvent_leasingRequestReceived`, `serviceTask_validateApplication`, `tbpm_gateway_applicationValid`, `userTask_checkCreditRating`, `gateway_isSolvent` | — | C1, C2 | — |
-| Core | — | Conclude the contract | `serviceTask_sendContract`, `event_contractSigned` | — | C4 | — |
-| Core | — | Reject the application | `gateway_rejectionJoin`, `serviceTask_sendRejection`, `endEvent_applicationRejected` | — | C3 | — |
-| Core | — | Insure and order in parallel (delivered [#2]) | `gateway_fork`, `serviceTask_issueInsurancePolicy`, `serviceTask_orderBike`, `gateway_join` | — | C7, C8, C18 | — |
-| Core | — | Hand over and activate | `event_handoverReported`, `endEvent_leasingActive` | — | C16, C17 | — |
-| Core | — | Withdraw, reverse by hand (inbox: delivered [#5], decided [#11]) | `subProcess_applicationWithdrawn`, `startEvent_applicationWithdrawn`, `userTask_reverseApplication`, `endEvent_applicationCancelled` | — | C12 | — |
-| 1 | [#18] | Signature deadline (14 days) | `gateway_awaitSignature` (event-based), `event_signatureDeadline` (14 days), `flow_deadlineToRejection` | `receiveTask_contractSigned`, `gateway_rejectionJoin` | C6 | core; #8 for the open question |
-| 1 | [#1] | Signature reminder (7 days) | `event_signatureReminder` (7 days), `serviceTask_sendReminderMail`, `endEvent_prospectReminded` | `receiveTask_contractSigned` | C5 | core |
-| 2 | [#19] | Credit check by DMN | note on `userTask_checkCreditRating` (it becomes the business rule task `businessRuleTask_checkCreditRating`) | `userTask_checkCreditRating`, `gateway_isSolvent` | C2 | core |
-| 2 | [#20] | Alternative bike when the dealer cannot deliver | `gateway_bikeSourceJoin`, `gateway_bikeAvailable`, `userTask_clarifyAlternative`, `gateway_alternativeFound`, `event_triggerReversal`, `serviceTask_confirmContractCancellation`, `endEvent_contractCancelled` (terminate) | `serviceTask_orderBike` | C9, C11 | #3 (its compensation handlers); shares the availability check with #7 |
-| 3 | [#21] | Withdrawal period before activation | `event_withdrawalPeriodElapsed` (14 days) | `event_handoverReported`, `endEvent_leasingActive` | C17 | core |
-| 3 | [#3] | Automatic reversal by compensation | `fmap_subProcess_automaticReversal` with `fmap_startEvent_applicationWithdrawn`, `event_reverseApplication`, `serviceTask_sendCancellationConfirmation`, `fmap_endEvent_applicationCancelled` | `subProcess_applicationWithdrawn`, `userTask_reverseApplication`, `serviceTask_sendContract`, `serviceTask_issueInsurancePolicy` | C12, C7 (policy cancellation) | core |
-| 3 | [#4] | Bike order cancellation | `fmap_gateway_bikeOrdered`, `callActivity_cancelBikeOrder` (Cancel bike order) with `startEvent_cancellationRequired`, `serviceTask_requestCancellation`, `gateway_cancellationPossible`, `userTask_clarifyReturn`, `serviceTask_bookCosts`, `cbo_gateway_join`, `endEvent_orderReversed`; `fmap_gateway_orderCancellationJoin` | `serviceTask_orderBike` | C13, C14, C15 | #3 |
-| 4 | [#7] | Live dealer availability | note on `serviceTask_orderBike` | `serviceTask_orderBike` | C10 (catalogue) | none; shares the availability check with #20 |
+| Stage | Issue | Title | Steps on the map (element ids) | Anchored elements in the executable model | Depends on |
+|---|---|---|---|---|---|
+| Core | — | Apply, validate and check credit | `startEvent_leasingRequestReceived`, `serviceTask_validateApplication`, `tbpm_gateway_applicationValid`, `userTask_checkCreditRating`, `gateway_isSolvent` | — | — |
+| Core | — | Conclude the contract | `serviceTask_sendContract`, `event_contractSigned` | — | — |
+| Core | — | Reject the application | `gateway_rejectionJoin`, `serviceTask_sendRejection`, `endEvent_applicationRejected` | — | — |
+| Core | — | Insure and order in parallel (delivered [#2]) | `gateway_fork`, `serviceTask_issueInsurancePolicy`, `serviceTask_orderBike`, `gateway_join` | — | — |
+| Core | — | Hand over and activate | `event_handoverReported`, `endEvent_leasingActive` | — | — |
+| Core | — | Withdraw, reverse by hand (inbox: delivered [#5], decided [#11]) | `subProcess_applicationWithdrawn`, `startEvent_applicationWithdrawn`, `userTask_reverseApplication`, `endEvent_applicationCancelled` | — | — |
+| 1 | [#18] | Signature deadline (14 days) | `gateway_awaitSignature` (event-based), `event_signatureDeadline` (14 days), `flow_deadlineToRejection` | `receiveTask_contractSigned`, `gateway_rejectionJoin` | core; #8 for the open question |
+| 1 | [#1] | Signature reminder (7 days) | `event_signatureReminder` (7 days), `serviceTask_sendReminderMail`, `endEvent_prospectReminded` | `receiveTask_contractSigned` | core |
+| 2 | [#19] | Credit check by DMN | note on `userTask_checkCreditRating` (it becomes the business rule task `businessRuleTask_checkCreditRating`) | `userTask_checkCreditRating`, `gateway_isSolvent` | core |
+| 2 | [#20] | Alternative bike when the dealer cannot deliver | `gateway_bikeSourceJoin`, `gateway_bikeAvailable`, `userTask_clarifyAlternative`, `gateway_alternativeFound`, `event_triggerReversal`, `serviceTask_confirmContractCancellation`, `endEvent_contractCancelled` (terminate) | `serviceTask_orderBike` | #3 (its compensation handlers); shares the availability check with #7 |
+| 3 | [#21] | Withdrawal period before activation | `event_withdrawalPeriodElapsed` (14 days) | `event_handoverReported`, `endEvent_leasingActive` | core |
+| 3 | [#3] | Automatic reversal by compensation | `fmap_subProcess_automaticReversal` with `fmap_startEvent_applicationWithdrawn`, `event_reverseApplication`, `serviceTask_sendCancellationConfirmation`, `fmap_endEvent_applicationCancelled` | `subProcess_applicationWithdrawn`, `userTask_reverseApplication`, `serviceTask_sendContract`, `serviceTask_issueInsurancePolicy` | core |
+| 3 | [#4] | Bike order cancellation | `fmap_gateway_bikeOrdered`, `callActivity_cancelBikeOrder` (Cancel bike order) with `startEvent_cancellationRequired`, `serviceTask_requestCancellation`, `gateway_cancellationPossible`, `userTask_clarifyReturn`, `serviceTask_bookCosts`, `cbo_gateway_join`, `endEvent_orderReversed`; `fmap_gateway_orderCancellationJoin` | `serviceTask_orderBike` | #3 |
+| 4 | [#7] | Live dealer availability | note on `serviceTask_orderBike` | `serviceTask_orderBike` | none; shares the availability check with #20 |
 
 Notes on the ids:
 
@@ -80,13 +81,15 @@ Notes on the ids:
 - `event_contractSigned` on the map and in the t.BPM model is the business event "Contract signed".
   The executable model waits for the same message in the receive task `receiveTask_contractSigned`,
   because the timers of #18 and #1 attach to it as boundary events.
-- Feature ids come from the issues and the original. `gateway_bikeAvailable` is the gateway variant
-  #20 names (option 2); #20 still chooses between it and the error boundary `event_bikeUnavailable`.
+- Feature ids come from the issues and the original model. `gateway_bikeAvailable` is the gateway
+  variant #20 names (option 2); #20 still chooses between it and the error boundary
+  `event_bikeUnavailable`.
+- Ids that exist only in the t.BPM model start with `tbpm_`, its flows `tbpm_flow_*`.
 - Ids that exist only on the map start with `fmap_`. The #3 sub-process and its start and end
   events need them because the core already owns `subProcess_applicationWithdrawn`,
   `startEvent_applicationWithdrawn` and `endEvent_applicationCancelled`.
-- `cbo_gateway_join` is the join of the original "Cancel Bike Order" process. It got the prefix
-  `cbo_` because the core already uses `gateway_join`.
+- `cbo_gateway_join` is the join of the "Cancel Bike Order" process in the original model. It got
+  the prefix `cbo_` because the core already uses `gateway_join`.
 - `fmap_gateway_bikeOrdered` ("Bike already ordered?") and `fmap_gateway_orderCancellationJoin`
   express the rule that the reversal cancels an order only if one was placed. In BPMN that rule is
   compensation.
@@ -112,12 +115,12 @@ The options, criteria and the Wardley map are in
 
 Two open questions are on the map as well:
 
-- In #18: does the rejection after the deadline revoke the issued contract? Decided with #8
-  (open question 1 in the [scope comparison](../original/scope-comparison.md)).
+- In #18: does the rejection after the deadline revoke the issued contract? Decided with #8.
 - In #4, at "Cancellation possible?": which answer leads to "Clarify return with dealer" and "Book
-  cancellation costs"? In the original, the branch labels contradict their conditions, so the two
-  branches are deliberately unlabelled here (open question 2).
+  cancellation costs"? In the original model, the branch labels contradict their conditions, so the
+  two branches are deliberately unlabelled here.
 
+[tag]: https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources
 [#1]: https://github.com/miragon-blueprints/miragon-ai-example/issues/1
 [#2]: https://github.com/miragon-blueprints/miragon-ai-example/issues/2
 [#3]: https://github.com/miragon-blueprints/miragon-ai-example/issues/3

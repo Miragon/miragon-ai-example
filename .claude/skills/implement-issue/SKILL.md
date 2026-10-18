@@ -18,11 +18,14 @@ gh issue view <n> --json comments --jq '.comments[].body'
 ```
 
 Collect the acceptance criteria, the anchor block's element ids, linked issues and the matching part
-of the original model in `docs/use-cases/bike-leasing/original/` (read-only). An open **feature**
-issue this one depends on blocks the work: say so and stop. An open **decision** issue (#8–#10) does
-not block; its question becomes an open question of the plan. Read
-`docs/use-cases/bike-leasing/process/executable-process.md` and the feature's row in
-`docs/use-cases/bike-leasing/feature-map/feature-map.md`.
+of the original model at tag `original-process-v1`, under
+[`kotlin-gradle/service/app/src/main/resources/`](https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources):
+`bpmn/bike-leasing.bpmn` (the original process, not the executable model of the same name),
+`bpmn/cancel-bike-order.bpmn` and `dmn/check-credit-rating.dmn`. Read them with
+`git show original-process-v1:kotlin-gradle/service/app/src/main/resources/<file>`. An open
+**feature** issue this one depends on blocks the work: say so and stop. An open **decision** issue
+(#8–#10) does not block; its question becomes an open question of the plan. Read the feature's row
+in `docs/use-cases/bike-leasing/feature-map/feature-map.md`.
 
 ## 2. Separate facts from assumptions
 
@@ -44,10 +47,9 @@ Write the plan as a checklist along the chain, skipping hops the issue does not 
    the regenerated contract and client
 5. Frontend (skill `create-feature-slice`)
 6. Bruno scenario; a Playwright spec when users see the change
-7. Design artifacts: a row in `executable-process.md` for every difference from the source model,
-   the feature map (`.bpmn` + `.md`), the t.BPM model if the core changes, the glossary, the use case,
-   `scope-comparison.md` and the README roadmap when a capability lands, anchor blocks of issues whose
-   element ids change, the PNGs in `docs/assets/`
+7. Design artifacts: the feature map (`.bpmn` + `.md`), the t.BPM model if the main path changes,
+   the glossary, the use case, the README roadmap when a capability lands, anchor blocks of issues
+   whose element ids change, the PNGs in `docs/assets/`
 
 Per item: the files, the test that proves it, the acceptance criterion it serves. Show the plan with
 the open questions and **wait for approval**. Do not write code before it.

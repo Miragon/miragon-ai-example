@@ -34,14 +34,14 @@ change: is it what the issue asks for, and nothing else? Does it hold for the pr
 | a JPA entity | a new `V<n>__*.sql` migration; no edited migration |
 | a controller or DTO | `@Operation(operationId)`, the re-exported `openapi.json`, the regenerated client |
 | a domain field shown to users | DTO, mapper, `openapi.json`, client, FSD entity, Bruno assertion |
-| `bike-leasing.bpmn` | regenerated `adapter/process`, complete BPMNDI, a row in `executable-process.md`, feature map and glossary for changed ids; run the agent `review-process` |
+| `bike-leasing.bpmn` | regenerated `adapter/process`, complete BPMNDI, feature map and glossary for changed ids; run the agent `review-process` |
 | a delegate | its unit test (`create-delegate`) and a process test for the path |
 | a service throwing what a delegate maps to `BpmnError` | `noRollbackFor` on `@Transactional` |
 | a user-visible flow | copy in `de.ts` and `en.ts`, a Playwright spec, the Bruno scenario |
 | a whole feature | run the agent `review-vertical-slice` |
 | an accepted ADR | no rewrite: a new ADR supersedes it, a factual fix gets a dated note |
 | Gradle modules, build or CI paths | working directories, relative paths in tests and CI, artifact and image names |
-| a model in `original/` or a generated file edited by hand | a blocker |
+| a generated file edited by hand | a blocker |
 
 ## 4. Security and robustness
 
@@ -55,7 +55,7 @@ Severity is absolute, not relative to this PR:
 
 - **Blocker:** wrong business result, data loss, broken path, security hole, red gate.
 - **Major:** a missing counterpart or test that lets a regression through, or a broken repo rule
-  (ADR policy, frozen models) that loses information.
+  (ADR policy) that loses information.
 - **Minor:** maintainability, naming, a weak assertion.
 - **Nit:** optional.
 

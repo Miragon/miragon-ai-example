@@ -3,6 +3,9 @@
 - **Status:** Accepted
 - **Date:** 2026-10-16
 - **Origin:** Consolidated baseline; earlier history in git.
+- **Note (2026-10-18):** PR [#33](https://github.com/miragon-blueprints/miragon-ai-example/pull/33)
+  removed `executable-process.md` from `docs/`. The link under Reasons points to its last
+  version, which is no longer maintained.
 
 ## Context
 
@@ -47,7 +50,7 @@ hand-maintained id lists. They are `@SpringBootTest` tests with the CIB seven as
 Reasons:
 
 - Delegates instead of external tasks keep the engine embedded and give every service task the same
-  pattern (recorded in [executable-process.md](../use-cases/bike-leasing/process/executable-process.md),
+  pattern (recorded in [executable-process.md](https://github.com/miragon-blueprints/miragon-ai-example/blob/90e4f61475727b1d284e389ffc3a79d630b9e5c6/docs/use-cases/bike-leasing/process/executable-process.md),
   "Deviations from the source model").
 - One deployable with no separate engine or worker process; the service changes domain state and
   completes a user task in one transaction (as the inbox relies on,

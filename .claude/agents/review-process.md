@@ -15,8 +15,8 @@ test paths are relative to `service/app/src/test/kotlin/io/miragon/blueprint/`.
 
 ### 1. Locate and parse the model
 The executable models live in `docs/use-cases/bike-leasing/process/` (`bike-leasing.bpmn`; Gradle
-packages them onto the classpath). Ignore `original/` (frozen), the t.BPM model and the feature map
-(documentation). Extract per element:
+packages them onto the classpath). Ignore the t.BPM model and the feature map (documentation).
+Extract per element:
 - **service tasks** — id, name, `camunda:delegateExpression`, `asyncBefore`/`asyncAfter`, retry cycle
 - **messages** — `<bpmn:message name="…">` and the start/catch events using them
 - **errors** — `<bpmn:error errorCode="…">` and the boundary events that catch them

@@ -8,16 +8,17 @@ How to read the tables:
 - **Status** `core` = exists today, in the running process or in this repo. `planned #N` = not in
   the core; it comes (back) with feature issue #N (links at the end).
 - **In the models** cites element ids of the executable `bike-leasing.bpmn`. Cells starting with
-  "original:" cite the frozen original (`original-bike-leasing.bpmn`, `original-cancel-bike-order.bpmn`,
-  `checkCreditRating.dmn` in `original/`) instead, because the core has no model or code for them.
-  Cells starting with "map:" cite the feature map, where a planned feature is already drawn.
+  "original:" cite the original model (tag `original-process-v1`: process `bikeLeasingProcess`, the
+  called process `cancelBikeOrder` and decision `checkCreditRating`) instead, because the core has
+  no model or code for them. Cells starting with "map:" cite the feature map, where a planned
+  feature is already drawn.
 - Models are named by file name. File names are unique under `docs/`, and designIQ uses them as ids.
 - `{id}` in an endpoint is the application id (`{applicationId}` in the OpenAPI contract).
 
 Where things live:
 
 - Executable process: [bike-leasing.bpmn](use-cases/bike-leasing/process/bike-leasing.bpmn)
-- Frozen original and the credit decision (not deployed): [original/](use-cases/bike-leasing/original/)
+- Original model and the credit decision (not deployed): tag [`original-process-v1`](https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources)
 - The use case: [bike-leasing-use-case.md](use-cases/bike-leasing/bike-leasing-use-case.md) · all docs: [README.md](README.md)
 - Backend code: [service/app/src/main/kotlin/io/miragon/blueprint/](../service/app/src/main/kotlin/io/miragon/blueprint/)
   (`domain`, `application`, `adapter`) · frontend: [frontend/src/](../frontend/src/)
@@ -35,7 +36,7 @@ Where things live:
 | BPMN element id | `<type>_<camelCase>`, never changed once released | `serviceTask_orderBike` · `receiveTask_contractSigned` · `gateway_isSolvent` |
 | Sequence flow id | `flow_<camelCase>` describing the step, as bpmnlint requires | `flow_requestToValidation` · `flow_notSolvent` |
 | Message | id `Message_<PascalCase>`, name `miravelo.<camelCase>` | `Message_ContractSigned` / `miravelo.contractSigned` |
-| Decision (DMN) | file name = decision id, so designIQ links the rule task | `checkCreditRating.dmn` → `checkCreditRating` |
+| Decision (DMN) | file name = decision id, so designIQ links the rule task | `checkCreditRating.dmn` → `checkCreditRating` (planned #19) |
 | Code | English. Types PascalCase with their layer suffix, variables camelCase, statuses UPPER_SNAKE_CASE, REST paths kebab-case | `SignContractUseCase` · `bikeId` · `CONTRACT_SIGNED` · `/sign-contract` |
 | One term, one name | the business name runs through model and code | Send contract → `serviceTask_sendContract` → `#{sendContractDelegate}` → `SendContractDelegate` → `SendContractUseCase` |
 | Frontend routes | German, like the UI copy | `/antraege/neu` (new application) · `/aufgaben` (inbox) |
@@ -44,17 +45,17 @@ Known deviations (ids stay stable):
 
 - In the code, "Send rejection" calls `RejectApplicationUseCase`, and the two user tasks are
   completed through `CompleteCreditCheckUseCase` and `CompleteReversalUseCase`.
-- The boundary event "Application invalid" is `event_applicationInvalid`; the source model calls
-  it `boundary_applicationInvalid` (see executable-process.md).
+- The boundary event "Application invalid" is `event_applicationInvalid`; the source model, a
+  variant Miragon maintains outside this repo, calls it `boundary_applicationInvalid`.
 
 ## Say this, not that
 
 | Say | Not | Why |
 |---|---|---|
-| Customer | prospect, applicant, lessee | One word for the person everywhere. "Prospect reminded" exists only in the original. |
-| Dealer | supplier, vendor | The original said "supplier" ("Clarify return with supplier") for the same party as `BikeDealerPort`. |
+| Customer | prospect, applicant, lessee | One word for the person everywhere. "Prospect reminded" exists only in the original model. |
+| Dealer | supplier, vendor | The original model said "supplier" ("Clarify return with supplier") for the same party as `BikeDealerPort`. |
 | Handover | delivery | The dealer reports the handover; there is no separate delivery step. |
-| Withdrawal | abort, cancellation | The customer withdraws; the original tests called it "abort". |
+| Withdrawal | abort, cancellation | The customer withdraws; the tests of the original model called it "abort". |
 | Reversal | rollback, storno | Undoing the steps already done. Today the back office does it by hand ("Reverse application"); "compensation" is the BPMN mechanism planned for it (#3). |
 | Inbox | Tasklist | The back office works in the frontend inbox. The CIB seven Tasklist is a tool for operations. |
 | Withdrawal period | cooling-off period | One name for the 14 days after the handover (planned #21). |
@@ -171,7 +172,7 @@ in the engine; the services set it when the process reaches the step.
 | Term | Definition | In the models | In the code | Status |
 |---|---|---|---|---|
 | BPMN | Business Process Model and Notation: the standard diagram language for processes. The file designIQ shows is the file the engine runs. | `bike-leasing.bpmn` (process `bikeLeasingProcess`) | generated `BikeLeasingProcessProcessApi` (bpmn-to-code) | core |
-| DMN | Decision Model and Notation: business rules as a decision table. Not deployed in the core; the frozen credit decision waits for #19. | `original/checkCreditRating.dmn` (decision `checkCreditRating`) | – | planned #19 |
+| DMN | Decision Model and Notation: business rules as a decision table. Not deployed in the core; the credit decision of the original model waits for #19. | original: decision `checkCreditRating` | – | planned #19 |
 | Process engine | CIB seven, the community fork of Camunda 7, embedded in the bike-leasing service. It runs the BPMN model and remembers where every case waits. | runs `bikeLeasingProcess` | `LeasingProcessAdapter`; the delegates in `adapter/inbound/cibseven`; `/engine-rest` | core |
 | Process instance | One run of the process for one leasing application, from "Leasing request received" to an end event. | an instance of `bikeLeasingProcess` | `LeasingProcess.submitRequest` starts it | core |
 | Business key | The application id attached to a process instance. Every message and task completion finds the right instance through it. | – | `LeasingProcessAdapter`, `correlateByBusinessKey`, `execution.processBusinessKey` in the delegates | core |
@@ -184,11 +185,11 @@ in the engine; the services set it when the process reaches the step.
 | Simulated system | An external system the core only fakes, so the demo needs no partners: contract system (#8), notification channel (#9), dealer system (#10), insurer. | – | `LoggingContractAdapter`, `LoggingNotificationAdapter`, `BikeDealerAdapter`, `LoggingInsuranceAdapter` | core |
 | Bruno scenario | A scripted series of REST calls that plays customer, dealer and back office against the running service. `00-demo-data` prepares cases for a live demo. | – | `bruno/` (`00-demo-data` … `06-incident-demo`) | core |
 | t.BPM | Tangible BPM: modelling a process together at a table with a reduced BPMN palette (activity, event, gateway, document). The table-top model is the shared language. | `bike-leasing-tbpm.bpmn` (workshop mode) | – | core |
-| Feature map | The t.BPM model plus the planned features, in stages: Core (runs today), Stage 1 – Customer follow-up, Stage 2 – Automation and supply, Stage 3 – Withdrawal, Stage 4 – Portal. A group marks each feature that adds steps, and a note sticky names every feature. No feature loses its place in the process. | `bike-leasing-feature-map.bpmn`, `feature-map.md` | – | core |
+| Feature map | The t.BPM model plus the core's withdrawal and the planned features, in stages: Core (runs today), Stage 1 – Customer follow-up, Stage 2 – Automation and supply, Stage 3 – Withdrawal, Stage 4 – Portal. A group marks each feature that adds steps, and a note sticky names every feature. No feature loses its place in the process. | `bike-leasing-feature-map.bpmn`, `feature-map.md` | – | core |
 | C4 model | Architecture diagrams at two zoom levels: system context (who and what talks to the service) and container (what runs inside it). | `c4-system-context.md`, `c4-container.md` (Mermaid: drawn on GitHub, raw text in designIQ) | – | core |
 | Wardley Map | A map of the components behind a user need: up = visible to the user, right = more evolved (genesis to commodity). It grounds the make, buy or adapt decisions #8 to #11. | `sourcing-map.owm`, `sourcing-decisions.md` | – | core |
 | designIQ | A Git-native workspace where teams model their business and architecture together, live. It shows every model under `docs/` from the default branch; edits reach Git through a release pull request. | `designiq.yml` (`models: docs`) at the repo root | – | core |
-| Todo | A GitHub issue that designIQ pins to process elements: labels `todo` and `process:bike-leasing` plus an anchor block with element ids. | anchor lines `element: <id>`, e.g. `serviceTask_sendContract` (#1, #8, #18) | – | core |
+| Todo | A GitHub issue that designIQ pins to process elements: labels `todo` and `process:bike-leasing` plus an anchor block with element ids. | anchor lines `element: <id>`, e.g. `receiveTask_contractSigned` (#1, #8, #18) | – | core |
 
 ## Issues referenced
 

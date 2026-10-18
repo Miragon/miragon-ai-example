@@ -64,8 +64,8 @@ A withdrawal sets WITHDRAWN at once; the reversal ends it as CANCELLED.
 
 1. Leasing request received: the case starts (RECEIVED).
 2. Validate application: the applicant must be at least 18 and the bike must be in the dealer's
-   catalogue. **Assumption:** the source model names the step but not its rule; this rule is
-   ours ([executable-process.md](process/executable-process.md)).
+   catalogue. **Assumption:** the source model, a variant Miragon maintains outside this repo,
+   names the step but not its rule; this rule is ours.
 3. Check credit rating: the back office decides "solvent" or "not solvent" in the inbox. No rule
    guides the decision yet ([#19] automates it).
 4. Send contract: the contract system issues the contract and the customer is asked to sign
@@ -98,9 +98,9 @@ completing a task that is not open) is refused with 409; an unknown application 
 
 ## Deliberately not in the core
 
-The original model did more (see the scope comparison). Each capability the core lacks is a feature
-issue, grouped into stages on the feature map. Every issue is also a designIQ todo, shown on the
-process elements it touches.
+The original model (tag [`original-process-v1`][tag]) did more. Each capability the core lacks is a
+feature issue, grouped into stages on the feature map. Every issue is also a designIQ todo, shown on
+the process elements it touches.
 
 | Stage | Issue | Feature |
 |---|---|---|
@@ -139,16 +139,14 @@ context, so going back a step is part of it.
 | Index of all artifacts and the demo order | [docs/README.md](../../README.md) |
 | Shared vocabulary | [glossary.md](../../glossary.md) |
 | Wardley map and sourcing decisions | [sourcing-map.owm](../../architecture/sourcing-map.owm), [sourcing-decisions.md](../../architecture/sourcing-decisions.md) |
-| t.BPM table-top model of the core | [bike-leasing-tbpm.bpmn](tbpm/bike-leasing-tbpm.bpmn) |
+| t.BPM table-top model of the main path | [bike-leasing-tbpm.bpmn](tbpm/bike-leasing-tbpm.bpmn) |
 | BPM feature map (process plus feature stages) | [bike-leasing-feature-map.bpmn](feature-map/bike-leasing-feature-map.bpmn), [feature-map.md](feature-map/feature-map.md) |
 | C4 system context and containers | [c4-system-context.md](../../architecture/c4-system-context.md), [c4-container.md](../../architecture/c4-container.md) |
-| Executable process | [bike-leasing.bpmn](process/bike-leasing.bpmn) |
-| How it is built and deployed, element list, deviations from the source model | [executable-process.md](process/executable-process.md) |
-| Original model, frozen credit decision and what changed | [original-bike-leasing.bpmn](original/original-bike-leasing.bpmn), [original-cancel-bike-order.bpmn](original/original-cancel-bike-order.bpmn), [checkCreditRating.dmn](original/checkCreditRating.dmn), [scope-comparison.md](original/scope-comparison.md) |
+| Executable process, and how it reaches the code | [bike-leasing.bpmn](process/bike-leasing.bpmn), [ADR-0011](../../adr/0011-embedded-cib-seven-with-delegates-and-a-generated-process-api.md) |
 | Architecture decisions (ADRs) | [adr/](../../adr/) |
-| Live demo script | [demo-script.md](../../demo/demo-script.md) |
 | PNG renders, if designIQ is unavailable | [assets/](../../assets/) |
 
+[tag]: https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources
 [#1]: https://github.com/miragon-blueprints/miragon-ai-example/issues/1
 [#2]: https://github.com/miragon-blueprints/miragon-ai-example/issues/2
 [#3]: https://github.com/miragon-blueprints/miragon-ai-example/issues/3

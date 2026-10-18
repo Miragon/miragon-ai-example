@@ -38,9 +38,9 @@ Backend paths are relative to `service/app/src/main/kotlin/io/miragon/blueprint/
    `03-not-solvent`, `04-withdrawal`, …).
 10. **Playwright spec** — `frontend/e2e/*.spec.ts` (baseURL `http://localhost:5173`). A spec covering
     the feature in the browser?
-11. **Design artifacts** — `docs/`: the element in `process/executable-process.md`, the term in
-    `glossary.md`, and the feature in `feature-map/bike-leasing-feature-map.bpmn` + `feature-map.md`.
-    Element ids referenced there must exist in the executable model.
+11. **Design artifacts** — `docs/`: the term in `glossary.md` and the feature in
+    `feature-map/bike-leasing-feature-map.bpmn` + `feature-map.md`. Element ids referenced there must
+    exist in the executable model.
 
 ## How to work
 

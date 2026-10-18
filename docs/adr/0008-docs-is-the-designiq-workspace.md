@@ -4,6 +4,11 @@
 - **Date:** 2026-10-16
 - **Deciders:** Thomas (@Hafflgav)
 - **Origin:** Consolidated baseline; earlier history in git.
+- **Note (2026-10-18):** PR [#33](https://github.com/miragon-blueprints/miragon-ai-example/pull/33)
+  removed `original/` and `demo/` from `docs/`. The original models remain at tag
+  [`original-process-v1`](https://github.com/miragon-blueprints/miragon-ai-example/tree/original-process-v1/kotlin-gradle/service/app/src/main/resources).
+  Read the layout below without `original/` and `demo/`. The `original/` bullet and the `original-`
+  prefix no longer apply, and no model in `docs/` contains a compensation handler today.
 
 ## Context
 

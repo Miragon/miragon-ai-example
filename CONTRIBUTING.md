@@ -190,8 +190,6 @@ the environment and win over the defaults:
   it onto the classpath). Then run `./gradlew generateBpmnModels`, commit the regenerated
   `adapter/process` files (never hand-edit them), run `npm run lint:bpmn` and the process tests. Keep
   element ids stable, because issues and docs refer to them.
-- **Never edit `docs/use-cases/bike-leasing/original/`.** It is the frozen original process
-  (tag `original-process-v1`).
 - **Changing the API?** Re-export the spec with the `OpenApiSpecExportTest` (every full build runs
   it), so that the committed `openapi/openapi.json` stays in sync, then regenerate the frontend
   client with `npm --prefix frontend run api:generate`. Both are **drift-gated in CI**.
@@ -199,10 +197,11 @@ the environment and win over the defaults:
   `V{n}__description.sql` under `service/app/src/main/resources/db/migration/` in the same change as the entity
   edit, and never edit an applied migration. Hibernate runs `validate`, so a mismatch fails startup.
   See [ADR-0006](docs/adr/0006-flyway-for-database-migrations.md).
-- **Changing a design artifact?** Everything under `docs/` is a designIQ model and must pass the
-  designIQ validator. The executable process validates clean; the only accepted errors are the known
-  ones on the frozen original ([ADR-0008](docs/adr/0008-docs-is-the-designiq-workspace.md)). Keep file stems unique under
-  `docs/`, keep BPMN diagrams complete (BPMNDI), and write Markdown that reads well as plain text.
+- **Changing a design artifact?** Everything under `docs/` is a designIQ model
+  ([ADR-0008](docs/adr/0008-docs-is-the-designiq-workspace.md)) and must pass the designIQ validator.
+  The executable process validates clean; the only accepted findings are the 2 workshop warnings on
+  the feature map. Keep file stems unique under `docs/`, keep BPMN diagrams complete (BPMNDI), and
+  write Markdown that reads well as plain text.
 
 ## Before opening a PR
 
@@ -214,7 +213,7 @@ git diff --exit-code openapi/openapi.json                  # the API contract mu
 npm run lint:bpmn                                          # the executable models
 npm --prefix frontend run verify                           # the frontend gates
 npm --prefix frontend run api:check                        # the client matches the contract
-npx --yes @miragon/design-iq-validator@5.3.0 --root .      # the designIQ models: no new errors
+npx --yes @miragon/design-iq-validator@5.3.0 --root .      # 0 errors, the feature map's 2 warnings
 ```
 
 CI runs the build, bpmnlint, the contract-drift check, the mutation gate, the frontend gates, the
