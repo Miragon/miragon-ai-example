@@ -105,7 +105,7 @@ the process elements it touches.
 | Stage | Issue | Feature |
 |---|---|---|
 | Stage 1 – Customer follow-up | [#18] | Reject the application when the contract stays unsigned for 14 days |
-| Stage 1 – Customer follow-up | [#1] | Remind the customer to sign after 7 days; needs #18 |
+| Stage 1 – Customer follow-up | [#1] | Remind the customer to sign after 7 days |
 | Stage 2 – Automation and supply | [#19] | Automate the credit check with the DMN `checkCreditRating` |
 | Stage 2 – Automation and supply | [#20] | Clarify an alternative bike with the customer when the dealer cannot deliver |
 | Stage 3 – Withdrawal | [#21] | Activate the lease only after a 14-day withdrawal period |

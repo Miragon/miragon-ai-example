@@ -196,7 +196,7 @@ in the engine; the services set it when the process reaches the step.
 Features (stage in the feature map):
 
 - [#18 Signature deadline](https://github.com/miragon-blueprints/miragon-ai-example/issues/18) (Stage 1 – Customer follow-up)
-- [#1 Signature reminder](https://github.com/miragon-blueprints/miragon-ai-example/issues/1) (Stage 1 – Customer follow-up, needs #18)
+- [#1 Signature reminder](https://github.com/miragon-blueprints/miragon-ai-example/issues/1) (Stage 1 – Customer follow-up)
 - [#19 Credit check by DMN](https://github.com/miragon-blueprints/miragon-ai-example/issues/19) (Stage 2 – Automation and supply)
 - [#20 Alternative bike](https://github.com/miragon-blueprints/miragon-ai-example/issues/20) (Stage 2 – Automation and supply)
 - [#21 Withdrawal period](https://github.com/miragon-blueprints/miragon-ai-example/issues/21) (Stage 3 – Withdrawal)
