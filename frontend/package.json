@@ -8,9 +8,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "node ./node_modules/@typescript/native/bin/tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "node ./node_modules/@typescript/native/bin/tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -62,7 +62,6 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@typescript/native": "npm:typescript@7.0.2",
     "@vitejs/plugin-react": "6.1.2",
     "eslint": "10.12.0",
     "globals": "17.13.0",
@@ -75,7 +74,7 @@
     "prettier-plugin-tailwindcss": "0.8.1",
     "steiger": "0.7.0",
     "tailwindcss": "4.3.3",
-    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "typescript": "6.0.3",
     "typescript-eslint": "8.71.2",
     "vite": "8.3.4",
     "vitest": "5.0.4"
