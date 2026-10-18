@@ -4,12 +4,6 @@
     <bpmn:participant id="tbpm_participant_bikeLeasing" name="Bike leasing" processRef="tbpm_process_bikeLeasing" />
   </bpmn:collaboration>
   <bpmn:process id="tbpm_process_bikeLeasing" name="Bike leasing" isExecutable="false">
-    <bpmn:extensionElements>
-      <bpmiq:sticky id="tbpm_sticky_customer" text="Customer" x="160" y="80" kind="role" width="110" height="60" />
-      <bpmiq:sticky id="tbpm_sticky_backOffice" text="Back office" x="480" y="340" kind="role" width="110" height="60" />
-      <bpmiq:sticky id="tbpm_sticky_dealer" text="Dealer" x="1200" y="340" kind="role" width="110" height="60" />
-      <bpmiq:sticky id="tbpm_sticky_core" text="This is the core. Everything else is on the feature map." x="1240" y="60" kind="note" width="180" height="80" />
-    </bpmn:extensionElements>
     <bpmn:dataObject id="tbpm_dataObject_leasingContractData" />
     <bpmn:startEvent id="startEvent_leasingRequestReceived" name="Leasing request received">
       <bpmn:outgoing>flow_requestToValidation</bpmn:outgoing>
@@ -39,8 +33,7 @@
         <bpmn:targetRef>tbpm_dataObject_leasingContract</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
     </bpmn:task>
-    <bpmn:dataObjectReference id="tbpm_dataObject_leasingContract" name="Leasing contract" dataObjectRef="tbpm_dataObject_leasingContractData">
-    </bpmn:dataObjectReference>
+    <bpmn:dataObjectReference id="tbpm_dataObject_leasingContract" name="Leasing contract" dataObjectRef="tbpm_dataObject_leasingContractData" />
     <bpmn:intermediateThrowEvent id="event_contractSigned" name="Contract signed">
       <bpmn:incoming>flow_contractSentToSigned</bpmn:incoming>
       <bpmn:outgoing>flow_signedToFork</bpmn:outgoing>
@@ -82,21 +75,6 @@
     <bpmn:endEvent id="endEvent_applicationRejected" name="Application rejected">
       <bpmn:incoming>flow_rejectionSent</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:subProcess id="subProcess_applicationWithdrawn" name="Application withdrawn" triggeredByEvent="true">
-      <bpmn:startEvent id="startEvent_applicationWithdrawn" name="Application&#10;withdrawn">
-        <bpmn:outgoing>flow_withdrawnToReversal</bpmn:outgoing>
-        <bpmn:messageEventDefinition id="startEvent_applicationWithdrawn_message" />
-      </bpmn:startEvent>
-      <bpmn:task id="userTask_reverseApplication" name="Reverse application">
-        <bpmn:incoming>flow_withdrawnToReversal</bpmn:incoming>
-        <bpmn:outgoing>flow_reversalToCancelled</bpmn:outgoing>
-      </bpmn:task>
-      <bpmn:endEvent id="endEvent_applicationCancelled" name="Application&#10;cancelled">
-        <bpmn:incoming>flow_reversalToCancelled</bpmn:incoming>
-      </bpmn:endEvent>
-      <bpmn:sequenceFlow id="flow_withdrawnToReversal" sourceRef="startEvent_applicationWithdrawn" targetRef="userTask_reverseApplication" />
-      <bpmn:sequenceFlow id="flow_reversalToCancelled" sourceRef="userTask_reverseApplication" targetRef="endEvent_applicationCancelled" />
-    </bpmn:subProcess>
     <bpmn:sequenceFlow id="flow_requestToValidation" sourceRef="startEvent_leasingRequestReceived" targetRef="serviceTask_validateApplication" />
     <bpmn:sequenceFlow id="tbpm_flow_validationToValidGateway" sourceRef="serviceTask_validateApplication" targetRef="tbpm_gateway_applicationValid" />
     <bpmn:sequenceFlow id="tbpm_flow_applicationValid" name="yes" sourceRef="tbpm_gateway_applicationValid" targetRef="userTask_checkCreditRating" />
@@ -118,7 +96,7 @@
   <bpmndi:BPMNDiagram id="tbpm_diagram_bikeLeasing">
     <bpmndi:BPMNPlane id="tbpm_plane_bikeLeasing" bpmnElement="tbpm_collaboration_bikeLeasing">
       <bpmndi:BPMNShape id="tbpm_participant_bikeLeasing_di" bpmnElement="tbpm_participant_bikeLeasing" isHorizontal="true">
-        <dc:Bounds x="120" y="30" width="1340" height="570" />
+        <dc:Bounds x="120" y="30" width="1340" height="450" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="startEvent_leasingRequestReceived_di" bpmnElement="startEvent_leasingRequestReceived">
@@ -197,24 +175,6 @@
         <dc:Bounds x="842" y="82" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="815" y="124" width="90" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="subProcess_applicationWithdrawn_di" bpmnElement="subProcess_applicationWithdrawn" isExpanded="true">
-        <dc:Bounds x="260" y="440" width="380" height="130" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="startEvent_applicationWithdrawn_di" bpmnElement="startEvent_applicationWithdrawn">
-        <dc:Bounds x="302" y="487" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="285.9" y="529" width="68.2" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="userTask_reverseApplication_di" bpmnElement="userTask_reverseApplication">
-        <dc:Bounds x="390" y="465" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="endEvent_applicationCancelled_di" bpmnElement="endEvent_applicationCancelled">
-        <dc:Bounds x="552" y="487" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="535.9" y="529" width="68.2" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="flow_requestToValidation_di" bpmnElement="flow_requestToValidation">
@@ -301,14 +261,6 @@
       <bpmndi:BPMNEdge id="flow_rejectionSent_di" bpmnElement="flow_rejectionSent">
         <di:waypoint x="800" y="100" />
         <di:waypoint x="842" y="100" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="flow_withdrawnToReversal_di" bpmnElement="flow_withdrawnToReversal">
-        <di:waypoint x="338" y="505" />
-        <di:waypoint x="390" y="505" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="flow_reversalToCancelled_di" bpmnElement="flow_reversalToCancelled">
-        <di:waypoint x="490" y="505" />
-        <di:waypoint x="552" y="505" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="tbpm_dataOutput_sendContractToLeasingContract_di" bpmnElement="tbpm_dataOutput_sendContractToLeasingContract">
         <di:waypoint x="750" y="300" />
