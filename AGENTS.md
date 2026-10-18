@@ -123,6 +123,9 @@ Two CLIs come as Claude Code plugins (`.claude/settings.json`) and pinned in the
   classpath, a hand deploy is a version the generated process API does not know) and never moves a case
   (user tasks, messages): the app's API does that, or the domain data and the engine drift apart.
 
+Two skill-only plugins sit next to them: **bpmn-to-code** (the generated process API, delegates and
+process tests against it) and **bpmnlint-rules** (the style guide behind `.bpmnlintrc`, layout review).
+
 ## Working with GitHub
 
 Use the `gh` CLI. Write everything (issues, PRs, commits, docs, models) in **English**. Conventional
