@@ -45,10 +45,11 @@ Read-only reviewers with their own context.
   as well: it also inspects shell commands (`cat .env`, `source ./stack/.env`).
 - `hooks/lint-bpmn.sh` (PostToolUse) runs bpmnlint after every edit of an executable `.bpmn` and
   hands the findings back to Claude. It changes nothing.
-- `settings.json` also enables two pinned plugins, `bpmn-cli@miragon-bpmn` (skill `bpmn-cli:bpmn`) and
-  `operate@miragon` (skill `operate:operate`, `/operate:status`), from marketplaces fixed to a release
-  tag. Claude Code installs them once you trust the folder; cloud sessions do not load them. Its `env`
-  sets `BPMN_KEEP_FLOW_IDS=1`, so bpmn-cli keeps flow ids stable.
+- `settings.json` also enables four pinned plugins: `bpmn-cli@miragon-bpmn` (skill `bpmn-cli:bpmn`),
+  `operate@miragon` (skill `operate:operate`, `/operate:status`), `bpmn-to-code@bpmn-to-code` (at the
+  Gradle plugin's version) and `bpmnlint-rules@miragon-bpmnlint`, each from a marketplace fixed to a
+  release tag. Claude Code installs
+  them once you trust the folder; cloud sessions do not load them. Its `env` sets `BPMN_KEEP_FLOW_IDS=1`, so bpmn-cli keeps flow ids stable.
 - `../.mcp.json` provides the Playwright MCP server (pinned) for `test-in-browser`.
 
 ## What goes where

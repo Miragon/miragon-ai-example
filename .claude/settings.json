@@ -66,10 +66,26 @@
         "repo": "Miragon/operate",
         "ref": "v0.9.0"
       }
+    },
+    "bpmn-to-code": {
+      "source": {
+        "source": "github",
+        "repo": "Miragon/bpmn-to-code",
+        "ref": "v6.3.0"
+      }
+    },
+    "miragon-bpmnlint": {
+      "source": {
+        "source": "github",
+        "repo": "Miragon/bpmnlint-rules",
+        "ref": "v0.14.0"
+      }
     }
   },
   "enabledPlugins": {
     "bpmn-cli@miragon-bpmn": true,
-    "operate@miragon": true
+    "operate@miragon": true,
+    "bpmn-to-code@bpmn-to-code": true,
+    "bpmnlint-rules@miragon-bpmnlint": true
   }
 }
