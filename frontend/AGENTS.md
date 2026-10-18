@@ -22,6 +22,14 @@ cva shadcn-style primitives · react-hook-form + zod · orval-generated client �
 Playwright. npm only, Node in the version from `.nvmrc`, every version pinned exact (`.npmrc`
 `save-exact=true`).
 
+**Two TypeScripts, side by side.** TypeScript 7 (the Go compiler) ships no JS API, and
+typescript-eslint needs one. So `typescript` is aliased to `@typescript/typescript6` (the 6.0 API
+for typescript-eslint) and `@typescript/native` to `typescript@7` (the compiler `typecheck` and
+`build` run by path). This is the layout of the TS 7.0 announcement; keep the alias name, a rename
+silently puts `.bin/tsc` back on 6.0. Dependabot skips `npm:` aliases, so bump both by hand. Drop the
+6.0 alias once typescript-eslint runs on the TS 7 API
+([typescript-eslint#10940](https://github.com/typescript-eslint/typescript-eslint/issues/10940)).
+
 ## Feature-Sliced Design (enforced)
 
 Layers, strictly downward: `app → pages → widgets → features → entities → shared`. Every slice has a
