@@ -80,12 +80,19 @@
         "repo": "Miragon/bpmnlint-rules",
         "ref": "v0.14.0"
       }
+    },
+    "miragon-blueprints": {
+      "source": {
+        "source": "github",
+        "repo": "miragon-blueprints/.github"
+      }
     }
   },
   "enabledPlugins": {
     "bpmn-cli@miragon-bpmn": true,
     "operate@miragon": true,
     "bpmn-to-code@bpmn-to-code": true,
-    "bpmnlint-rules@miragon-bpmnlint": true
+    "bpmnlint-rules@miragon-bpmnlint": true,
+    "blueprint-tools@miragon-blueprints": true
   }
 }
