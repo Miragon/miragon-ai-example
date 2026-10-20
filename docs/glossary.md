@@ -52,7 +52,7 @@ Known deviations (ids stay stable):
 
 | Say | Not | Why |
 |---|---|---|
-| Customer | prospect, applicant, lessee | One word for the person everywhere. "Prospect reminded" exists only in the original model. |
+| Customer, applicant | prospect, lessee | The same person: the applicant becomes the customer in the course of the leasing process, so both words are fine. "Prospect reminded" exists only in the original model. |
 | Dealer | supplier, vendor | The original model said "supplier" ("Clarify return with supplier") for the same party as `BikeDealerPort`. |
 | Handover | delivery | The dealer reports the handover; there is no separate delivery step. |
 | Withdrawal | abort, cancellation | The customer withdraws; the tests of the original model called it "abort". |
