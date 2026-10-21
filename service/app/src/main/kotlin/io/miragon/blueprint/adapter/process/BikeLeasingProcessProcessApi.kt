@@ -24,10 +24,6 @@ import io.miragon.bpmn.runtime.ProcessId
 import io.miragon.bpmn.runtime.RegisteredVariableDefinitions
 import io.miragon.bpmn.runtime.SequenceFlows
 import io.miragon.bpmn.runtime.VariableName
-import kotlin.Boolean
-import kotlin.String
-import kotlin.Suppress
-import kotlin.collections.List
 
 object BikeLeasingProcessProcessApi {
   val PROCESS_ID: ProcessId = ProcessId("bikeLeasingProcess")
@@ -95,8 +91,7 @@ object BikeLeasingProcessProcessApi {
       id = ElementId(EventApplicationInvalid.ELEMENT_ID),
       elementType = BpmnElementType.BOUNDARY_EVENT,
       name = "Application invalid",
-    ), HasSuccessors<EventApplicationInvalid.Next>, BoundaryEvent<ServiceTaskValidateApplication>,
-        ErrorEvent {
+    ), HasSuccessors<EventApplicationInvalid.Next>, BoundaryEvent<ServiceTaskValidateApplication>, ErrorEvent {
       override val eventType: BpmnEventType = BpmnEventType.ERROR
 
       const val ELEMENT_ID: String = "event_applicationInvalid"
@@ -178,7 +173,7 @@ object BikeLeasingProcessProcessApi {
           get() = SequenceFlows.single(
             flowId = ElementId("flow_notSolvent"),
             name = "No",
-            conditionExpression = $$"""${!solvent}""",
+            conditionExpression = "\${!solvent}",
             target = GatewayRejectionJoin,
           )
 
