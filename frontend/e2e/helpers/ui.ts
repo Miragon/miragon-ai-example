@@ -28,6 +28,7 @@ export async function submitApplication(page: Page, input: ApplicationInput): Pr
   await page.waitForURL(/\/antraege\/[0-9a-f-]{36}$/i, { timeout: 15_000 });
   const match = page.url().match(/\/antraege\/([0-9a-f-]{36})/i);
   expect(match, "expected to land on the detail page").not.toBeNull();
+  await expect(page.getByTestId("application-status")).toBeVisible({ timeout: 15_000 });
   return match![1];
 }
 
